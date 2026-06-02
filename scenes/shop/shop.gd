@@ -24,20 +24,26 @@ func _populate_upgrades() -> void:
 	for u in UPGRADE_DATA:
 		var level := DataManager.get_upgrade_level(u.key)
 		var max_lv: int = DataManager.UPGRADE_MAX_LEVEL.get(u.key, DataManager.MAX_LEVEL)
-		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 88)
+		var row := CenterContainer.new()
+		row.custom_minimum_size = Vector2(0, 120)
+
+		var hbox := HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 60)
 
 		var name_label := Label.new()
 		name_label.text = u.name
-		name_label.size_flags_horizontal = 3
-		name_label.add_theme_font_size_override("font_size", 32)
+		name_label.custom_minimum_size = Vector2(260, 0)
+		name_label.add_theme_font_size_override("font_size", 36)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		var level_label := Label.new()
 		level_label.text = "Nivel %d/%d" % [level, max_lv]
-		level_label.add_theme_font_size_override("font_size", 32)
+		level_label.custom_minimum_size = Vector2(200, 0)
+		level_label.add_theme_font_size_override("font_size", 36)
+		level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		var buy_btn := Button.new()
-		buy_btn.custom_minimum_size = Vector2(0, 96)
+		buy_btn.custom_minimum_size = Vector2(260, 96)
 		buy_btn.add_theme_font_size_override("font_size", 36)
 		var cost := DataManager.get_upgrade_cost(u.key)
 		if cost == -1:
@@ -48,12 +54,13 @@ func _populate_upgrades() -> void:
 			buy_btn.disabled = DataManager.palitos_balance < cost
 			buy_btn.pressed.connect(_buy.bind(u.key))
 
-		row.add_child(name_label)
-		row.add_child(level_label)
-		row.add_child(buy_btn)
+		hbox.add_child(name_label)
+		hbox.add_child(level_label)
+		hbox.add_child(buy_btn)
+		row.add_child(hbox)
 		list.add_child(row)
 
-	_update_balance()
+		_update_balance()
 
 func _buy(upgrade_key: String) -> void:
 	var nuevos := DataManager.buy_upgrade(upgrade_key)

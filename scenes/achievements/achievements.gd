@@ -26,9 +26,9 @@ func _populate_achievements() -> void:
 		var cur_val: int = DataManager.get_current_value(a["cond"])
 
 		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 130)
+		row.custom_minimum_size = Vector2(0, 190)
 		row.size_flags_horizontal = 3
-		row.add_theme_constant_override("separation", 10)
+		row.add_theme_constant_override("separation", 30)
 
 		var icon := Label.new()
 		if all_done:
@@ -40,8 +40,8 @@ func _populate_achievements() -> void:
 		else:
 			icon.text = "X"
 			icon.modulate = Color(0.5, 0.5, 0.5)
-		icon.add_theme_font_size_override("font_size", 30)
-		icon.custom_minimum_size = Vector2(48, 0)
+		icon.add_theme_font_size_override("font_size", 52)
+		icon.custom_minimum_size = Vector2(80, 0)
 		icon.size_flags_vertical = 3
 
 		var info := VBoxContainer.new()
@@ -52,10 +52,10 @@ func _populate_achievements() -> void:
 
 		var name_lbl := Label.new()
 		name_lbl.text = a["name"]
-		name_lbl.add_theme_font_size_override("font_size", 28)
+		name_lbl.add_theme_font_size_override("font_size", 44)
 
 		var level_lbl := Label.new()
-		level_lbl.add_theme_font_size_override("font_size", 18)
+		level_lbl.add_theme_font_size_override("font_size", 30)
 		level_lbl.modulate = Color(0.7, 0.7, 0.7)
 		if all_done:
 			level_lbl.text = "Completado"
@@ -70,7 +70,7 @@ func _populate_achievements() -> void:
 			var lv = a["levels"][next_idx]
 			var desc_lbl := Label.new()
 			desc_lbl.text = lv["desc"]
-			desc_lbl.add_theme_font_size_override("font_size", 16)
+			desc_lbl.add_theme_font_size_override("font_size", 26)
 			desc_lbl.modulate = Color(0.7, 0.7, 0.7)
 
 			info.add_child(header)
@@ -78,7 +78,7 @@ func _populate_achievements() -> void:
 
 			if cur_val >= 0:
 				var bar := ProgressBar.new()
-				bar.custom_minimum_size = Vector2(0, 20)
+				bar.custom_minimum_size = Vector2(0, 30)
 				bar.size_flags_horizontal = 3
 				bar.min_value = 0.0
 				bar.max_value = lv["target"]
@@ -87,7 +87,7 @@ func _populate_achievements() -> void:
 
 				var progress_lbl := Label.new()
 				progress_lbl.text = "%d / %d" % [min(cur_val, lv["target"]), lv["target"]]
-				progress_lbl.add_theme_font_size_override("font_size", 14)
+				progress_lbl.add_theme_font_size_override("font_size", 22)
 				progress_lbl.modulate = Color(0.6, 0.6, 0.6)
 
 				info.add_child(bar)
@@ -97,7 +97,7 @@ func _populate_achievements() -> void:
 			if all_done:
 				var done_lbl := Label.new()
 				done_lbl.text = "Completado al maximo nivel"
-				done_lbl.add_theme_font_size_override("font_size", 16)
+				done_lbl.add_theme_font_size_override("font_size", 26)
 				done_lbl.modulate = Color(0, 1, 0)
 				info.add_child(done_lbl)
 
@@ -108,7 +108,7 @@ func _populate_achievements() -> void:
 			reward.text = "%s +%d" % [rtype, lv["reward_amount"]]
 		else:
 			reward.text = "---"
-		reward.add_theme_font_size_override("font_size", 26)
+		reward.add_theme_font_size_override("font_size", 38)
 		reward.modulate = Color(1, 1, 0) if all_done else Color(0.5, 0.5, 0.5)
 		reward.size_flags_vertical = 3
 

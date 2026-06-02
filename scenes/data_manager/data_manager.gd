@@ -22,9 +22,9 @@ const MAX_LEVEL := 8
 
 const BIRDS := {
 	"hornero": { "name": "Hornero", "cost": 0, "Bonus": "—", "Penalidad": "—" },
-	"tero": { "name": "Tero", "cost": 5, "Bonus": "+ velocidad", "Penalidad": "Aleteo lento" },
-	"golondrina": { "name": "Golondrina", "cost": 8, "Bonus": "+15% kiwi", "Penalidad": "-50% palitos" },
-	"carpintero": { "name": "Carpintero", "cost": 10, "Bonus": "2 vidas", "Penalidad": "- velocidad" },
+	"tero": { "name": "Tero", "cost": 15, "Bonus": "+ velocidad", "Penalidad": "Aleteo lento" },
+	"golondrina": { "name": "Golondrina", "cost": 15, "Bonus": "+15% kiwi", "Penalidad": "-50% palitos" },
+	"carpintero": { "name": "Carpintero", "cost": 15, "Bonus": "2 vidas", "Penalidad": "- velocidad" },
 	"premio_pajarero": { "name": "???", "cost": -1, "Bonus": "—", "Penalidad": "—" },
 }
 

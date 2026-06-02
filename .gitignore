@@ -5,6 +5,10 @@
 # Backups
 *.bak
 
+# Build artifacts
+*.apk
+*.apk.idsig
+
 # OS
 Thumbs.db
 .DS_Store

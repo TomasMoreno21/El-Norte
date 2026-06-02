@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://mxbmxjba0q8k"]
 
-[ext_resource type="Script" path="res://scenes/calandria/choice_menu.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/kiwi/choice_menu.gd" id="1"]
 
 [node name="ChoiceMenu" type="CanvasLayer" unique_id=514092948]
 process_mode = 2
