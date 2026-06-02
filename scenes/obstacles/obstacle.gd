@@ -1,0 +1,87 @@
+extends StaticBody2D
+
+enum ShapeType { RECT_H, RECT_V, CIRCLE }
+enum MoveType { STATIC, OSCILLATE }
+
+var speed := 250.0
+var shape_type := ShapeType.RECT_H
+var move_type := MoveType.STATIC
+var ghost_time := 0.0
+
+var time := 0.0
+var start_y: float
+var angular_speed := 0.0
+var _sprite: Sprite2D
+var _collision_shape: CollisionShape2D
+var _alive := false
+
+const SHAPE_COLORS := {
+	ShapeType.RECT_H: Color(0.5, 0.7, 0.3),
+	ShapeType.RECT_V: Color(0.8, 0.3, 0.3),
+	ShapeType.CIRCLE: Color(0.6, 0.6, 0.6),
+}
+
+const SHAPE_SIZES := {
+	ShapeType.RECT_H: Vector2(100, 25),
+	ShapeType.RECT_V: Vector2(25, 100),
+	ShapeType.CIRCLE: Vector2(55, 55),
+}
+
+func _ready() -> void:
+	start_y = position.y
+	angular_speed = randf_range(1.5, 4.0) * (-1 if randi() % 2 == 0 else 1)
+	_setup_visual()
+	_setup_collision()
+	if ghost_time > 0:
+		_sprite.modulate.a = 0.25
+		_collision_shape.disabled = true
+
+func _physics_process(delta: float) -> void:
+	time += delta
+
+	if not _alive:
+		if time >= ghost_time:
+			_alive = true
+			_sprite.modulate.a = 1.0
+			_collision_shape.disabled = false
+		return
+
+	position.x -= speed * delta
+	_sprite.rotation += angular_speed * delta
+
+	match move_type:
+		MoveType.OSCILLATE:
+			position.y = start_y + sin(time * 3.0) * 20.0
+		_:
+			position.y = start_y
+
+	if position.x < -200:
+		queue_free()
+
+func _setup_visual() -> void:
+	var size: Vector2 = SHAPE_SIZES[shape_type]
+	var image := Image.create(int(size.x), int(size.y), false, Image.FORMAT_RGBA8)
+	image.fill(SHAPE_COLORS[shape_type])
+	var texture := ImageTexture.create_from_image(image)
+
+	_sprite = Sprite2D.new()
+	_sprite.texture = texture
+	add_child(_sprite)
+
+func _setup_collision() -> void:
+	var shape: Shape2D
+	var size: Vector2 = SHAPE_SIZES[shape_type]
+	match shape_type:
+		ShapeType.RECT_H, ShapeType.RECT_V:
+			var s := RectangleShape2D.new()
+			s.size = size
+			shape = s
+		ShapeType.CIRCLE:
+			var s := CircleShape2D.new()
+			s.radius = size.x / 2.0
+			shape = s
+
+	var col := CollisionShape2D.new()
+	col.shape = shape
+	_collision_shape = col
+	add_child(col)

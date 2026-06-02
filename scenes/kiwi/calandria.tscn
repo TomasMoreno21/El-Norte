@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://f4vlptj8neio"]
+
+[ext_resource type="Script" path="res://scenes/calandria/calandria.gd" id="1_1q0ol"]
+
+[sub_resource type="RectangleShape2D" id="RectShape1"]
+size = Vector2(54, 54)
+
+[node name="Calandria" type="Area2D" unique_id=1649251695]
+collision_layer = 4
+script = ExtResource("1_1q0ol")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1332577324]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=690155904]
+shape = SubResource("RectShape1")

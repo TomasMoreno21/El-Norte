@@ -1,0 +1,92 @@
+extends CharacterBody2D
+
+const GRAVITY := 900.0
+const FLAP_VELOCITY := -400.0
+
+@export var start_position := Vector2(400, 540)
+
+signal died
+
+var alive := true
+var invulnerable := false
+var blink_timer: Timer
+var lives := 1
+var flap_mult := 1.0
+var _miniatura := false
+var _original_col_size: Vector2
+var _original_scale: Vector2
+
+func _ready() -> void:
+	position = start_position
+	var mods := DataManager.get_bird_modifiers()
+	flap_mult = mods["flap_mult"]
+	lives = 1 + mods["extra_lives"]
+	var col_shape := $CollisionShape2D.shape as RectangleShape2D
+	if col_shape:
+		_original_col_size = col_shape.size
+	_original_scale = $Sprite2D.scale
+
+	blink_timer = Timer.new()
+	blink_timer.wait_time = 0.12
+	blink_timer.timeout.connect(_blink)
+	add_child(blink_timer)
+
+func _physics_process(delta: float) -> void:
+	if not alive:
+		return
+
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE):
+		velocity.y = FLAP_VELOCITY * flap_mult
+	else:
+		velocity.y += GRAVITY * delta
+
+	move_and_slide()
+
+	if position.y < 53.5 or position.y > 1026.5:
+		die()
+		return
+
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		if collision.get_collider() is StaticBody2D:
+			die()
+
+func die() -> void:
+	if not alive:
+		return
+	if invulnerable:
+		return
+	if lives > 1:
+		lives -= 1
+		invulnerable = true
+		collision_mask = 0
+		blink_timer.start()
+		await get_tree().create_timer(1.5).timeout
+		invulnerable = false
+		collision_mask = 2
+		blink_timer.stop()
+		$Sprite2D.modulate.a = 1.0
+		return
+	alive = false
+	velocity = Vector2.ZERO
+	died.emit()
+
+func set_miniatura(active: bool) -> void:
+	_miniatura = active
+	var col_shape := $CollisionShape2D.shape as RectangleShape2D
+	if col_shape:
+		col_shape.size = _original_col_size * (0.5 if active else 1.0)
+	$Sprite2D.scale = _original_scale * (0.5 if active else 1.0)
+
+func set_shield(value: bool) -> void:
+	invulnerable = value
+	if value:
+		collision_mask = 0
+		blink_timer.start()
+	else:
+		collision_mask = 2
+		blink_timer.stop()
+		$Sprite2D.modulate.a = 1.0
+
+func _blink() -> void:
+	$Sprite2D.modulate.a = 0.2 if $Sprite2D.modulate.a == 1.0 else 1.0

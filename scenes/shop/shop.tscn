@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/shop/shop.gd" id="1"]
+
+[node name="Shop" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1")
+
+[node name="Bg" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.05, 0.05, 0.95)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Bg"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -340.0
+offset_right = 320.0
+offset_bottom = 340.0
+theme_override_constants/separation = 28
+
+[node name="Title" type="Label" parent="Bg/VBoxContainer"]
+text = "TIENDA"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 60
+
+[node name="PalitosLabel" type="Label" parent="Bg/VBoxContainer"]
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="UpgradeList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer"]
+theme_override_constants/separation = 14
+
+[node name="Volver" type="Button" parent="Bg/VBoxContainer"]
+text = "Volver"
+custom_minimum_size = Vector2(0, 80)
+theme_override_font_sizes/font_size = 40
