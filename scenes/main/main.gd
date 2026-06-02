@@ -8,7 +8,7 @@ extends Node2D
 
 var distance := 0.0
 var difficulty_dist := 0.0
-var last_kiwi_distance := 0.0
+var kiwi_cooldown_timer := 0.0
 var shield_active := false
 var turbo_active := false
 var shield_start_time := 0.0
@@ -29,11 +29,11 @@ var last_rafaga_distance := 0.0
 var last_calma_distance := 0.0
 var last_check_dist := 0
 var storms_in_run := 0
+var run_bolas := 0
+var run_kiwis := 0
 var x2_palitos_active := false
 var x2_palitos_start_time := 0.0
 var x2_bolas_active := false
-var precognition_active := false
-var precognition_start_time := 0.0
 var miniatura_active := false
 var miniatura_start_time := 0.0
 
@@ -42,9 +42,8 @@ const MAX_SPEED := 1000.0
 const MAX_INTERVAL := 1.6
 const MIN_INTERVAL := 0.5
 const PIXEL_TO_METER := 60.0
-const KIWI_MIN_DIST := 400.0
-const KIWI_MAX_DIST := 1200.0
-const KIWI_BASE_CHANCE := 0.15
+const KIWI_COOLDOWN := 20.0
+const KIWI_SPAWN_CHANCE := 0.08
 const STORM_INTERVAL := 500.0
 const STORM_DURATION := 4.0
 const STORM_SPEED_BOOST := 1.6
@@ -72,13 +71,13 @@ var shake_strength := 10
 const SHAKE_DECAY := 4.0
 
 func get_speed(dist: float) -> float:
-	var s: float = min(MIN_SPEED + dist * 0.5, MAX_SPEED)
+	var s: float = min(MIN_SPEED + dist * 0.6, MAX_SPEED)
 	if in_storm:
 		s *= STORM_SPEED_BOOST
 	return s
 
 func get_spawn_interval(dist: float) -> float:
-	var i: float = max(MAX_INTERVAL - dist * 0.0009, MIN_INTERVAL)
+	var i: float = max(MAX_INTERVAL - dist * 0.0012, MIN_INTERVAL)
 	if in_storm:
 		i *= STORM_INTERVAL_FACTOR
 	return i
@@ -93,6 +92,9 @@ func _ready() -> void:
 	var mods := DataManager.get_bird_modifiers()
 	bird_speed_mult = mods["speed_mult"]
 	bird_kiwi_bonus = mods["kiwi_bonus"]
+	storms_in_run = 0
+	run_bolas = 0
+	run_kiwis = 0
 	camera.zoom = Vector2(1.2, 1.2)
 	if turbo_effect_scene:
 		turbo_effect = turbo_effect_scene.instantiate()
@@ -155,7 +157,7 @@ func _on_player_died() -> void:
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
 	var nuevos := DataManager.check_achievements({ "distance": int(distance), "storms_in_run": storms_in_run })
 	_show_popups(nuevos)
-	death_screen.show_screen(int(distance))
+	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)
 
 func _process(delta: float) -> void:
 	if not player.alive:
@@ -178,6 +180,8 @@ func _process(delta: float) -> void:
 		if randf() < CALMA_CHANCE:
 			start_calma()
 
+	kiwi_cooldown_timer += delta
+
 	var current_speed := get_speed(difficulty_dist)
 	var speed_bonus := 1.0 + DataManager.get_upgrade_level("speed") * 0.05
 	var turbo_mult := 1.0
@@ -187,7 +191,6 @@ func _process(delta: float) -> void:
 	var shield_remaining := 0.0
 	var turbo_remaining := 0.0
 	var x2p_remaining := 0.0
-	var precog_remaining := 0.0
 	var mini_remaining := 0.0
 
 	if rafaga_active:
@@ -235,12 +238,6 @@ func _process(delta: float) -> void:
 		else:
 			palitos_dist_mult = 2.0
 
-	if precognition_active:
-		precog_remaining = 5.0 - (now - precognition_start_time) / 1000.0
-		if precog_remaining <= 0:
-			precognition_active = false
-			precog_remaining = 0.0
-
 	if miniatura_active:
 		mini_remaining = 3.0 - (now - miniatura_start_time) / 1000.0
 		if mini_remaining <= 0:
@@ -257,7 +254,7 @@ func _process(delta: float) -> void:
 		last_check_dist = curr_dist
 		var nuevos := DataManager.check_achievements({ "distance": curr_dist })
 		_show_popups(nuevos)
-	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining, precog_remaining)
+	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining)
 	hud.show_storm(in_storm)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult
@@ -282,19 +279,15 @@ func _on_spawn_timer_timeout() -> void:
 	if not obstacle_scene or not player.alive or calma_active:
 		return
 
-	var kiwi_extra := DataManager.get_upgrade_level("kiwi") * 0.05
-	var kiwi_dist := distance - last_kiwi_distance
-	if kiwi_scene and kiwi_dist >= KIWI_MIN_DIST:
-		var t := clampf((kiwi_dist - KIWI_MIN_DIST) / (KIWI_MAX_DIST - KIWI_MIN_DIST), 0.0, 1.0)
-		var prob := KIWI_BASE_CHANCE + (1.0 - KIWI_BASE_CHANCE) * t
-		prob += bird_kiwi_bonus + kiwi_extra
+	if kiwi_scene and kiwi_cooldown_timer >= KIWI_COOLDOWN:
+		var prob := KIWI_SPAWN_CHANCE + bird_kiwi_bonus + DataManager.get_upgrade_level("kiwi") * 0.02
 		if randf() < prob:
 			var kiwi := kiwi_scene.instantiate()
 			kiwi.speed = get_speed(difficulty_dist)
 			kiwi.position = Vector2(2100, randf_range(260, 820))
 			kiwi.collected.connect(_on_kiwi_collected)
 			add_child(kiwi)
-			last_kiwi_distance = distance
+			kiwi_cooldown_timer = 0.0
 			return
 
 	var turbo_obs_speed := TURBO_OBSTACLE_SPEED if turbo_active else 1.0
@@ -304,8 +297,6 @@ func _on_spawn_timer_timeout() -> void:
 	obstacle.shape_type = randi() % 3
 	obstacle.move_type = 0 if randf() < 0.7 else 1
 	obstacle.position = Vector2(2100, randf_range(160, 920))
-	if precognition_active:
-		obstacle.ghost_time = 0.5
 	obstacle.add_to_group("obstacle")
 	add_child(obstacle)
 
@@ -315,12 +306,11 @@ func _on_spawn_timer_timeout() -> void:
 		obs2.shape_type = randi() % 3
 		obs2.move_type = 0 if randf() < 0.7 else 1
 		obs2.position = Vector2(2100, randf_range(160, 920))
-		if precognition_active:
-			obs2.ghost_time = 0.5
 		obs2.add_to_group("obstacle")
 		add_child(obs2)
 
 func _on_kiwi_collected() -> void:
+	run_kiwis += 1
 	var menu := choice_menu_scene.instantiate()
 	menu.power_up_selected.connect(_on_power_up_selected)
 	add_child(menu)
@@ -345,13 +335,11 @@ func _on_power_up_selected(type: String) -> void:
 			x2_bolas_active = true
 		"bola_extra":
 			DataManager.add_bolas(1)
+			run_bolas += 1
 			hud.update_bolas(DataManager.bolas_balance)
 		"x2_palitos":
 			x2_palitos_active = true
 			x2_palitos_start_time = Time.get_ticks_msec()
-		"precognicion":
-			precognition_active = true
-			precognition_start_time = Time.get_ticks_msec()
 		"miniatura":
 			miniatura_active = true
 			miniatura_start_time = Time.get_ticks_msec()
@@ -372,6 +360,7 @@ func _on_bola_timer_timeout() -> void:
 func _on_bola_collected() -> void:
 	var amount := 2 if x2_bolas_active else 1
 	DataManager.add_bolas(amount)
+	run_bolas += amount
 	var nuevos := DataManager.check_achievements({})
 	_show_popups(nuevos)
 	hud.update_bolas(DataManager.bolas_balance)

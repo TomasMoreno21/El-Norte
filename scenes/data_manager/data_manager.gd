@@ -39,9 +39,9 @@ const ACHIEVEMENTS := {
 		{ "target": 2000, "desc": "Llegar a 2000m", "reward_type": "palitos", "reward_amount": 80 },
 	]},
 	"collector": { "name": "Coleccionista", "cond": "bolas_total", "idx": 3, "levels": [
-		{ "target": 3, "desc": "3 bolas total", "reward_type": "bolas", "reward_amount": 1 },
-		{ "target": 5, "desc": "5 bolas total", "reward_type": "bolas", "reward_amount": 2 },
-		{ "target": 10, "desc": "10 bolas total", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 3, "desc": "3 barro total", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 5, "desc": "5 barro total", "reward_type": "bolas", "reward_amount": 2 },
+		{ "target": 10, "desc": "10 barro total", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"persistent": { "name": "Persistente", "cond": "deaths", "idx": 4, "levels": [
 		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 30 },
@@ -269,24 +269,24 @@ func show_achievement_popup(info: Dictionary) -> void:
 
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.05, 0.85)
-	bg.size = Vector2(280, 72)
+	bg.size = Vector2(350, 88)
 	bg.position = Vector2(16, 16)
 	bg.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	var name_lbl := Label.new()
 	name_lbl.text = info["name"]
-	name_lbl.add_theme_font_size_override("font_size", 24)
+	name_lbl.add_theme_font_size_override("font_size", 28)
 	name_lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
 	name_lbl.position = Vector2(0, 6)
-	name_lbl.size = Vector2(280, 30)
+	name_lbl.size = Vector2(350, 34)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	var desc_lbl := Label.new()
 	desc_lbl.text = info["desc"]
-	desc_lbl.add_theme_font_size_override("font_size", 16)
+	desc_lbl.add_theme_font_size_override("font_size", 20)
 	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	desc_lbl.position = Vector2(0, 38)
-	desc_lbl.size = Vector2(280, 26)
+	desc_lbl.position = Vector2(0, 46)
+	desc_lbl.size = Vector2(350, 32)
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	bg.add_child(name_lbl)

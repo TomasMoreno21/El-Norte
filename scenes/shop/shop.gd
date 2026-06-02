@@ -1,11 +1,11 @@
 extends CanvasLayer
 
 const UPGRADE_DATA := [
-	{ "key": "speed", "name": "Velocidad +5%", "base_cost": 30 },
-	{ "key": "kiwi", "name": "Kiwi +5%", "base_cost": 25 },
-	{ "key": "palitos_base", "name": "Palitos +1 c/10m", "base_cost": 40 },
-	{ "key": "shield_duration", "name": "Escudo +0.2s", "base_cost": 30 },
-	{ "key": "turbo_duration", "name": "Turbo +0.2s", "base_cost": 30 },
+	{ "key": "speed", "name": "+Velocidad", "base_cost": 30 },
+	{ "key": "kiwi", "name": "+Kiwi", "base_cost": 25 },
+	{ "key": "palitos_base", "name": "+Palitos", "base_cost": 40 },
+	{ "key": "shield_duration", "name": "+Escudo", "base_cost": 30 },
+	{ "key": "turbo_duration", "name": "+Turbo", "base_cost": 30 },
 ]
 
 func _ready() -> void:
@@ -24,11 +24,12 @@ func _populate_upgrades() -> void:
 	for u in UPGRADE_DATA:
 		var level := DataManager.get_upgrade_level(u.key)
 		var max_lv: int = DataManager.UPGRADE_MAX_LEVEL.get(u.key, DataManager.MAX_LEVEL)
-		var row := CenterContainer.new()
+		var row := HBoxContainer.new()
 		row.custom_minimum_size = Vector2(0, 120)
 
-		var hbox := HBoxContainer.new()
-		hbox.add_theme_constant_override("separation", 60)
+		var spacer := Control.new()
+		spacer.custom_minimum_size = Vector2(100, 0)
+		row.add_child(spacer)
 
 		var name_label := Label.new()
 		name_label.text = u.name
@@ -54,10 +55,11 @@ func _populate_upgrades() -> void:
 			buy_btn.disabled = DataManager.palitos_balance < cost
 			buy_btn.pressed.connect(_buy.bind(u.key))
 
-		hbox.add_child(name_label)
-		hbox.add_child(level_label)
-		hbox.add_child(buy_btn)
-		row.add_child(hbox)
+		row.add_theme_constant_override("separation", 60)
+
+		row.add_child(name_label)
+		row.add_child(level_label)
+		row.add_child(buy_btn)
 		list.add_child(row)
 
 		_update_balance()

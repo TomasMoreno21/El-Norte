@@ -8,7 +8,7 @@ func _ready() -> void:
 func _update_stats() -> void:
 	var s := DataManager
 	$Bg/VBoxContainer/Estadisticas.text = (
-		"Max dist: %dm  |  Bolas: %d  |  Muertes: %d  |  Tormentas: %d"
+		"Max dist: %dm  |  Barro: %d  |  Muertes: %d  |  Tormentas: %d"
 		% [s.max_distance, s.bolas_total, s.deaths, s.storms_survived]
 	)
 
@@ -104,7 +104,7 @@ func _populate_achievements() -> void:
 		var reward := Label.new()
 		if not all_done and next_idx < total_levels:
 			var lv = a["levels"][next_idx]
-			var rtype: String = "B" if lv["reward_type"] == "bolas" else "P"
+			var rtype: String = "Ba" if lv["reward_type"] == "bolas" else "P"
 			reward.text = "%s +%d" % [rtype, lv["reward_amount"]]
 		else:
 			reward.text = "---"

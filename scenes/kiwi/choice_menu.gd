@@ -5,13 +5,12 @@ signal power_up_selected(type: String)
 const ALL_POWERUPS := [
 	{ "text": "Escudo 4s", "type": "shield" },
 	{ "text": "Turbo 5s", "type": "turbo" },
-	{ "text": "x2 Bolas", "type": "x2_bolas" },
+	{ "text": "x2 Barro", "type": "x2_bolas" },
 	{ "text": "Miniatura 3s", "type": "miniatura" },
 	{ "text": "x2 Palitos 4s", "type": "x2_palitos" },
-	{ "text": "Precognición 5s", "type": "precognicion" },
 ]
 
-const TRATO_POWERUP := { "text": "Bola extra", "type": "bola_extra" }
+const TRATO_POWERUP := { "text": "Barro extra", "type": "bola_extra" }
 
 func _ready() -> void:
 	var pool := ALL_POWERUPS.duplicate()

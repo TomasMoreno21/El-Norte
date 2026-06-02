@@ -13,7 +13,7 @@ func _ready() -> void:
 	_populate_birds()
 
 func _update_balance() -> void:
-	$Bg/VBoxContainer/BolasLabel.text = "Bolas de barro: %d" % DataManager.bolas_balance
+	$Bg/VBoxContainer/BolasLabel.text = "Barro: %d" % DataManager.bolas_balance
 
 func _populate_birds() -> void:
 	var list := $Bg/VBoxContainer/CenterContainer/BirdList
