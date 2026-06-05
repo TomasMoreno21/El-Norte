@@ -36,10 +36,11 @@ var x2_palitos_start_time := 0.0
 var x2_bolas_active := false
 var miniatura_active := false
 var miniatura_start_time := 0.0
+var _revive_available := true
 
-const MIN_SPEED := 400.0
+const MIN_SPEED := 500.0
 const MAX_SPEED := 1000.0
-const MAX_INTERVAL := 1.6
+const MAX_INTERVAL := 1.3
 const MIN_INTERVAL := 0.5
 const PIXEL_TO_METER := 60.0
 const KIWI_COOLDOWN := 20.0
@@ -59,12 +60,15 @@ const RAFAGA_BOOST := 1.5
 const CALMA_COOLDOWN := 800.0
 const CALMA_CHANCE := 0.25
 const CALMA_DURATION := 5.0
+const REVIVE_COST := 200
+const REVIVE_REWIND := 150.0
 
 @onready var spawn_timer := $SpawnTimer
 @onready var bola_timer := $BolaTimer
 @onready var hud := $HUD
 @onready var player := $Player
 @onready var death_screen := $DeathScreen
+@onready var revive_popup := $RevivePopup
 @onready var camera := $Camera2D
 
 var shake_strength := 10
@@ -88,6 +92,8 @@ func _ready() -> void:
 	bola_timer.wait_time = BOLA_SPAWN_INTERVAL
 	bola_timer.start()
 	player.died.connect(_on_player_died)
+	revive_popup.revived.connect(_on_revive)
+	revive_popup.rejected.connect(_on_revive_reject)
 	hud.update_bolas(DataManager.bolas_balance)
 	var mods := DataManager.get_bird_modifiers()
 	bird_speed_mult = mods["speed_mult"]
@@ -157,7 +163,12 @@ func _on_player_died() -> void:
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
 	var nuevos := DataManager.check_achievements({ "distance": int(distance), "storms_in_run": storms_in_run })
 	_show_popups(nuevos)
-	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)
+	if DataManager.palitos_balance >= REVIVE_COST and _revive_available:
+		_revive_available = false
+		revive_popup.show_revive(REVIVE_COST)
+		get_tree().paused = true
+	else:
+		death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)
 
 func _process(delta: float) -> void:
 	if not player.alive:
@@ -256,6 +267,7 @@ func _process(delta: float) -> void:
 		_show_popups(nuevos)
 	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining)
 	hud.show_storm(in_storm)
+	$Background.set_run_distance(distance)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult
 
@@ -286,6 +298,7 @@ func _on_spawn_timer_timeout() -> void:
 			kiwi.speed = get_speed(difficulty_dist)
 			kiwi.position = Vector2(2100, randf_range(260, 820))
 			kiwi.collected.connect(_on_kiwi_collected)
+			kiwi.add_to_group("kiwi")
 			add_child(kiwi)
 			kiwi_cooldown_timer = 0.0
 			return
@@ -355,6 +368,7 @@ func _on_bola_timer_timeout() -> void:
 	bola.speed = get_speed(difficulty_dist)
 	bola.position = Vector2(2100, randf_range(220, 860))
 	bola.collected.connect(_on_bola_collected)
+	bola.add_to_group("bola")
 	add_child(bola)
 
 func _on_bola_collected() -> void:
@@ -373,3 +387,45 @@ func _show_popups(nuevos: Array) -> void:
 	for a in nuevos:
 		hud.show_achievement_popup(a)
 		await get_tree().create_timer(2.8).timeout
+
+func _on_revive() -> void:
+	DataManager.palitos_balance -= REVIVE_COST
+	distance = max(distance - REVIVE_REWIND, 0.0)
+	difficulty_dist = max(difficulty_dist - REVIVE_REWIND, 0.0)
+	next_storm_distance = floor(distance / STORM_INTERVAL) * STORM_INTERVAL + STORM_INTERVAL
+	last_rafaga_distance = distance
+	last_calma_distance = distance
+
+	for obs in get_tree().get_nodes_in_group("obstacle"):
+		obs.queue_free()
+	for k in get_tree().get_nodes_in_group("kiwi"):
+		k.queue_free()
+	for b in get_tree().get_nodes_in_group("bola"):
+		b.queue_free()
+
+	if in_storm:
+		in_storm = false
+		storm_time = 0.0
+		_update_encounter_mode()
+	if rafaga_active:
+		rafaga_active = false
+		_update_encounter_mode()
+	if calma_active:
+		calma_active = false
+		_update_encounter_mode()
+
+	shield_active = false
+	turbo_active = false
+	x2_palitos_active = false
+	x2_bolas_active = false
+	miniatura_active = false
+	kiwi_cooldown_timer = 0.0
+
+	player.reset()
+	revive_popup.visible = false
+	spawn_timer.wait_time = get_spawn_interval(difficulty_dist)
+	get_tree().paused = false
+
+func _on_revive_reject() -> void:
+	revive_popup.visible = false
+	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)

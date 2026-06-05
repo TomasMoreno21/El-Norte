@@ -90,3 +90,12 @@ func set_shield(value: bool) -> void:
 
 func _blink() -> void:
 	$Sprite2D.modulate.a = 0.2 if $Sprite2D.modulate.a == 1.0 else 1.0
+
+func reset() -> void:
+	alive = true
+	velocity = Vector2.ZERO
+	position = start_position
+	invulnerable = false
+	collision_mask = 2
+	blink_timer.stop()
+	$Sprite2D.modulate.a = 1.0

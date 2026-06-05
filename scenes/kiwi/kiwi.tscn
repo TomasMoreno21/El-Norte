@@ -1,16 +1,19 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://c7u327ecgqx27"]
 
-[ext_resource type="Script" path="res://scenes/kiwi/kiwi.gd" id="1"]
+[ext_resource type="Script" uid="uid://0y7unkmx38gt" path="res://scenes/kiwi/kiwi.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://b7br0rkg3nsib" path="res://Sprites/kiwi5.png" id="2_4nc7q"]
 
 [sub_resource type="RectangleShape2D" id="RectShape1"]
-size = Vector2(54, 54)
+size = Vector2(43, 63)
 
-[node name="Kiwi" type="Area2D"]
+[node name="Kiwi" type="Area2D" unique_id=818335976]
 collision_layer = 4
-collision_mask = 1
 script = ExtResource("1")
 
-[node name="Sprite" type="Sprite2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=353403258]
+position = Vector2(-3.5, -1.5)
 shape = SubResource("RectShape1")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=643642309]
+position = Vector2(17, -8)
+texture = ExtResource("2_4nc7q")
