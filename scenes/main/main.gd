@@ -47,8 +47,9 @@ const KIWI_COOLDOWN := 20.0
 const KIWI_SPAWN_CHANCE := 0.08
 const STORM_INTERVAL := 500.0
 const STORM_DURATION := 4.0
-const STORM_SPEED_BOOST := 1.6
-const STORM_INTERVAL_FACTOR := 0.5
+const STORM_SPEED_BOOST := 1.3
+const STORM_INTERVAL_FACTOR := 0.7
+const STORM_WARNING_DIST := 50.0
 const BOLA_SPAWN_INTERVAL := 6.0
 const BOLA_SPAWN_CHANCE := 0.15
 const TURBO_OBSTACLE_SPEED := 1.5
@@ -62,6 +63,12 @@ const CALMA_CHANCE := 0.25
 const CALMA_DURATION := 5.0
 const REVIVE_COST := 200
 const REVIVE_REWIND := 150.0
+
+# Constraint-based obstacle spawning
+const MIN_GAP := 90
+const SPAWN_MIN_Y := 160.0
+const SPAWN_MAX_Y := 920.0
+const OBSTACLE_HALF_HEIGHTS := [12.5, 50.0, 27.5]
 
 @onready var spawn_timer := $SpawnTimer
 @onready var bola_timer := $BolaTimer
@@ -176,10 +183,15 @@ func _process(delta: float) -> void:
 
 	if not in_storm and distance >= next_storm_distance:
 		start_storm()
+		hud.show_storm_warning(false)
 	elif in_storm:
 		storm_time += delta
 		if storm_time >= STORM_DURATION:
 			end_storm()
+	else:
+		var storm_dist := next_storm_distance
+		var warning := distance >= storm_dist - STORM_WARNING_DIST and distance < storm_dist
+		hud.show_storm_warning(warning)
 
 	if not rafaga_active and not calma_active and not in_storm and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
 		last_rafaga_distance = distance
@@ -287,6 +299,52 @@ func _process(delta: float) -> void:
 	else:
 		camera.offset = Vector2.ZERO
 
+func _safe_obstacle_y(shape_type: int) -> float:
+	var half_h: float = OBSTACLE_HALF_HEIGHTS[shape_type]
+	var min_y := SPAWN_MIN_Y + half_h
+	var max_y := SPAWN_MAX_Y - half_h
+
+	var gap_below_max := max_y - MIN_GAP
+	var gap_above_min := min_y + MIN_GAP
+
+	var opts: Array[float] = []
+	if gap_below_max >= min_y:
+		opts.append(randf_range(min_y, gap_below_max))
+	if gap_above_min <= max_y:
+		opts.append(randf_range(gap_above_min, max_y))
+
+	if opts.is_empty():
+		return randf_range(min_y, max_y)
+	return opts[randi() % opts.size()]
+
+func _safe_double_y(shape_a: int, shape_b: int) -> Vector2:
+	var half_a: float = OBSTACLE_HALF_HEIGHTS[shape_a]
+	var half_b: float = OBSTACLE_HALF_HEIGHTS[shape_b]
+	var min_y: float = SPAWN_MIN_Y + max(half_a, half_b)
+	var max_y: float = SPAWN_MAX_Y - max(half_a, half_b)
+
+	var mid_low: float = max(min_y, min_y + half_a + half_b + MIN_GAP)
+	var mid_high: float = min(max_y, max_y - half_a - half_b - MIN_GAP)
+
+	if mid_low <= max_y - half_b - MIN_GAP:
+		var a_y := randf_range(min_y, mid_low)
+		var b_y := randf_range(a_y + half_a + half_b + MIN_GAP, max_y)
+		return Vector2(a_y, b_y)
+
+	return Vector2(_safe_obstacle_y(shape_a), _safe_obstacle_y(shape_b))
+
+func _spawn_obstacle(shape_type: int, speed: float) -> void:
+	_spawn_obstacle_at(shape_type, speed, _safe_obstacle_y(shape_type))
+
+func _spawn_obstacle_at(shape_type: int, speed: float, y: float) -> void:
+	var obs := obstacle_scene.instantiate()
+	obs.speed = speed
+	obs.shape_type = shape_type
+	obs.move_type = 0 if randf() < 0.7 else 1
+	obs.position = Vector2(2100, y)
+	obs.add_to_group("obstacle")
+	add_child(obs)
+
 func _on_spawn_timer_timeout() -> void:
 	if not obstacle_scene or not player.alive or calma_active:
 		return
@@ -304,23 +362,16 @@ func _on_spawn_timer_timeout() -> void:
 			return
 
 	var turbo_obs_speed := TURBO_OBSTACLE_SPEED if turbo_active else 1.0
+	var base_speed := get_speed(difficulty_dist) * turbo_obs_speed
 
-	var obstacle := obstacle_scene.instantiate()
-	obstacle.speed = get_speed(difficulty_dist) * turbo_obs_speed
-	obstacle.shape_type = randi() % 3
-	obstacle.move_type = 0 if randf() < 0.7 else 1
-	obstacle.position = Vector2(2100, randf_range(160, 920))
-	obstacle.add_to_group("obstacle")
-	add_child(obstacle)
-
+	var shape_a := randi() % 3
 	if randf() < 0.08:
-		var obs2 := obstacle_scene.instantiate()
-		obs2.speed = get_speed(difficulty_dist) * turbo_obs_speed
-		obs2.shape_type = randi() % 3
-		obs2.move_type = 0 if randf() < 0.7 else 1
-		obs2.position = Vector2(2100, randf_range(160, 920))
-		obs2.add_to_group("obstacle")
-		add_child(obs2)
+		var shape_b := randi() % 3
+		var positions := _safe_double_y(shape_a, shape_b)
+		_spawn_obstacle_at(shape_a, base_speed, positions.x)
+		_spawn_obstacle_at(shape_b, base_speed, positions.y)
+	else:
+		_spawn_obstacle(shape_a, base_speed)
 
 func _on_kiwi_collected() -> void:
 	run_kiwis += 1

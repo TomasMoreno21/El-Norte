@@ -4,6 +4,7 @@ extends CanvasLayer
 @onready var max_dist_label := $MaxDistLabel
 @onready var powerup_label := $PowerUpLabel
 @onready var storm_label := $StormLabel
+@onready var storm_warning := $StormWarningLabel
 @onready var bolas_label := $BolasLabel
 
 func _ready() -> void:
@@ -30,6 +31,9 @@ func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, 
 
 func show_storm(active: bool) -> void:
 	storm_label.visible = active
+
+func show_storm_warning(active: bool) -> void:
+	storm_warning.visible = active
 
 func show_achievement_popup(logro: Dictionary) -> void:
 	var bg := ColorRect.new()
