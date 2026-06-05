@@ -6,14 +6,12 @@ enum MoveType { STATIC, OSCILLATE }
 var speed := 250.0
 var shape_type := ShapeType.RECT_H
 var move_type := MoveType.STATIC
-var ghost_time := 0.0
 
 var time := 0.0
 var start_y: float
 var angular_speed := 0.0
 var _sprite: Sprite2D
 var _collision_shape: CollisionShape2D
-var _alive := false
 
 const SHAPE_COLORS := {
 	ShapeType.RECT_H: Color(0.5, 0.7, 0.3),
@@ -32,20 +30,9 @@ func _ready() -> void:
 	angular_speed = randf_range(1.5, 4.0) * (-1 if randi() % 2 == 0 else 1)
 	_setup_visual()
 	_setup_collision()
-	if ghost_time > 0:
-		_sprite.modulate.a = 0.25
-		_collision_shape.disabled = true
 
 func _physics_process(delta: float) -> void:
 	time += delta
-
-	if not _alive:
-		if time >= ghost_time:
-			_alive = true
-			_sprite.modulate.a = 1.0
-			_collision_shape.disabled = false
-		return
-
 	position.x -= speed * delta
 	_sprite.rotation += angular_speed * delta
 

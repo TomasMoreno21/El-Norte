@@ -48,6 +48,7 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 
 [node name="StormLabel" type="Label" parent="." unique_id=286242357]
+visible = false
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 130.0
@@ -59,6 +60,7 @@ text = "¡TORMENTA!"
 horizontal_alignment = 1
 
 [node name="StormWarningLabel" type="Label" parent="." unique_id=2137064804]
+visible = false
 offset_left = 1720.0
 offset_top = 420.0
 offset_right = 1900.0
@@ -68,4 +70,16 @@ theme_override_colors/font_shadow_color = Color(0.96045476, 0.09887571, 3.080368
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 140
 text = "!"
+horizontal_alignment = 1
+
+[node name="TransitionLabel" type="Label" parent="."]
+visible = false
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 480.0
+offset_bottom = 580.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_font_sizes/font_size = 52
+text = ""
 horizontal_alignment = 1

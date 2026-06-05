@@ -135,13 +135,3 @@ func set_calma_mode() -> void:
 	rafaga_top.emitting = false
 	rafaga_bottom.emitting = false
 	calma_label.visible = true
-
-func hide_effect() -> void:
-	top_emitter.emitting = false
-	bottom_emitter.emitting = false
-	rafaga_top.emitting = false
-	rafaga_bottom.emitting = false
-	calma_label.visible = false
-
-func show_effect() -> void:
-	set_normal_mode()

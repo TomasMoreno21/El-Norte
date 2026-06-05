@@ -89,3 +89,15 @@ func show_achievement_popup(logro: Dictionary) -> void:
 	tween.tween_interval(2.0)
 	tween.tween_property(bg, "position:x", -350.0, 0.3).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
 	tween.tween_callback(bg.queue_free)
+
+func show_transition_message(text: String) -> void:
+	$TransitionLabel.text = text
+	$TransitionLabel.visible = true
+	$TransitionLabel.modulate.a = 0.0
+	var tween := create_tween()
+	tween.tween_property($TransitionLabel, "modulate:a", 1.0, 0.8).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+
+func hide_transition_message() -> void:
+	var tween := create_tween()
+	tween.tween_property($TransitionLabel, "modulate:a", 0.0, 0.6).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_callback(func(): $TransitionLabel.visible = false)

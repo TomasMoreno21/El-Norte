@@ -19,14 +19,14 @@ func fade_to_scene(scene_path: String) -> void:
 	_overlay.modulate.a = 0.0
 
 	var tween := create_tween()
-	tween.tween_property(_overlay, "modulate:a", 1.0, 0.3)
+	tween.tween_property(_overlay, "modulate:a", 1.0, 0.15)
 	tween.tween_callback(func(): get_tree().change_scene_to_file(scene_path))
 
 func fade_in() -> void:
 	_overlay.visible = true
 	_overlay.modulate.a = 1.0
 	var tween := create_tween()
-	tween.tween_property(_overlay, "modulate:a", 0.0, 0.3)
+	tween.tween_property(_overlay, "modulate:a", 0.0, 0.15)
 	tween.tween_callback(func():
 		_overlay.visible = false
 		_is_transitioning = false

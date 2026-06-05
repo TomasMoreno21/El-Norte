@@ -12,7 +12,6 @@ var invulnerable := false
 var blink_timer: Timer
 var lives := 1
 var flap_mult := 1.0
-var _miniatura := false
 var _original_col_size: Vector2
 var _original_scale: Vector2
 
@@ -69,10 +68,28 @@ func die() -> void:
 		return
 	alive = false
 	velocity = Vector2.ZERO
-	died.emit()
+	rotation = 0.0
+	kill_all_tweens()
+
+	get_tree().paused = true
+	var slow := create_tween()
+	slow.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	var steps := 12
+	var duration := 0.4
+	for i in steps:
+		slow.tween_callback(func():
+			Engine.time_scale = lerpf(1.0, 0.3, float(i + 1) / steps)
+		)
+		slow.tween_interval(duration / steps)
+	slow.tween_callback(func():
+		died.emit()
+	)
+
+func kill_all_tweens() -> void:
+	for t in get_tree().get_processed_tweens():
+		t.kill()
 
 func set_miniatura(active: bool) -> void:
-	_miniatura = active
 	var col_shape := $CollisionShape2D.shape as RectangleShape2D
 	if col_shape:
 		col_shape.size = _original_col_size * (0.5 if active else 1.0)
@@ -95,7 +112,10 @@ func reset() -> void:
 	alive = true
 	velocity = Vector2.ZERO
 	position = start_position
+	rotation = 0.0
 	invulnerable = false
 	collision_mask = 2
 	blink_timer.stop()
 	$Sprite2D.modulate.a = 1.0
+	$Sprite2D.scale = _original_scale
+	Engine.time_scale = 1.0

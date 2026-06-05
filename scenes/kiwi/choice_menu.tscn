@@ -50,24 +50,3 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 50
 text = "Elegí un poder:"
 horizontal_alignment = 1
-
-[node name="BarroSeco" type="Button" parent="RightPanel/VBoxContainer" unique_id=680868912]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 46
-text = "Escudo 4s"
-
-[node name="PlumaViento" type="Button" parent="RightPanel/VBoxContainer" unique_id=1597376407]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 46
-text = "Turbo 5s"
-
-[node name="Semilla" type="Button" parent="RightPanel/VBoxContainer" unique_id=1383185181]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 46
-text = "x2 Barro"

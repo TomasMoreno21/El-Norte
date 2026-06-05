@@ -13,17 +13,14 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0)
 	$ColorRect/VBoxContainer/StatsLabel.text = "Tormentas: %d  |  Barro: %d  |  Kiwis: %d" % [storms, bolas, kiwis]
 
 	visible = true
-	$ColorRect.position.y = -1080
-
-	var tween := create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tween.tween_property($ColorRect, "position:y", 0.0, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	tween.tween_callback(func(): get_tree().paused = true)
+	get_tree().paused = true
 
 func _on_restart() -> void:
+	Engine.time_scale = 1.0
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func _on_menu() -> void:
+	Engine.time_scale = 1.0
 	get_tree().paused = false
 	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")

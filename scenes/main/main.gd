@@ -64,6 +64,12 @@ const CALMA_DURATION := 5.0
 const REVIVE_COST := 200
 const REVIVE_REWIND := 150.0
 
+const TRANSITIONS := [
+	{ "start": 800.0, "end": 900.0, "message": "Las Llanuras se abren..." },
+	{ "start": 2000.0, "end": 2100.0, "message": "La Puna te espera..." },
+]
+var _in_transition := false
+
 # Constraint-based obstacle spawning
 const MIN_GAP := 90
 const SPAWN_MIN_Y := 160.0
@@ -170,18 +176,28 @@ func _on_player_died() -> void:
 	DataManager.deaths += 1
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
 	var nuevos := DataManager.check_achievements({ "distance": int(distance), "storms_in_run": storms_in_run })
-	_show_popups(nuevos)
 	if DataManager.palitos_balance >= REVIVE_COST and _revive_available:
 		_revive_available = false
 		revive_popup.show_revive(REVIVE_COST)
 		get_tree().paused = true
 	else:
 		death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)
+	_show_popups(nuevos)
 
 func _process(delta: float) -> void:
 	if not player.alive:
 		return
 
+	var was_in_transition := _in_transition
+	_in_transition = false
+	for t: Dictionary in TRANSITIONS:
+		if distance >= t["start"] and distance < t["end"]:
+			_in_transition = true
+			if not was_in_transition:
+				hud.show_transition_message(t["message"])
+			break
+	if was_in_transition and not _in_transition:
+		hud.hide_transition_message()
 	if not in_storm and distance >= next_storm_distance:
 		start_storm()
 		hud.show_storm_warning(false)
@@ -347,7 +363,7 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float) -> void:
 	add_child(obs)
 
 func _on_spawn_timer_timeout() -> void:
-	if not obstacle_scene or not player.alive or calma_active:
+	if not obstacle_scene or not player.alive or calma_active or _in_transition:
 		return
 
 	if kiwi_scene and kiwi_cooldown_timer >= KIWI_COOLDOWN:
@@ -411,7 +427,7 @@ func _on_power_up_selected(type: String) -> void:
 			player.set_miniatura(true)
 
 func _on_bola_timer_timeout() -> void:
-	if not player.alive or not bola_scene:
+	if not player.alive or not bola_scene or _in_transition:
 		return
 	if randf() >= BOLA_SPAWN_CHANCE:
 		return
@@ -419,6 +435,7 @@ func _on_bola_timer_timeout() -> void:
 	var bola := bola_scene.instantiate()
 	bola.speed = get_speed(difficulty_dist)
 	bola.position = Vector2(2100, randf_range(220, 860))
+	bola.amount = 2 if x2_bolas_active else 1
 	bola.collected.connect(_on_bola_collected)
 	bola.add_to_group("bola")
 	add_child(bola)
@@ -441,6 +458,7 @@ func _show_popups(nuevos: Array) -> void:
 		await get_tree().create_timer(2.8).timeout
 
 func _on_revive() -> void:
+	Engine.time_scale = 1.0
 	DataManager.palitos_balance -= REVIVE_COST
 	distance = max(distance - REVIVE_REWIND, 0.0)
 	difficulty_dist = max(difficulty_dist - REVIVE_REWIND, 0.0)
@@ -479,5 +497,6 @@ func _on_revive() -> void:
 	get_tree().paused = false
 
 func _on_revive_reject() -> void:
+	Engine.time_scale = 1.0
 	revive_popup.visible = false
 	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)

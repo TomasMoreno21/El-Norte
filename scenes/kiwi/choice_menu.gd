@@ -21,10 +21,6 @@ func _ready() -> void:
 	var count := 4 if "trato_hecho" in DataManager.completed_achievements else 3
 	var chosen := pool.slice(0, count)
 
-	$RightPanel/VBoxContainer/BarroSeco.visible = false
-	$RightPanel/VBoxContainer/PlumaViento.visible = false
-	$RightPanel/VBoxContainer/Semilla.visible = false
-
 	for p in chosen:
 		_add_choice(p["text"], p["type"])
 

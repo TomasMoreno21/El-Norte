@@ -4,28 +4,31 @@ const BIOMES := [
 	{
 		"start": 0,
 		"end": 800,
+		"name": "Cordillera",
 		"layers": [
-			{ "color": Color(0.53, 0.81, 0.92), "scroll_scale": Vector2(0.05, 0), "height_ratio": 1.0 },
-			{ "color": Color(0.29, 0.51, 0.19), "scroll_scale": Vector2(0.2, 0), "height_ratio": 0.6 },
-			{ "color": Color(0.18, 0.31, 0.11), "scroll_scale": Vector2(0.4, 0), "height_ratio": 0.4 },
+			{ "color": Color(0.55, 0.65, 0.75), "scroll_scale": Vector2(0.05, 0), "height_ratio": 1.0 },
+			{ "color": Color(0.35, 0.45, 0.55), "scroll_scale": Vector2(0.2, 0), "height_ratio": 0.6 },
+			{ "color": Color(0.25, 0.30, 0.40), "scroll_scale": Vector2(0.4, 0), "height_ratio": 0.4 },
 		]
 	},
 	{
-		"start": 1000,
+		"start": 900,
 		"end": 2000,
+		"name": "Llanuras",
 		"layers": [
-			{ "color": Color(0.76, 0.70, 0.50), "scroll_scale": Vector2(0.05, 0), "height_ratio": 1.0 },
-			{ "color": Color(0.55, 0.49, 0.25), "scroll_scale": Vector2(0.2, 0), "height_ratio": 0.6 },
-			{ "color": Color(0.35, 0.29, 0.15), "scroll_scale": Vector2(0.4, 0), "height_ratio": 0.4 },
+			{ "color": Color(0.53, 0.72, 0.45), "scroll_scale": Vector2(0.05, 0), "height_ratio": 1.0 },
+			{ "color": Color(0.40, 0.55, 0.30), "scroll_scale": Vector2(0.2, 0), "height_ratio": 0.6 },
+			{ "color": Color(0.30, 0.40, 0.20), "scroll_scale": Vector2(0.4, 0), "height_ratio": 0.4 },
 		]
 	},
 	{
-		"start": 2200,
+		"start": 2100,
 		"end": INF,
+		"name": "Puna",
 		"layers": [
-			{ "color": Color(0.40, 0.65, 0.80), "scroll_scale": Vector2(0.05, 0), "height_ratio": 1.0 },
-			{ "color": Color(0.10, 0.40, 0.15), "scroll_scale": Vector2(0.2, 0), "height_ratio": 0.6 },
-			{ "color": Color(0.05, 0.25, 0.08), "scroll_scale": Vector2(0.4, 0), "height_ratio": 0.4 },
+			{ "color": Color(0.70, 0.60, 0.45), "scroll_scale": Vector2(0.05, 0), "height_ratio": 1.0 },
+			{ "color": Color(0.55, 0.42, 0.28), "scroll_scale": Vector2(0.2, 0), "height_ratio": 0.6 },
+			{ "color": Color(0.40, 0.30, 0.18), "scroll_scale": Vector2(0.4, 0), "height_ratio": 0.4 },
 		]
 	}
 ]
