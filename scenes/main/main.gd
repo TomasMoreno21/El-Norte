@@ -14,7 +14,7 @@ var turbo_active := false
 var shield_start_time := 0.0
 var turbo_start_time := 0.0
 var shield_duration_max := 4.0
-var turbo_duration_max := 6.0
+var turbo_duration_max := 3.0
 var in_storm := false
 var storm_time := 0.0
 var turbo_effect: CanvasLayer
@@ -112,6 +112,7 @@ func _ready() -> void:
 	if turbo_effect_scene:
 		turbo_effect = turbo_effect_scene.instantiate()
 		add_child(turbo_effect)
+	SceneTransition.fade_in()
 
 func start_storm() -> void:
 	in_storm = true

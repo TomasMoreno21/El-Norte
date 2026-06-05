@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bgsnu8impi7oc"]
 
 [ext_resource type="Script" uid="uid://bwlhnk4g3n8st" path="res://scenes/death_screen/death_screen.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/effects/button_feedback.gd" id="2"]
 
 [node name="DeathScreen" type="CanvasLayer" unique_id=2139104526]
 process_mode = 2
@@ -50,10 +51,12 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 70
+script = ExtResource("2")
 text = "Volver a volar"
 
 [node name="MenuButton" type="Button" parent="ColorRect/VBoxContainer" unique_id=1505973835]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 70
+script = ExtResource("2")
 text = "Volver al menú"

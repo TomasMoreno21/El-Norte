@@ -12,6 +12,7 @@ func _ready() -> void:
 	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
 	_update_balance()
 	_populate_upgrades()
+	SceneTransition.fade_in()
 
 func _update_balance() -> void:
 	$Bg/VBoxContainer/PalitosLabel.text = "Palitos: %d" % DataManager.palitos_balance
@@ -72,4 +73,4 @@ func _buy(upgrade_key: String) -> void:
 	_populate_upgrades()
 
 func _on_volver() -> void:
-	get_tree().change_scene_to_file("res://scenes/menu/menu.tscn")
+	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")

@@ -7,18 +7,32 @@ func _ready() -> void:
 	$RightBox/Logros.pressed.connect(_on_logros)
 	$Salir.pressed.connect(_on_salir)
 	$ResetButton.pressed.connect(_on_reset)
+	SceneTransition.fade_in()
+	_animate_menu()
+
+func _animate_menu() -> void:
+	$Label.modulate.a = 0.0
+	$Jugar.modulate.a = 0.0
+	$Salir.modulate.a = 0.0
+	$RightBox.modulate.a = 0.0
+
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property($Label, "modulate:a", 1.0, 0.5)
+	tween.tween_property($Jugar, "modulate:a", 1.0, 0.5).set_delay(0.1)
+	tween.tween_property($Salir, "modulate:a", 1.0, 0.5).set_delay(0.2)
+	tween.tween_property($RightBox, "modulate:a", 1.0, 0.5).set_delay(0.3)
 
 func _on_jugar() -> void:
-	get_tree().change_scene_to_file("res://scenes/main/main.tscn")
+	SceneTransition.fade_to_scene("res://scenes/main/main.tscn")
 
 func _on_tienda() -> void:
-	get_tree().change_scene_to_file("res://scenes/shop/shop.tscn")
+	SceneTransition.fade_to_scene("res://scenes/shop/shop.tscn")
 
 func _on_skins() -> void:
-	get_tree().change_scene_to_file("res://scenes/skins/skins.tscn")
+	SceneTransition.fade_to_scene("res://scenes/skins/skins.tscn")
 
 func _on_logros() -> void:
-	get_tree().change_scene_to_file("res://scenes/achievements/achievements.tscn")
+	SceneTransition.fade_to_scene("res://scenes/achievements/achievements.tscn")
 
 func _on_salir() -> void:
 	get_tree().quit()

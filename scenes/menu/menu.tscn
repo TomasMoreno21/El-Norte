@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bjxce07k240fk"]
 
 [ext_resource type="Script" uid="uid://bflsbndb8q1hm" path="res://scenes/menu/menu.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/effects/button_feedback.gd" id="2"]
 
 [node name="Menu" type="Control" unique_id=2052919699]
 layout_mode = 3
@@ -26,6 +27,7 @@ custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 48
+script = ExtResource("2")
 text = "Tienda"
 
 [node name="Skins" type="Button" parent="RightBox" unique_id=1535242349]
@@ -33,6 +35,7 @@ custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 48
+script = ExtResource("2")
 text = "Skins"
 
 [node name="Logros" type="Button" parent="RightBox" unique_id=868661184]
@@ -40,6 +43,7 @@ custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 48
+script = ExtResource("2")
 text = "Logros"
 
 [node name="Jugar" type="Button" parent="." unique_id=1647251839]
@@ -49,6 +53,7 @@ anchor_top = 0.55
 anchor_right = 0.75
 anchor_bottom = 0.75
 theme_override_font_sizes/font_size = 120
+script = ExtResource("2")
 text = "Jugar"
 
 [node name="Salir" type="Button" parent="." unique_id=587563896]
@@ -58,6 +63,7 @@ anchor_top = 0.78
 anchor_right = 0.75
 anchor_bottom = 0.9
 theme_override_font_sizes/font_size = 60
+script = ExtResource("2")
 text = "Salir"
 
 [node name="ResetButton" type="Button" parent="." unique_id=2104571763]
@@ -67,6 +73,7 @@ offset_top = 16.0
 offset_right = 228.0
 offset_bottom = 56.0
 theme_override_font_sizes/font_size = 20
+script = ExtResource("2")
 text = "Reset"
 
 [node name="Label" type="Label" parent="." unique_id=1109512196]

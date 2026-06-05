@@ -7,6 +7,21 @@ extends CanvasLayer
 @onready var storm_warning := $StormWarningLabel
 @onready var bolas_label := $BolasLabel
 
+var _storm_warning_active := false
+var _storm_warning_time := 0.0
+const STORM_WARNING_DURATION := 2.0
+
+func _process(delta: float) -> void:
+	if _storm_warning_active:
+		_storm_warning_time += delta
+		if _storm_warning_time >= STORM_WARNING_DURATION:
+			show_storm_warning(false)
+			return
+		var t := sin(_storm_warning_time * 15.0)
+		storm_warning.modulate.a = 0.5 + 0.5 * t
+		var s := 1.0 + 0.2 * t
+		storm_warning.scale = Vector2(s, s)
+
 func _ready() -> void:
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
 
@@ -33,13 +48,21 @@ func show_storm(active: bool) -> void:
 	storm_label.visible = active
 
 func show_storm_warning(active: bool) -> void:
-	storm_warning.visible = active
+	_storm_warning_active = active
+	if not active:
+		storm_warning.visible = false
+		storm_warning.modulate.a = 1.0
+		storm_warning.scale = Vector2(1.0, 1.0)
+		_storm_warning_time = 0.0
+	else:
+		storm_warning.visible = true
+		_storm_warning_time = 0.0
 
 func show_achievement_popup(logro: Dictionary) -> void:
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.05, 0.85)
 	bg.size = Vector2(350, 88)
-	bg.position = Vector2(16, get_viewport().get_visible_rect().size.y - 120)
+	bg.position = Vector2(-350, get_viewport().get_visible_rect().size.y - 120)
 
 	var name_lbl := Label.new()
 	name_lbl.text = logro["name"]
@@ -61,9 +84,8 @@ func show_achievement_popup(logro: Dictionary) -> void:
 	bg.add_child(desc_lbl)
 	add_child(bg)
 
-	bg.modulate = Color(1, 1, 1, 0)
 	var tween := create_tween()
-	tween.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.25)
+	tween.tween_property(bg, "position:x", 16.0, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 	tween.tween_interval(2.0)
-	tween.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.4)
+	tween.tween_property(bg, "position:x", -350.0, 0.3).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
 	tween.tween_callback(bg.queue_free)

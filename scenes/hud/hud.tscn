@@ -11,6 +11,8 @@ offset_left = 47.0
 offset_top = 20.0
 offset_right = 227.0
 offset_bottom = 81.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.53224236, 0.53224236, 0.53224236, 1)
 theme_override_font_sizes/font_size = 44
 text = "0m"
 
@@ -20,6 +22,7 @@ offset_top = 82.0
 offset_right = 227.0
 offset_bottom = 113.0
 theme_override_colors/font_color = Color(0.7919991, 0.79199916, 0.7919991, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 22
 text = "Récord: 0m"
 
@@ -45,23 +48,24 @@ theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 
 [node name="StormLabel" type="Label" parent="." unique_id=286242357]
-visible = false
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 130.0
 offset_bottom = 185.0
 theme_override_colors/font_color = Color(1, 0.3, 0.1, 1)
+theme_override_colors/font_shadow_color = Color(0.96640044, 0, 0.14082664, 1)
 theme_override_font_sizes/font_size = 48
 text = "¡TORMENTA!"
 horizontal_alignment = 1
 
-[node name="StormWarningLabel" type="Label" parent="."]
-visible = false
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 70.0
-offset_bottom = 120.0
-theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
-theme_override_font_sizes/font_size = 44
-text = "¡VIENTO FUERTE!"
+[node name="StormWarningLabel" type="Label" parent="." unique_id=2137064804]
+offset_left = 1720.0
+offset_top = 420.0
+offset_right = 1900.0
+offset_bottom = 620.0
+theme_override_colors/font_color = Color(0.9111997, 0.27477574, 0, 1)
+theme_override_colors/font_shadow_color = Color(0.96045476, 0.09887571, 3.080368e-06, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 140
+text = "!"
 horizontal_alignment = 1
