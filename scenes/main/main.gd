@@ -296,7 +296,7 @@ func _process(delta: float) -> void:
 		_show_popups(nuevos)
 	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining)
 	hud.show_storm(in_storm)
-	$Background.set_run_distance(distance)
+	$Background.set_run_distance(distance, turbo_mult * rafaga_mult)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult
 
