@@ -29,7 +29,7 @@ El juego se llama "El Norte" porque el viaje va de **sur a norte** de Argentina.
 - **Choice Menu** (`kiwi/choice_menu.tscn`): CanvasLayer, RightPanel, botones dinámicos desde pool. Sin nodos placeholder.
 - **Death Screen** (`death_screen.tscn`): **Estático, centrado** (anchor 0.25–0.75), pausa inmediata. Sin animación.
 - **Revive Popup** (`revive_popup/`): CanvasLayer layer 20, process_mode=2, REVIVE_COST=200, REVIVE_REWIND=150m.
-- **Background** (`background/`): ParallaxBackground con BIOMES (Cordillera/Llanuras/Puna), 100m transitions, self_modulate. Zonas de transición sin obstáculos + mensaje.
+- **Background** (`background/`): ParallaxBackground con BIOMES (Cordillera/Llanuras/Puna), 100m transitions, self_modulate. Zonas de transición sin obstáculos + mensaje. Sprites Llanura agregados (8 PNGs 1920×1080) pero código actual usa Cordillera como placeholder para Llanuras.
 - **Effects** (`effects/`): button_feedback.gd (reusable), scene_transition.gd (autoload 0.15s).
 
 ## Mecánicas
@@ -46,7 +46,7 @@ El juego se llama "El Norte" porque el viaje va de **sur a norte** de Argentina.
 - **Miniatura**: 3s, player scale 0.5, collision shape escalada.
 - **Palitos**: `(dist/10) × (1 + nivel_palitos)`.
 - **Revive**: 200 palitos, rewinds 150m, once per run.
-- **Transiciones de bioma**: 100m sin obstáculos, mensaje centrado con fade.
+- **Transiciones de bioma**: 100m sin obstáculos, mensaje centrado con fade. **REFACTOR 9/6/2026**: cambió a transiciones por tiempo (1.5s fade-out, 3s empty, 1.5s fade-in) con editor F1 in-game (@export y_offsets/sprite_scales por bioma). Luego revertido a commit original.
 - **Barro**: "+1" flotante al recolectar (o "+2" con x2_bolas).
 
 ## Game Feel
@@ -122,6 +122,9 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 - **kill_tweens() no existe** en Godot 4 → usar `get_tree().get_processed_tweens()`
 - **Engine.time_scale no se tweenea** con `tween_property` → usar callbacks con steps
 - **Enums Tween en mayúsculas**: `TRANS_QUAD`, `EASE_OUT`, etc.
+- **Señales conectadas dentro de `_on_power_up_selected`** (9/6/2026): causaba conexiones duplicadas en cada power-up. Mover a `_ready()`.
+- **Parallax + texturas no tileables** (9/6/2026): ninguna técnica (flip_h, 3 copias, shader wrap, shader blend) elimina la costura si la textura no tilea. El usuario prefiere modificar las imágenes a usar shaders.
+- **ShaderMaterial compartido** (9/6/2026): si varias capas comparten el mismo ShaderMaterial, cambiar un uniform en una afecta a todas. Crear instancias independientes.
 
 ## Limpieza (5/6/2026)
 - `_miniatura` write-only eliminada de player.gd
