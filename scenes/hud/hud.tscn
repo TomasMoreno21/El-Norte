@@ -21,8 +21,7 @@ offset_left = 47.0
 offset_top = 82.0
 offset_right = 227.0
 offset_bottom = 113.0
-theme_override_colors/font_color = Color(0.7919991, 0.79199916, 0.7919991, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 22
 text = "Récord: 0m"
 
@@ -38,6 +37,31 @@ grow_horizontal = 0
 theme_override_colors/font_color = Color(0.6, 0.35, 0.15, 1)
 theme_override_font_sizes/font_size = 32
 horizontal_alignment = 2
+
+[node name="PalitosLabel" type="Label" parent="." unique_id=1892457836]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1835.0
+offset_top = 119.0
+offset_right = -1685.0
+offset_bottom = 180.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
+theme_override_font_sizes/font_size = 44
+
+[node name="PalitosEmoji" type="Label" parent="." unique_id=1892457837]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1889.0
+offset_top = 118.0
+offset_right = -1829.0
+offset_bottom = 179.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
+theme_override_font_sizes/font_size = 44
+text = "🪵"
 
 [node name="PowerUpLabel" type="Label" parent="." unique_id=988080970]
 anchors_preset = 10
@@ -72,7 +96,7 @@ theme_override_font_sizes/font_size = 140
 text = "!"
 horizontal_alignment = 1
 
-[node name="TransitionLabel" type="Label" parent="."]
+[node name="TransitionLabel" type="Label" parent="." unique_id=1750067253]
 visible = false
 anchors_preset = 10
 anchor_right = 1.0
@@ -81,5 +105,4 @@ offset_bottom = 580.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_font_sizes/font_size = 52
-text = ""
 horizontal_alignment = 1

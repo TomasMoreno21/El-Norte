@@ -125,12 +125,22 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 - **Señales conectadas dentro de `_on_power_up_selected`** (9/6/2026): causaba conexiones duplicadas en cada power-up. Mover a `_ready()`.
 - **Parallax + texturas no tileables** (9/6/2026): ninguna técnica (flip_h, 3 copias, shader wrap, shader blend) elimina la costura si la textura no tilea. El usuario prefiere modificar las imágenes a usar shaders.
 - **ShaderMaterial compartido** (9/6/2026): si varias capas comparten el mismo ShaderMaterial, cambiar un uniform en una afecta a todas. Crear instancias independientes.
+- **Dict `["key"]` devuelve Variant** (12/6/2026): aunque el valor guardado sea `int`, `float` o `String`, indexar un Dictionary siempre retorna Variant. Usar `var x: <tipo> = dict["key"]` en lugar de `var x := dict["key"]`. Lo mismo aplica a funciones que devuelven Dictionary.
 
 ## Limpieza (5/6/2026)
 - `_miniatura` write-only eliminada de player.gd
 - `hide_effect()` y `show_effect()` muertas eliminadas de turbo_effect.gd
 - `ghost_time` + `_alive` + lógica ghost eliminados de obstacle.gd (nunca se activaban)
 - 3 nodos placeholder (BarroSeco, PlumaViento, Semilla) eliminados de choice_menu
+
+## Lecciones Aprendidas
+- `dict["key"]` siempre devuelve Variant en GDScript 4 → usar `var x: Tipo = dict["key"]`, no `var x := dict["key"]`
+- `Array[var] := [{...}]` infiere `Array`, no `Array[Dictionary]` → tipar explícitamente
+- `Engine.time_scale` no se puede tweenear con `tween_property` → usar callbacks con steps
+- `kill_tweens()` no existe en Godot 4 → usar `get_tree().get_processed_tweens()`
+- Conectar señales dentro de callbacks (ej. `_on_power_up_selected`) causa conexiones duplicadas → conectar en `_ready()`
+- ShaderMaterial compartido entre múltiples nodos: cambiar un uniform afecta a todos → crear instancias independientes
+- `TRANS_QUAD` no `TRANS_quad` — enum en mayúscula en Godot 4
 
 ## Pendiente
 - Sprites pixel art (bird 137×73, obst 100×25/25×100/55×55, kiwi 54×54, bola 70×70)

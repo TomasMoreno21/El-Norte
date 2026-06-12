@@ -30,15 +30,21 @@ func _ready() -> void:
 	blink_timer.timeout.connect(_blink)
 	add_child(blink_timer)
 
+var _was_pressed := false
+
 func _physics_process(delta: float) -> void:
 	if not alive:
 		return
 
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE):
+	var is_pressed := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE)
+	if is_pressed:
+		if not _was_pressed:
+			AudioManager.play_sfx("flap")
 		velocity.y = FLAP_VELOCITY * flap_mult
 	else:
 		velocity.y += GRAVITY * delta
-
+	
+	_was_pressed = is_pressed
 	move_and_slide()
 
 	if position.y < 53.5 or position.y > 1026.5:
@@ -56,6 +62,7 @@ func die() -> void:
 	if invulnerable:
 		return
 	if lives > 1:
+		AudioManager.play_sfx("collect") # use a lighter sound for losing a life
 		lives -= 1
 		invulnerable = true
 		collision_mask = 0
@@ -66,6 +73,8 @@ func die() -> void:
 		blink_timer.stop()
 		$Sprite2D.modulate.a = 1.0
 		return
+	
+	AudioManager.play_sfx("hit")
 	alive = false
 	velocity = Vector2.ZERO
 	rotation = 0.0

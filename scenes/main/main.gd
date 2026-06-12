@@ -64,12 +64,6 @@ const CALMA_DURATION := 5.0
 const REVIVE_COST := 200
 const REVIVE_REWIND := 150.0
 
-const TRANSITIONS := [
-	{ "start": 800.0, "end": 900.0, "message": "Las Llanuras se abren..." },
-	{ "start": 2000.0, "end": 2100.0, "message": "La Puna te espera..." },
-]
-var _in_transition := false
-
 # Constraint-based obstacle spawning
 const MIN_GAP := 90
 const SPAWN_MIN_Y := 160.0
@@ -119,11 +113,14 @@ func _ready() -> void:
 		turbo_effect = turbo_effect_scene.instantiate()
 		add_child(turbo_effect)
 	SceneTransition.fade_in()
+	$Background.transition_started.connect(_on_transition_started)
+	$Background.transition_ended.connect(_on_transition_ended)
 
 func start_storm() -> void:
 	in_storm = true
 	storm_time = 0.0
 	shake_strength = 16.0
+	AudioManager.play_sfx("storm_start")
 	_update_encounter_mode()
 
 func end_storm() -> void:
@@ -132,6 +129,7 @@ func end_storm() -> void:
 	next_storm_distance += STORM_INTERVAL
 	DataManager.storms_survived += 1
 	storms_in_run += 1
+	AudioManager.play_sfx("storm_end")
 	var nuevos := DataManager.check_achievements({ "storms_in_run": storms_in_run })
 	_show_popups(nuevos)
 	if "rey_tormentas" in DataManager.completed_achievements:
@@ -188,16 +186,6 @@ func _process(delta: float) -> void:
 	if not player.alive:
 		return
 
-	var was_in_transition := _in_transition
-	_in_transition = false
-	for t: Dictionary in TRANSITIONS:
-		if distance >= t["start"] and distance < t["end"]:
-			_in_transition = true
-			if not was_in_transition:
-				hud.show_transition_message(t["message"])
-			break
-	if was_in_transition and not _in_transition:
-		hud.hide_transition_message()
 	if not in_storm and distance >= next_storm_distance:
 		start_storm()
 		hud.show_storm_warning(false)
@@ -289,6 +277,12 @@ func _process(delta: float) -> void:
 	difficulty_dist += raw_delta
 	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult
 	hud.update_distance(int(distance))
+	var palitos_rate := 1 + DataManager.get_upgrade_level("palitos_base")
+	var bird_palitos_mult: float = DataManager.get_bird_modifiers()["palitos_mult"]
+	var run_palitos := int(distance / 10) * palitos_rate * bird_palitos_mult
+	if x2_palitos_active:
+		run_palitos *= 2
+	hud.update_palitos(int(run_palitos))
 	var curr_dist := int(distance)
 	if curr_dist >= last_check_dist + 25:
 		last_check_dist = curr_dist
@@ -363,7 +357,7 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float) -> void:
 	add_child(obs)
 
 func _on_spawn_timer_timeout() -> void:
-	if not obstacle_scene or not player.alive or calma_active or _in_transition:
+	if not obstacle_scene or not player.alive or calma_active or $Background.in_transition:
 		return
 
 	if kiwi_scene and kiwi_cooldown_timer >= KIWI_COOLDOWN:
@@ -392,6 +386,7 @@ func _on_spawn_timer_timeout() -> void:
 
 func _on_kiwi_collected() -> void:
 	run_kiwis += 1
+	AudioManager.play_sfx("kiwi_appear")
 	var menu := choice_menu_scene.instantiate()
 	menu.power_up_selected.connect(_on_power_up_selected)
 	add_child(menu)
@@ -427,7 +422,7 @@ func _on_power_up_selected(type: String) -> void:
 			player.set_miniatura(true)
 
 func _on_bola_timer_timeout() -> void:
-	if not player.alive or not bola_scene or _in_transition:
+	if not player.alive or not bola_scene or $Background.in_transition:
 		return
 	if randf() >= BOLA_SPAWN_CHANCE:
 		return
@@ -444,6 +439,7 @@ func _on_bola_collected() -> void:
 	var amount := 2 if x2_bolas_active else 1
 	DataManager.add_bolas(amount)
 	run_bolas += amount
+	AudioManager.play_sfx("collect")
 	var nuevos := DataManager.check_achievements({})
 	_show_popups(nuevos)
 	hud.update_bolas(DataManager.bolas_balance)
@@ -454,10 +450,12 @@ func _show_popups(nuevos: Array) -> void:
 	if nuevos.is_empty():
 		return
 	for a in nuevos:
+		AudioManager.play_sfx("achievement")
 		hud.show_achievement_popup(a)
 		await get_tree().create_timer(2.8).timeout
 
 func _on_revive() -> void:
+	AudioManager.play_sfx("revive")
 	Engine.time_scale = 1.0
 	DataManager.palitos_balance -= REVIVE_COST
 	distance = max(distance - REVIVE_REWIND, 0.0)
@@ -500,3 +498,9 @@ func _on_revive_reject() -> void:
 	Engine.time_scale = 1.0
 	revive_popup.visible = false
 	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)
+
+func _on_transition_started(msg: String) -> void:
+	hud.show_transition_message(msg)
+
+func _on_transition_ended(_biome_name: String) -> void:
+	hud.hide_transition_message()

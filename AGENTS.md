@@ -27,6 +27,7 @@ Eres un asistente de IA entrenado para colaborar en el **desarrollo de videojueg
 3. **Investigación previa:** Antes de escribir código nuevo, revisa los archivos y estructura del proyecto para entender el contexto.
 4. **Commits y ramas:** El usuario prefiere hacer commits y gestionar ramas manualmente. Pregúntale si quiere hacer un commit o trabajar en una rama nueva antes de proceder.
 5. **Sin comandos de verificación por ahora:** No hay scripts de test, lint ni build configurados.
+6. **Aprendizaje de errores:** Si cometés un error de sintaxis, lógica o código, reconocelo automaticamente, analizá la causa raíz y registrá la lección en `MEMORY.md` en la sección "Lecciones Aprendidas". Antes de escribir código similar en el futuro, revisá esa sección para evitar repetir el mismo error.
 
 ## Memoria Persistente (MEMORY.md)
 

@@ -6,6 +6,7 @@ extends CanvasLayer
 @onready var storm_label := $StormLabel
 @onready var storm_warning := $StormWarningLabel
 @onready var bolas_label := $BolasLabel
+@onready var palitos_label := $PalitosLabel
 
 var _storm_warning_active := false
 var _storm_warning_time := 0.0
@@ -31,6 +32,9 @@ func update_distance(meters: int) -> void:
 
 func update_bolas(amount: int) -> void:
 	bolas_label.text = "Barro: %d" % amount
+
+func update_palitos(amount: int) -> void:
+	palitos_label.text = " %d" % amount
 
 func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, x2p: float = 0.0) -> void:
 	var parts := []

@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 DataManager="*res://scenes/data_manager/data_manager.gd"
 SceneTransition="*res://scenes/effects/scene_transition.gd"
+AudioManager="*res://scenes/audio/audio_manager.gd"
 
 [display]
 
