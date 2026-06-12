@@ -77,6 +77,7 @@ const OBSTACLE_HALF_HEIGHTS := [12.5, 50.0, 27.5]
 @onready var death_screen := $DeathScreen
 @onready var revive_popup := $RevivePopup
 @onready var camera := $Camera2D
+@onready var parallax_editor := $ParallaxEditor
 
 var shake_strength := 10
 const SHAKE_DECAY := 4.0
@@ -115,6 +116,7 @@ func _ready() -> void:
 	SceneTransition.fade_in()
 	$Background.transition_started.connect(_on_transition_started)
 	$Background.transition_ended.connect(_on_transition_ended)
+	parallax_editor.set_background($Background)
 
 func start_storm() -> void:
 	in_storm = true
@@ -290,7 +292,7 @@ func _process(delta: float) -> void:
 		_show_popups(nuevos)
 	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining)
 	hud.show_storm(in_storm)
-	$Background.set_run_distance(distance, turbo_mult * rafaga_mult)
+	$Background.set_run_distance(distance, turbo_mult)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult
 
