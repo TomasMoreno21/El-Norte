@@ -53,20 +53,20 @@ El juego se llama "El Norte" porque el viaje va de **sur a norte** de Argentina.
 - **Slow-motion al morir**: `Engine.time_scale` 1.0 → 0.3 en 0.4s (12 steps con callbacks). Pausa del árbol + tween con TWEEN_PAUSE_PROCESS.
 - **Transiciones de escena**: 0.15s fade to black (SceneTransition autoload).
 - **Button feedback**: scale 0.92 press, 1.05 hover (button_feedback.gd).
-- **Achievement popups**: slide-in izquierda, stay 2s, slide-out.
+- **Achievement popups**: fade-in 0.3s, stay 5s, fade-out 0.5s. Persisten entre escenas (autoload DataManager).
 - **Storm warning "!"**: pulse rápido, auto-hide 2s.
 
 ## UI Animations
 - **Menu**: staggered fade-in (Label→Jugar→Salir→RightBox, 0.1s delays).
-- **Achievement popups**: slide-in ease-out back 0.4s, stay 2s, slide-out ease-in cubic 0.3s.
+- **Achievement popups**: fade-in 0.3s, stay 5s, fade-out 0.5s. Creado en DataManager (autoload) para persistir entre escenas.
 
 ## Pájaros (costos en bolas de barro)
 | Pájaro | Costo | flap_mult | speed_mult | kiwi_bonus | palitos_mult | extra_lives |
 |---|---|---|---|---|---|---|
 | Hornero | 0 | 1.0 | 1.0 | 0.0 | 1.0 | 0 |
-| Tero | 15 | 0.6 | 2.0 | 0.0 | 1.0 | 0 |
-| Golondrina | 15 | 1.0 | 1.0 | 0.15 | 0.5 | 0 |
-| Carpintero | 15 | 1.0 | 0.6 | 0.0 | 1.0 | 1 |
+| Tero | 50 | 0.8 | 1.4 | 0.0 | 0.85 | 0 |
+| Golondrina | 40 | 1.1 | 1.0 | 0.20 | 0.85 | 0 |
+| Carpintero | 30 | 1.0 | 0.9 | 0.0 | 0.75 | 1 |
 | premio_pajarero | -1 | — | — | — | — | — |
 
 ## Tienda — Mejoras
@@ -97,11 +97,17 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 | birder | Pajarero | all_birds | 1 |
 | trato_hecho | Trato Hecho | kiwi_accepts | 20 |
 | rey_tormentas | Rey de Tormentas | storms_in_run | 6 |
+| llanura | Llanuras | distance | 900m |
+| norte | Norte (Puna) | distance | 2100m |
+| por_los_pelos | Por los Pelos | revives_used | 1, 5, 10 |
+| rico | Rico | palitos_balance | 1000, 3000, 8000 |
+| multiuso | Multiuso | bird_uses | 2, 3, 4 |
 
 ## Variables persistentes (data_manager.gd)
 - palitos_balance, bolas_balance, upgrades, unlocked_birds, active_bird
 - bolas_total, deaths, storms_survived, max_distance, kiwi_accepts, total_upgrades_bought, calmas_survived
 - completed_achievements: Dictionary `{ id: level_index }`
+- revives_used, used_birds[] (trackeados desde 12/6/2026)
 - Save/load: `user://save.data`
 
 ### Migración de saves viejos
@@ -126,6 +132,7 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 - **Parallax + texturas no tileables** (9/6/2026): ninguna técnica (flip_h, 3 copias, shader wrap, shader blend) elimina la costura si la textura no tilea. El usuario prefiere modificar las imágenes a usar shaders.
 - **ShaderMaterial compartido** (9/6/2026): si varias capas comparten el mismo ShaderMaterial, cambiar un uniform en una afecta a todas. Crear instancias independientes.
 - **Dict `["key"]` devuelve Variant** (12/6/2026): aunque el valor guardado sea `int`, `float` o `String`, indexar un Dictionary siempre retorna Variant. Usar `var x: <tipo> = dict["key"]` en lugar de `var x := dict["key"]`. Lo mismo aplica a funciones que devuelven Dictionary.
+- **Achievement popups** (12/6/2026): `hud.show_achievement_popup()` creaba popups en el HUD (se destruía al recargar escena). Movido a `DataManager.show_achievement_popup()` que cuelga del autoload y persiste entre escenas. Duración aumentada de ~2.65s a ~5.8s (0.3 fade in + 5s visible + 0.5 fade out).
 
 ## Limpieza (5/6/2026)
 - `_miniatura` write-only eliminada de player.gd
@@ -148,5 +155,5 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 - Nubes/elementos en fondo parallax (esperando sprites)
 - Más variedad de encuentros (tailwind, bird flock)
 - Definir skin reward para "Pajarero"
-- Consumibles pre-partida
-- Desafíos diarios
+- Texturas tileables de parallax (eliminar costura)
+- Review/finalizar targets y rewards de logros

@@ -6,7 +6,9 @@ func _ready() -> void:
 
 func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0) -> void:
 	var palitos := DataManager.calculate_palitos_earned(distance)
-	DataManager.add_palitos(palitos)
+	var nuevos := DataManager.add_palitos(palitos)
+	for a in nuevos:
+		DataManager.show_achievement_popup(a)
 
 	$ColorRect/VBoxContainer/DistanceLabel.text = "%dm" % distance
 	$ColorRect/VBoxContainer/PalitosLabel.text = "Palitos: +%d  (Total: %d)" % [palitos, DataManager.palitos_balance]

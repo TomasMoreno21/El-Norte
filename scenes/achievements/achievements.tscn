@@ -41,7 +41,18 @@ size_flags_vertical = 3
 [node name="AchievementList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer"]
 theme_override_constants/separation = 10
 
-[node name="Volver" type="Button" parent="Bg/VBoxContainer"]
+[node name="ButtonRow" type="HBoxContainer" parent="Bg/VBoxContainer"]
+theme_override_constants/separation = 20
+
+[node name="Volver" type="Button" parent="Bg/VBoxContainer/ButtonRow"]
 text = "Volver"
+size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 140)
 theme_override_font_sizes/font_size = 56
+
+[node name="ResetLogros" type="Button" parent="Bg/VBoxContainer/ButtonRow"]
+text = "Reset Logros"
+size_flags_horizontal = 1
+custom_minimum_size = Vector2(0, 140)
+theme_override_font_sizes/font_size = 40
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)

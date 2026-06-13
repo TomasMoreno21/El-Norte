@@ -22,9 +22,9 @@ const MAX_LEVEL := 8
 
 const BIRDS := {
 	"hornero": { "name": "Hornero", "cost": 0, "Bonus": "—", "Penalidad": "—" },
-	"tero": { "name": "Tero", "cost": 15, "Bonus": "+ velocidad", "Penalidad": "Aleteo lento" },
-	"golondrina": { "name": "Golondrina", "cost": 15, "Bonus": "+15% kiwi", "Penalidad": "-50% palitos" },
-	"carpintero": { "name": "Carpintero", "cost": 15, "Bonus": "2 vidas", "Penalidad": "- velocidad" },
+	"tero": { "name": "Tero", "cost": 50, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
+	"golondrina": { "name": "Golondrina", "cost": 40, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
+	"carpintero": { "name": "Carpintero", "cost": 30, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
 	"premio_pajarero": { "name": "???", "cost": -1, "Bonus": "—", "Penalidad": "—" },
 }
 
@@ -39,9 +39,9 @@ const ACHIEVEMENTS := {
 		{ "target": 2000, "desc": "Llegar a 2000m", "reward_type": "palitos", "reward_amount": 80 },
 	]},
 	"collector": { "name": "Coleccionista", "cond": "bolas_total", "idx": 3, "levels": [
-		{ "target": 3, "desc": "3 barro total", "reward_type": "bolas", "reward_amount": 1 },
-		{ "target": 5, "desc": "5 barro total", "reward_type": "bolas", "reward_amount": 2 },
-		{ "target": 10, "desc": "10 barro total", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 3, "desc": "3 barro total", "reward_type": "palitos", "reward_amount": 100 },
+		{ "target": 5, "desc": "5 barro total", "reward_type": "palitos", "reward_amount": 150 },
+		{ "target": 10, "desc": "10 barro total", "reward_type": "palitos", "reward_amount": 200 },
 	]},
 	"persistent": { "name": "Persistente", "cond": "deaths", "idx": 4, "levels": [
 		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 30 },
@@ -74,6 +74,27 @@ const ACHIEVEMENTS := {
 	"rey_tormentas": { "name": "Rey de Tormentas", "cond": "storms_in_run", "idx": 11, "levels": [
 		{ "target": 6, "desc": "6 tormentas en una partida", "reward_type": "none", "reward_amount": 0 },
 	]},
+	"llanura": { "name": "Llanuras", "cond": "distance", "idx": 12, "levels": [
+		{ "target": 900, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
+	]},
+	"norte": { "name": "Norte", "cond": "distance", "idx": 13, "levels": [
+		{ "target": 2100, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
+	]},
+	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
+		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },
+		{ "target": 5, "desc": "Usar 5 revives", "reward_type": "palitos", "reward_amount": 60 },
+		{ "target": 10, "desc": "Usar 10 revives", "reward_type": "palitos", "reward_amount": 100 },
+	]},
+	"rico": { "name": "Rico", "cond": "palitos_balance", "idx": 15, "levels": [
+		{ "target": 1000, "desc": "Tener 1000 palitos", "reward_type": "bolas", "reward_amount": 2 },
+		{ "target": 3000, "desc": "Tener 3000 palitos", "reward_type": "bolas", "reward_amount": 4 },
+		{ "target": 8000, "desc": "Tener 8000 palitos", "reward_type": "bolas", "reward_amount": 6 },
+	]},
+	"multiuso": { "name": "Multiuso", "cond": "bird_uses", "idx": 16, "levels": [
+		{ "target": 2, "desc": "Usar 2 pájaros distintos", "reward_type": "palitos", "reward_amount": 40 },
+		{ "target": 3, "desc": "Usar 3 pájaros distintos", "reward_type": "palitos", "reward_amount": 80 },
+		{ "target": 4, "desc": "Usar los 4 pájaros", "reward_type": "bolas", "reward_amount": 5 },
+	]},
 }
 
 var palitos_balance := 0
@@ -89,6 +110,8 @@ var completed_achievements := {}
 var kiwi_accepts := 0
 var total_upgrades_bought := 0
 var calmas_survived := 0
+var revives_used := 0
+var used_birds := []
 
 func _ready() -> void:
 	load_data()
@@ -136,11 +159,11 @@ func unlock_bird(bird: String) -> Array:
 func get_bird_modifiers() -> Dictionary:
 	match active_bird:
 		"tero":
-			return { "flap_mult": 0.6, "speed_mult": 2.0, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0 }
+			return { "flap_mult": 0.8, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 0.85, "extra_lives": 0 }
 		"golondrina":
-			return { "flap_mult": 1.0, "speed_mult": 1.0, "kiwi_bonus": 0.15, "palitos_mult": 0.5, "extra_lives": 0 }
+			return { "flap_mult": 1.1, "speed_mult": 1.0, "kiwi_bonus": 0.20, "palitos_mult": 0.85, "extra_lives": 0 }
 		"carpintero":
-			return { "flap_mult": 1.0, "speed_mult": 0.6, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 1 }
+			return { "flap_mult": 1.0, "speed_mult": 0.9, "kiwi_bonus": 0.0, "palitos_mult": 0.75, "extra_lives": 1 }
 		_:
 			return { "flap_mult": 1.0, "speed_mult": 1.0, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0 }
 
@@ -168,6 +191,10 @@ func accept_kiwi() -> Array:
 	save_data()
 	return unlocked
 
+func reset_achievements() -> void:
+	completed_achievements = {}
+	save_data()
+
 func reset_data() -> void:
 	palitos_balance = 0
 	bolas_balance = 0
@@ -182,11 +209,19 @@ func reset_data() -> void:
 	kiwi_accepts = 0
 	total_upgrades_bought = 0
 	calmas_survived = 0
+	revives_used = 0
+	used_birds = []
 	save_data()
 
-func add_palitos(amount: int) -> void:
+func mark_bird_used(bird: String) -> void:
+	if not bird in used_birds:
+		used_birds.append(bird)
+		save_data()
+
+func add_palitos(amount: int) -> Array:
 	palitos_balance += amount
 	save_data()
+	return check_achievements({})
 
 func check_achievements(conditions: Dictionary) -> Array:
 	var unlocked := []
@@ -228,6 +263,12 @@ func check_achievements(conditions: Dictionary) -> Array:
 				achieved = total_upgrades_bought >= level_data["target"]
 			"calmas_survived":
 				achieved = calmas_survived >= level_data["target"]
+			"revives_used":
+				achieved = revives_used >= level_data["target"]
+			"palitos_balance":
+				achieved = palitos_balance >= level_data["target"]
+			"bird_uses":
+				achieved = used_birds.size() >= level_data["target"]
 		if achieved:
 			completed_achievements[id] = next_idx
 			var rtype: String = level_data["reward_type"]
@@ -259,6 +300,12 @@ func get_current_value(cond: String) -> int:
 			return total_upgrades_bought
 		"calmas_survived":
 			return calmas_survived
+		"revives_used":
+			return revives_used
+		"palitos_balance":
+			return palitos_balance
+		"bird_uses":
+			return used_birds.size()
 		_:
 			return -1
 
@@ -295,9 +342,9 @@ func show_achievement_popup(info: Dictionary) -> void:
 
 	bg.modulate = Color(1, 1, 1, 0)
 	var tween := create_tween()
-	tween.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.25)
-	tween.tween_interval(2.0)
-	tween.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.4)
+	tween.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
+	tween.tween_interval(5.0)
+	tween.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
 	tween.tween_callback(overlay.queue_free)
 
 func save_data() -> void:
@@ -315,6 +362,8 @@ func save_data() -> void:
 		"kiwi_accepts": kiwi_accepts,
 		"total_upgrades_bought": total_upgrades_bought,
 		"calmas_survived": calmas_survived,
+		"revives_used": revives_used,
+		"used_birds": used_birds,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -337,6 +386,8 @@ func load_data() -> void:
 				kiwi_accepts = data.get("kiwi_accepts", data.get("calandria_accepts", 0))
 				total_upgrades_bought = data.get("total_upgrades_bought", 0)
 				calmas_survived = data.get("calmas_survived", 0)
+				revives_used = data.get("revives_used", 0)
+				used_birds = data.get("used_birds", [])
 				var u = data.get("upgrades", {})
 				if u.has("calandria") and not u.has("kiwi"):
 					u["kiwi"] = u["calandria"]

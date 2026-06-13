@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 const GRAVITY := 900.0
-const FLAP_VELOCITY := -400.0
+const FLAP_VELOCITY := -430.0
 
 @export var start_position := Vector2(400, 540)
 

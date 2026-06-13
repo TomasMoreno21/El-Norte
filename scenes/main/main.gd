@@ -175,6 +175,7 @@ func _update_encounter_mode() -> void:
 func _on_player_died() -> void:
 	DataManager.deaths += 1
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
+	DataManager.mark_bird_used(DataManager.active_bird)
 	var nuevos := DataManager.check_achievements({ "distance": int(distance), "storms_in_run": storms_in_run })
 	if DataManager.palitos_balance >= REVIVE_COST and _revive_available:
 		_revive_available = false
@@ -453,13 +454,16 @@ func _show_popups(nuevos: Array) -> void:
 		return
 	for a in nuevos:
 		AudioManager.play_sfx("achievement")
-		hud.show_achievement_popup(a)
+		DataManager.show_achievement_popup(a)
 		await get_tree().create_timer(2.8).timeout
 
 func _on_revive() -> void:
 	AudioManager.play_sfx("revive")
 	Engine.time_scale = 1.0
 	DataManager.palitos_balance -= REVIVE_COST
+	DataManager.revives_used += 1
+	var nuevos_revive := DataManager.check_achievements({})
+	_show_popups(nuevos_revive)
 	distance = max(distance - REVIVE_REWIND, 0.0)
 	difficulty_dist = max(difficulty_dist - REVIVE_REWIND, 0.0)
 	next_storm_distance = floor(distance / STORM_INTERVAL) * STORM_INTERVAL + STORM_INTERVAL

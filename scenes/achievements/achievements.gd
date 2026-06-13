@@ -1,7 +1,8 @@
 extends CanvasLayer
 
 func _ready() -> void:
-	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
+	$Bg/VBoxContainer/ButtonRow/Volver.pressed.connect(_on_volver)
+	$Bg/VBoxContainer/ButtonRow/ResetLogros.pressed.connect(_on_reset_logros)
 	_update_stats()
 	_populate_achievements()
 	SceneTransition.fade_in()
@@ -120,3 +121,7 @@ func _populate_achievements() -> void:
 
 func _on_volver() -> void:
 	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")
+
+func _on_reset_logros() -> void:
+	DataManager.reset_achievements()
+	_populate_achievements()
