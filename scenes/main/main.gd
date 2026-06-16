@@ -38,6 +38,7 @@ var x2_bolas_active := false
 var miniatura_active := false
 var miniatura_start_time := 0.0
 var _revive_available := true
+var _death_old_max := 0
 
 const SPEED_BASE := 550.0
 const SPEED_AMP := 650.0
@@ -191,6 +192,7 @@ func _update_encounter_mode() -> void:
 
 func _on_player_died() -> void:
 	DataManager.deaths += 1
+	_death_old_max = DataManager.max_distance
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
 	DataManager.mark_bird_used(DataManager.active_bird)
 	var nuevos := DataManager.check_achievements({ "distance": int(distance), "storms_in_run": storms_in_run })
@@ -199,7 +201,7 @@ func _on_player_died() -> void:
 		revive_popup.show_revive(REVIVE_COST)
 		get_tree().paused = true
 	else:
-		death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)
+		death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis, _death_old_max)
 	_show_popups(nuevos)
 
 func _process(delta: float) -> void:
@@ -523,7 +525,7 @@ func _on_revive() -> void:
 func _on_revive_reject() -> void:
 	Engine.time_scale = 1.0
 	revive_popup.visible = false
-	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis)
+	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis, _death_old_max)
 
 func _on_transition_started(msg: String) -> void:
 	hud.show_transition_message(msg)
