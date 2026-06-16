@@ -14,6 +14,7 @@ func _ready() -> void:
 func fade_to_scene(scene_path: String) -> void:
 	if _is_transitioning:
 		return
+	DataManager.clear_achievement_popups()
 	_is_transitioning = true
 	_overlay.visible = true
 	_overlay.modulate.a = 0.0

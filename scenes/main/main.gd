@@ -16,6 +16,7 @@ var turbo_start_time := 0.0
 var shield_duration_max := 4.0
 var turbo_duration_max := 3.0
 var in_storm := false
+var _rafaga_progress := 0.0
 var storm_time := 0.0
 var turbo_effect: CanvasLayer
 var next_storm_distance := 500.0
@@ -38,10 +39,12 @@ var miniatura_active := false
 var miniatura_start_time := 0.0
 var _revive_available := true
 
-const MIN_SPEED := 500.0
-const MAX_SPEED := 1000.0
-const MAX_INTERVAL := 1.3
-const MIN_INTERVAL := 0.5
+const SPEED_BASE := 550.0
+const SPEED_AMP := 650.0
+const SPEED_TAU := 2500.0
+const INTERVAL_MIN := 0.38
+const INTERVAL_AMP := 0.90
+const INTERVAL_TAU := 2600.0
 const PIXEL_TO_METER := 60.0
 const KIWI_COOLDOWN := 20.0
 const KIWI_SPAWN_CHANCE := 0.08
@@ -52,7 +55,9 @@ const STORM_INTERVAL_FACTOR := 0.7
 const STORM_WARNING_DIST := 50.0
 const BOLA_SPAWN_INTERVAL := 6.0
 const BOLA_SPAWN_CHANCE := 0.15
-const TURBO_OBSTACLE_SPEED := 1.5
+const TURBO_OBSTACLE_SPEED_BASE := 1.5
+const TURBO_OBSTACLE_SPEED_PER_M := 0.00002
+const TURBO_OBSTACLE_SPEED_MAX := 1.7
 const TURBO_SPAWN_MULT := 1.5
 const RAFAGA_COOLDOWN := 1200.0
 const RAFAGA_CHANCE := 0.4
@@ -82,26 +87,29 @@ const OBSTACLE_HALF_HEIGHTS := [12.5, 50.0, 27.5]
 var shake_strength := 10
 const SHAKE_DECAY := 4.0
 
+func get_base_speed(dist: float) -> float:
+	return SPEED_BASE + SPEED_AMP * (1.0 - exp(-dist / SPEED_TAU))
+
 func get_speed(dist: float) -> float:
-	var s: float = min(MIN_SPEED + dist * 0.6, MAX_SPEED)
+	var s := get_base_speed(dist)
 	if in_storm:
 		s *= STORM_SPEED_BOOST
 	return s
-
-func get_speed_no_storm(dist: float) -> float:
-	return min(MIN_SPEED + dist * 0.6, MAX_SPEED)
 
 func get_double_chance(dist: float) -> float:
 	return min(0.08 + dist * 0.002, 0.40)
 
 func get_spawn_interval(dist: float) -> float:
-	var i: float = max(MAX_INTERVAL - dist * 0.0012, MIN_INTERVAL)
+	var i: float = INTERVAL_MIN + INTERVAL_AMP * exp(-dist / INTERVAL_TAU)
 	if in_storm:
 		i *= STORM_INTERVAL_FACTOR
 	return i
 
+func get_turbo_obs_speed(dist: float) -> float:
+	return min(TURBO_OBSTACLE_SPEED_BASE + dist * TURBO_OBSTACLE_SPEED_PER_M, TURBO_OBSTACLE_SPEED_MAX)
+
 func _ready() -> void:
-	spawn_timer.wait_time = MAX_INTERVAL
+	spawn_timer.wait_time = get_spawn_interval(0.0)
 	spawn_timer.start()
 	bola_timer.wait_time = BOLA_SPAWN_INTERVAL
 	bola_timer.start()
@@ -148,7 +156,9 @@ func end_storm() -> void:
 func start_rafaga() -> void:
 	rafaga_active = true
 	rafaga_time = 0.0
+	_rafaga_progress = 0.0
 	last_rafaga_distance = distance
+	_update_encounter_mode()
 
 func end_rafaga() -> void:
 	rafaga_active = false
@@ -158,8 +168,7 @@ func start_calma() -> void:
 	calma_active = true
 	calma_time = 0.0
 	last_calma_distance = distance
-	if turbo_effect:
-		turbo_effect.set_calma_mode()
+	_update_encounter_mode()
 
 func end_calma() -> void:
 	calma_active = false
@@ -173,6 +182,8 @@ func _update_encounter_mode() -> void:
 		turbo_effect.set_calma_mode()
 	elif in_storm:
 		turbo_effect.set_storm_mode()
+	elif rafaga_active:
+		turbo_effect.set_rafaga_mode(_rafaga_progress)
 	elif turbo_active:
 		turbo_effect.set_turbo_mode()
 	else:
@@ -195,7 +206,7 @@ func _process(delta: float) -> void:
 	if not player.alive:
 		return
 
-	if not in_storm and distance >= next_storm_distance:
+	if not in_storm and not $Background.in_transition and distance >= next_storm_distance:
 		start_storm()
 		hud.show_storm_warning(false)
 	elif in_storm:
@@ -243,8 +254,8 @@ func _process(delta: float) -> void:
 			progress = 0.0
 			end_rafaga()
 		rafaga_mult = 1.0 + (RAFAGA_BOOST - 1.0) * progress
-		if turbo_effect:
-			turbo_effect.set_rafaga_mode(progress)
+		_rafaga_progress = progress
+		_update_encounter_mode()
 
 	if calma_active:
 		calma_time += delta
@@ -380,10 +391,12 @@ func _on_spawn_timer_timeout() -> void:
 			kiwi_cooldown_timer = 0.0
 			return
 
-	var turbo_mult_obs := TURBO_OBSTACLE_SPEED if turbo_active else 1.0
+	var turbo_obs_speed := get_turbo_obs_speed(difficulty_dist) if turbo_active else 1.0
 	var storm_mult_obs := STORM_SPEED_BOOST if in_storm else 1.0
-	var combined_obs_mult := min(turbo_mult_obs * storm_mult_obs, 1.5)
-	var base_speed := get_speed_no_storm(difficulty_dist) * combined_obs_mult
+	var combined_obs_mult := turbo_obs_speed * storm_mult_obs
+	if in_storm and turbo_active:
+		combined_obs_mult = min(combined_obs_mult, 1.5)
+	var base_speed := get_base_speed(difficulty_dist) * combined_obs_mult
 
 	var shape_a := randi() % 3
 	if randf() < get_double_chance(difficulty_dist):
