@@ -136,6 +136,7 @@ var revives_used := 0
 var used_birds := []
 var first_milestones_claimed := []
 var record_bolas_claimed := []
+var tutorial_done := false
 
 func _ready() -> void:
 	load_data()
@@ -273,6 +274,7 @@ func reset_data() -> void:
 	used_birds = []
 	first_milestones_claimed = []
 	record_bolas_claimed = []
+	tutorial_done = false
 	save_data()
 
 func mark_bird_used(bird: String) -> void:
@@ -434,6 +436,7 @@ func save_data() -> void:
 		"used_birds": used_birds,
 		"first_milestones_claimed": first_milestones_claimed,
 		"record_bolas_claimed": record_bolas_claimed,
+		"tutorial_done": tutorial_done,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -460,6 +463,7 @@ func load_data() -> void:
 				used_birds = data.get("used_birds", [])
 				first_milestones_claimed = data.get("first_milestones_claimed", [])
 				record_bolas_claimed = data.get("record_bolas_claimed", [])
+				tutorial_done = data.get("tutorial_done", false)
 				var u = data.get("upgrades", {})
 				if u.has("calandria") and not u.has("kiwi"):
 					u["kiwi"] = u["calandria"]

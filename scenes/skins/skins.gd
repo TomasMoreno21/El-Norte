@@ -35,21 +35,33 @@ func _populate_birds() -> void:
 		var sprite := ColorRect.new()
 		sprite.custom_minimum_size = Vector2(120, 120)
 		sprite.size_flags_horizontal = 4
-		sprite.color = BIRD_COLORS.get(id, Color.WHITE)
+		if not owned and bird.get("cost", 0) < 0:
+			sprite.color = Color(0.15, 0.15, 0.15)
+		else:
+			sprite.color = BIRD_COLORS.get(id, Color.WHITE)
 		sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 		var name_label := Label.new()
-		name_label.text = bird.get("name", "?")
+		if not owned and bird.get("cost", 0) < 0:
+			name_label.text = "???"
+		else:
+			name_label.text = bird.get("name", "?")
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_label.add_theme_font_size_override("font_size", 36)
 
 		var bonus_label := Label.new()
-		bonus_label.text = "Bonus: %s" % bird.get("Bonus", "—")
+		if not owned and bird.get("cost", 0) < 0:
+			bonus_label.text = "??? "
+		else:
+			bonus_label.text = "Bonus: %s" % bird.get("Bonus", "—")
 		bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		bonus_label.add_theme_font_size_override("font_size", 26)
 
 		var penalty_label := Label.new()
-		penalty_label.text = "Penalidad: %s" % bird.get("Penalidad", "—")
+		if not owned and bird.get("cost", 0) < 0:
+			penalty_label.text = ""
+		else:
+			penalty_label.text = "Penalidad: %s" % bird.get("Penalidad", "—")
 		penalty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		penalty_label.add_theme_font_size_override("font_size", 26)
 

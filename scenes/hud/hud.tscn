@@ -106,3 +106,127 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_font_sizes/font_size = 52
 horizontal_alignment = 1
+
+[node name="TutorialOverlay" type="Control" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+
+[node name="Bg" type="ColorRect" parent="TutorialOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Panel" type="ColorRect" parent="TutorialOverlay"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -70.0
+offset_right = 400.0
+offset_bottom = 210.0
+color = Color(0.1, 0.1, 0.1, 0.9)
+
+[node name="Title" type="Label" parent="TutorialOverlay/Panel"]
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 780.0
+offset_bottom = 74.0
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 36
+text = "¡Bienvenido a El Norte!"
+horizontal_alignment = 1
+
+[node name="Instruction" type="Label" parent="TutorialOverlay/Panel"]
+offset_left = 40.0
+offset_top = 90.0
+offset_right = 760.0
+offset_bottom = 146.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "Mantené presionado para volar"
+horizontal_alignment = 1
+
+[node name="Instruction2" type="Label" parent="TutorialOverlay/Panel"]
+offset_left = 40.0
+offset_top = 130.0
+offset_right = 760.0
+offset_bottom = 186.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "Soltá para caer"
+horizontal_alignment = 1
+
+[node name="TapArrow" type="Label" parent="TutorialOverlay/Panel"]
+offset_left = 360.0
+offset_top = 186.0
+offset_right = 440.0
+offset_bottom = 246.0
+theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 36
+text = "👆"
+horizontal_alignment = 1
+
+[node name="PauseBtn" type="Button" parent="." unique_id=1516378720]
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 1820.0
+offset_top = 29.0
+offset_right = -49.0
+offset_bottom = 104.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 48
+text = "☰"
+
+[node name="PauseOverlay" type="ColorRect" parent="." unique_id=859131915]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="PauseTitle" type="Label" parent="PauseOverlay" unique_id=2014433288]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = -40.0
+theme_override_font_sizes/font_size = 80
+text = "PAUSA"
+horizontal_alignment = 1
+
+[node name="ContinueBtn" type="Button" parent="PauseOverlay" unique_id=1957101210]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = 20.0
+offset_right = 140.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 48
+text = "Seguir"
+
+[node name="QuitBtn" type="Button" parent="PauseOverlay" unique_id=424113099]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = 140.0
+offset_right = 140.0
+offset_bottom = 220.0
+theme_override_font_sizes/font_size = 48
+text = "Salir al menú"

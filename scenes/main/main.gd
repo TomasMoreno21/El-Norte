@@ -132,6 +132,8 @@ func _ready() -> void:
 	$Background.transition_started.connect(_on_transition_started)
 	$Background.transition_ended.connect(_on_transition_ended)
 	parallax_editor.set_background($Background)
+	if not DataManager.tutorial_done:
+		hud.start_tutorial()
 
 func start_storm() -> void:
 	in_storm = true

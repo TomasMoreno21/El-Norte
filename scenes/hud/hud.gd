@@ -7,12 +7,28 @@ extends CanvasLayer
 @onready var storm_warning := $StormWarningLabel
 @onready var bolas_label := $BolasLabel
 @onready var palitos_label := $PalitosLabel
+@onready var pause_btn := $PauseBtn
+@onready var pause_overlay := $PauseOverlay
+@onready var tutorial_overlay := $TutorialOverlay
+@onready var tap_arrow := $TutorialOverlay/Panel/TapArrow
 
 var _storm_warning_active := false
 var _storm_warning_time := 0.0
 const STORM_WARNING_DURATION := 2.0
 
+var _tutorial_timer := 0.0
+var _tutorial_arrow_time := 0.0
+const TUTORIAL_DURATION := 5.0
+
 func _process(delta: float) -> void:
+	if _tutorial_timer > 0:
+		_tutorial_timer -= delta
+		tap_arrow.modulate.a = 0.5 + 0.5 * sin(_tutorial_arrow_time * 4.0)
+		_tutorial_arrow_time += delta
+		if _tutorial_timer <= 0:
+			_hide_tutorial()
+	if get_tree().paused:
+		return
 	if _storm_warning_active:
 		_storm_warning_time += delta
 		if _storm_warning_time >= STORM_WARNING_DURATION:
@@ -24,6 +40,41 @@ func _process(delta: float) -> void:
 
 func _ready() -> void:
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	pause_btn.pressed.connect(_toggle_pause)
+	$PauseOverlay/ContinueBtn.pressed.connect(_toggle_pause)
+	$PauseOverlay/QuitBtn.pressed.connect(_quit_to_menu)
+
+func _toggle_pause() -> void:
+	var paused := not get_tree().paused
+	get_tree().paused = paused
+	pause_overlay.visible = paused
+	pause_btn.visible = not paused
+
+func start_tutorial() -> void:
+	tutorial_overlay.visible = true
+	pause_btn.visible = false
+	_tutorial_timer = TUTORIAL_DURATION
+	_tutorial_arrow_time = 0.0
+	tap_arrow.modulate.a = 1.0
+	get_tree().paused = true
+
+func _hide_tutorial() -> void:
+	tutorial_overlay.visible = false
+	pause_btn.visible = true
+	_tutorial_timer = 0.0
+	DataManager.tutorial_done = true
+	DataManager.save_data()
+	get_tree().paused = false
+
+func _input(event: InputEvent) -> void:
+	if _tutorial_timer > 0 and (event is InputEventScreenTouch or event is InputEventMouseButton):
+		_hide_tutorial()
+
+func _quit_to_menu() -> void:
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")
 
 func update_distance(meters: int) -> void:
 	distance_label.text = "%dm" % meters
@@ -60,9 +111,6 @@ func show_storm_warning(active: bool) -> void:
 	else:
 		storm_warning.visible = true
 		_storm_warning_time = 0.0
-
-
-
 
 func show_transition_message(text: String) -> void:
 	$TransitionLabel.text = text
