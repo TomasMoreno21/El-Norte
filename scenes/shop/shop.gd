@@ -1,11 +1,11 @@
 extends CanvasLayer
 
 const UPGRADE_DATA := [
-	{ "key": "speed", "name": "+Velocidad", "base_cost": 30 },
-	{ "key": "kiwi", "name": "+Kiwi", "base_cost": 25 },
-	{ "key": "palitos_base", "name": "+Palitos", "base_cost": 40 },
-	{ "key": "shield_duration", "name": "+Escudo", "base_cost": 30 },
-	{ "key": "turbo_duration", "name": "+Turbo", "base_cost": 30 },
+	{ "key": "speed", "name": "+Velocidad", "base_cost": 110 },
+	{ "key": "kiwi", "name": "+Kiwi", "base_cost": 90 },
+	{ "key": "palitos_base", "name": "+Palitos", "base_cost": 150 },
+	{ "key": "shield_duration", "name": "+Escudo", "base_cost": 100 },
+	{ "key": "turbo_duration", "name": "+Turbo", "base_cost": 100 },
 ]
 
 func _ready() -> void:
