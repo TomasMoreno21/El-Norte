@@ -3,11 +3,19 @@ extends Node
 const SAVE_PATH := "user://save.data"
 
 const UPGRADE_COST := {
-	"speed": 30,
-	"kiwi": 25,
-	"palitos_base": 40,
-	"shield_duration": 30,
-	"turbo_duration": 30,
+	"speed": 110,
+	"kiwi": 90,
+	"palitos_base": 150,
+	"shield_duration": 100,
+	"turbo_duration": 100,
+}
+
+const UPGRADE_COST_TABLE := {
+	"speed": [200, 300, 500, 700, 1200, 2000, 3000, 5000],
+	"kiwi": [150, 250, 400, 600, 1000, 1500, 2500, 4000],
+	"palitos_base": [250, 400, 600, 1000, 1500, 2500, 4000, 6500],
+	"shield_duration": [150, 250, 400, 700, 1000],
+	"turbo_duration": [150, 250, 400, 700, 1000],
 }
 
 const UPGRADE_MAX_LEVEL := {
@@ -22,11 +30,25 @@ const MAX_LEVEL := 8
 
 const BIRDS := {
 	"hornero": { "name": "Hornero", "cost": 0, "Bonus": "—", "Penalidad": "—" },
-	"tero": { "name": "Tero", "cost": 50, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
-	"golondrina": { "name": "Golondrina", "cost": 40, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
-	"carpintero": { "name": "Carpintero", "cost": 30, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
+	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
+	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
+	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
 	"premio_pajarero": { "name": "???", "cost": -1, "Bonus": "—", "Penalidad": "—" },
 }
+
+const DISTANCE_MILESTONES := [
+	{ "target": 500, "reward": 10 },
+	{ "target": 1000, "reward": 25 },
+	{ "target": 2200, "reward": 75 },
+	{ "target": 4600, "reward": 150 },
+]
+
+const RECORD_BOLAS := [
+	{ "target": 500, "reward": 1 },
+	{ "target": 1000, "reward": 2 },
+	{ "target": 2200, "reward": 3 },
+	{ "target": 4600, "reward": 5 },
+]
 
 const ACHIEVEMENTS := {
 	"first_flight": { "name": "Primer Vuelo", "cond": "distance", "idx": 0, "levels": [
@@ -112,6 +134,8 @@ var total_upgrades_bought := 0
 var calmas_survived := 0
 var revives_used := 0
 var used_birds := []
+var first_milestones_claimed := []
+var record_bolas_claimed := []
 
 func _ready() -> void:
 	load_data()
@@ -121,10 +145,12 @@ func get_upgrade_level(key: String) -> int:
 
 func get_upgrade_cost(key: String) -> int:
 	var level := get_upgrade_level(key)
-	var max_lv: int = UPGRADE_MAX_LEVEL.get(key, 8)
-	if level >= max_lv:
+	if not key in UPGRADE_COST_TABLE:
 		return -1
-	return UPGRADE_COST[key] * int(pow(2, level))
+	var table: Array = UPGRADE_COST_TABLE[key]
+	if level >= table.size():
+		return -1
+	return table[level]
 
 func buy_upgrade(key: String) -> Array:
 	var level := get_upgrade_level(key)
@@ -178,12 +204,44 @@ func calculate_palitos_earned(distance: int) -> int:
 	var total := segments * rate
 	var mods := get_bird_modifiers()
 	total = int(total * mods["palitos_mult"])
+	var biome_mult := 1.0
+	if distance > 4600:
+		biome_mult = 2.0
+	elif distance > 2200:
+		biome_mult = 1.5
+	total = int(total * biome_mult)
 	return total
 
 func add_bolas(amount: int) -> void:
 	bolas_balance += amount
 	bolas_total += amount
 	save_data()
+
+func claim_distance_milestones(distance: int) -> int:
+	var total := 0
+	for m in DISTANCE_MILESTONES:
+		var t: int = m["target"]
+		if distance >= t and not t in first_milestones_claimed:
+			first_milestones_claimed.append(t)
+			total += m["reward"]
+	if total > 0:
+		save_data()
+	return total
+
+func claim_record_bolas(distance: int, old_max: int) -> int:
+	var total := 0
+	if distance <= old_max:
+		return 0
+	for m in RECORD_BOLAS:
+		var t: int = m["target"]
+		if distance >= t and not t in record_bolas_claimed:
+			record_bolas_claimed.append(t)
+			total += m["reward"]
+	if total > 0:
+		bolas_balance += total
+		bolas_total += total
+		save_data()
+	return total
 
 func accept_kiwi() -> Array:
 	kiwi_accepts += 1
@@ -211,6 +269,8 @@ func reset_data() -> void:
 	calmas_survived = 0
 	revives_used = 0
 	used_birds = []
+	first_milestones_claimed = []
+	record_bolas_claimed = []
 	save_data()
 
 func mark_bird_used(bird: String) -> void:
@@ -370,6 +430,8 @@ func save_data() -> void:
 		"calmas_survived": calmas_survived,
 		"revives_used": revives_used,
 		"used_birds": used_birds,
+		"first_milestones_claimed": first_milestones_claimed,
+		"record_bolas_claimed": record_bolas_claimed,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -394,6 +456,8 @@ func load_data() -> void:
 				calmas_survived = data.get("calmas_survived", 0)
 				revives_used = data.get("revives_used", 0)
 				used_birds = data.get("used_birds", [])
+				first_milestones_claimed = data.get("first_milestones_claimed", [])
+				record_bolas_claimed = data.get("record_bolas_claimed", [])
 				var u = data.get("upgrades", {})
 				if u.has("calandria") and not u.has("kiwi"):
 					u["kiwi"] = u["calandria"]

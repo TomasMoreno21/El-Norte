@@ -3,15 +3,13 @@ extends CanvasLayer
 signal power_up_selected(type: String)
 
 const POOL := [
-	{ "text": "Escudo", "type": "shield" },
-	{ "text": "Turbo", "type": "turbo" },
-	{ "text": "x2 Barro", "type": "x2_bolas" },
-	{ "text": "Miniatura", "type": "miniatura" },
-	{ "text": "x2 Palitos", "type": "x2_palitos" },
-	{ "text": "Barro extra", "type": "bola_extra" },
+	{ "text": "Escudo", "type": "shield", "cost": 35 },
+	{ "text": "Turbo", "type": "turbo", "cost": 40 },
+	{ "text": "x2 Bolas", "type": "x2_bolas", "cost": 25 },
+	{ "text": "Miniatura", "type": "miniatura", "cost": 20 },
+	{ "text": "x2 Palitos", "type": "x2_palitos", "cost": 60 },
+	{ "text": "Barro extra", "type": "bola_extra", "cost": 35 },
 ]
-
-const PAID_COST := 30
 
 func _ready() -> void:
 	var pool: Array[Dictionary] = []
@@ -30,24 +28,22 @@ func _ready() -> void:
 	$RightPanel/VBoxContainer.add_child(palitos_label)
 	$RightPanel/VBoxContainer.move_child(palitos_label, 2)
 
-	var display: Array[Dictionary] = [free_option]
+	_add_choice(free_option["text"], free_option["type"], 0)
 
-	if DataManager.palitos_balance >= PAID_COST:
-		var paid_count := 2
-		if "trato_hecho" in DataManager.completed_achievements:
-			paid_count = 3
-		for i in range(min(paid_count, pool.size())):
-			var p := pool[i].duplicate()
-			p["cost"] = PAID_COST
-			display.append(p)
+	var paid: Array[Dictionary] = []
+	for p in pool:
+		if DataManager.palitos_balance >= p["cost"]:
+			paid.append(p)
+	paid.shuffle()
 
-	display.shuffle()
+	var max_paid := 2
+	if "trato_hecho" in DataManager.completed_achievements:
+		max_paid = 3
+	for i in range(min(max_paid, paid.size())):
+		var p := paid[i]
+		_add_choice(p["text"] + "  🪵" + str(p["cost"]), p["type"], p["cost"])
 
-	for p in display:
-		var label: String = p["text"]
-		if p.has("cost"):
-			label += "  🪵" + str(p["cost"])
-		_add_choice(label, p["type"], p.get("cost", 0))
+	_add_reject()
 
 func _add_choice(text: String, type: String, cost: int) -> void:
 	var btn := Button.new()
@@ -58,10 +54,24 @@ func _add_choice(text: String, type: String, cost: int) -> void:
 	btn.pressed.connect(_on_choice.bind(type, cost))
 	$RightPanel/VBoxContainer.add_child(btn)
 
+func _add_reject() -> void:
+	var btn := Button.new()
+	btn.text = "Rechazar"
+	btn.custom_minimum_size = Vector2(0, 64)
+	btn.add_theme_font_size_override("font_size", 36)
+	btn.size_flags_horizontal = 4
+	btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	btn.pressed.connect(_on_reject)
+	$RightPanel/VBoxContainer.add_child(btn)
+
 func _on_choice(type: String, cost: int) -> void:
 	if cost > 0:
 		DataManager.palitos_balance -= cost
 		DataManager.save_data()
 	power_up_selected.emit(type)
+	get_tree().paused = false
+	queue_free()
+
+func _on_reject() -> void:
 	get_tree().paused = false
 	queue_free()

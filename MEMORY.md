@@ -149,6 +149,40 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 - ShaderMaterial compartido entre múltiples nodos: cambiar un uniform afecta a todos → crear instancias independientes
 - `TRANS_QUAD` no `TRANS_quad` — enum en mayúscula en Godot 4
 
+## Branch: economia-final
+
+### Ingreso de palitos
+- Fórmula: `int(dist/10) × (1 + lv_palitos_base) × biome_mult × bird_mult`
+- **Biome mult**: Cordillera ×1.0, Llanuras (2200+) ×1.5, Puna (4600+) ×2.0
+- **Bonos únicos por hito**: 500m=+10, 1000m=+25, 2200m=+75, 4600m=+150 🪵
+
+### Bolas por récord
+- Umbrales: 500m=1🔵, 1000m=2🔵, 2200m=3🔵, 4600m=5🔵
+- Solo cuando rompés `max_distance`. Usa `_death_old_max` guardado antes de actualizar.
+
+### Costos (UPGRADE_COST_TABLE, tabla hardcodeada)
+| Mejora | Lv1 | Lv2 | Lv3 | Lv4 | Lv5 | Lv6 | Lv7 | Lv8 |
+|--------|-----|-----|-----|-----|-----|-----|-----|-----|
+| Velocidad | 200 | 300 | 500 | 700 | 1200 | 2000 | 3000 | 5000 |
+| Kiwi | 150 | 250 | 400 | 600 | 1000 | 1500 | 2500 | 4000 |
+| Palitos Base | 250 | 400 | 600 | 1000 | 1500 | 2500 | 4000 | 6500 |
+| Escudo/Turbo (max5) | 150 | 250 | 400 | 700 | 1000 | — | — | — |
+
+**Total maxear: ~34.840 🪵**. Pájaros: Carpintero 25🔵, Golondrina 35🔵, Tero 45🔵.
+
+### Archivos modificados
+- `data_manager.gd`: UPGRADE_COST_TABLE, biome_mult en calculate_palitos_earned(), claim_distance_milestones(), claim_record_bolas(), nuevas variables + persistencia
+- `death_screen.gd`: bonus milestones/récords en UI + BonusLabel
+- `death_screen.tscn`: BonusLabel agregado
+- `main.gd`: _death_old_max, pase a death_screen
+- `shop.gd`: base_cost actualizados
+
+### Flujo récord
+1. `_on_player_died()` guarda `_death_old_max` → actualiza `max_distance`
+2. `show_screen()` pasa `old_max` a `claim_record_bolas()`
+3. `claim_record_bolas()` compara distance vs old_max → solo paga si es récord
+4. `_on_revive_reject()` también pasa `_death_old_max`
+
 ## Pendiente
 - Sprites pixel art (bird 137×73, obst 100×25/25×100/55×55, kiwi 54×54, bola 70×70)
 - Sonido/música
