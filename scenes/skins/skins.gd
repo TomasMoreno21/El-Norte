@@ -5,6 +5,7 @@ const BIRD_COLORS := {
 	"tero": Color(0.9, 0.9, 0.85),
 	"golondrina": Color(0.3, 0.6, 0.9),
 	"carpintero": Color(0.9, 0.2, 0.15),
+	"premio_pajarero": Color(0.55, 0.27, 0.07),
 }
 
 func _ready() -> void:

@@ -382,8 +382,8 @@ func _on_spawn_timer_timeout() -> void:
 
 	var turbo_mult_obs := TURBO_OBSTACLE_SPEED if turbo_active else 1.0
 	var storm_mult_obs := STORM_SPEED_BOOST if in_storm else 1.0
-	var combined_obs_mult := min(turbo_mult_obs * storm_mult_obs, 1.5)
-	var base_speed := get_speed_no_storm(difficulty_dist) * combined_obs_mult
+	var combined_obs_mult: float = min(turbo_mult_obs * storm_mult_obs, 1.5)
+	var base_speed: float = get_speed_no_storm(difficulty_dist) * combined_obs_mult
 
 	var shape_a := randi() % 3
 	if randf() < get_double_chance(difficulty_dist):

@@ -25,7 +25,7 @@ const BIRDS := {
 	"tero": { "name": "Tero", "cost": 50, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
 	"golondrina": { "name": "Golondrina", "cost": 40, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
 	"carpintero": { "name": "Carpintero", "cost": 30, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
-	"premio_pajarero": { "name": "???", "cost": -1, "Bonus": "—", "Penalidad": "—" },
+	"premio_pajarero": { "name": "Carancho", "cost": -1, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
 }
 
 const ACHIEVEMENTS := {
@@ -75,10 +75,10 @@ const ACHIEVEMENTS := {
 		{ "target": 6, "desc": "6 tormentas en una partida", "reward_type": "none", "reward_amount": 0 },
 	]},
 	"llanura": { "name": "Llanuras", "cond": "distance", "idx": 12, "levels": [
-		{ "target": 1400, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
+		{ "target": 2200, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
 	]},
 	"norte": { "name": "Norte", "cond": "distance", "idx": 13, "levels": [
-		{ "target": 2800, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
 		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },
@@ -159,11 +159,13 @@ func unlock_bird(bird: String) -> Array:
 func get_bird_modifiers() -> Dictionary:
 	match active_bird:
 		"tero":
-			return { "flap_mult": 0.8, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 0.85, "extra_lives": 0 }
+			return { "flap_mult": 0.72, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 0.85, "extra_lives": 0 }
 		"golondrina":
 			return { "flap_mult": 1.1, "speed_mult": 1.0, "kiwi_bonus": 0.20, "palitos_mult": 0.85, "extra_lives": 0 }
 		"carpintero":
 			return { "flap_mult": 1.0, "speed_mult": 0.9, "kiwi_bonus": 0.0, "palitos_mult": 0.75, "extra_lives": 1 }
+		"premio_pajarero":
+			return { "flap_mult": 1.0, "speed_mult": 1.6, "kiwi_bonus": 0.0, "palitos_mult": 1.1, "extra_lives": 1 }
 		_:
 			return { "flap_mult": 1.0, "speed_mult": 1.0, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0 }
 
