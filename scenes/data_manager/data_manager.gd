@@ -159,7 +159,7 @@ func unlock_bird(bird: String) -> Array:
 func get_bird_modifiers() -> Dictionary:
 	match active_bird:
 		"tero":
-			return { "flap_mult": 0.8, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 0.85, "extra_lives": 0 }
+			return { "flap_mult": 0.72, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 0.85, "extra_lives": 0 }
 		"golondrina":
 			return { "flap_mult": 1.1, "speed_mult": 1.0, "kiwi_bonus": 0.20, "palitos_mult": 0.85, "extra_lives": 0 }
 		"carpintero":
@@ -309,15 +309,21 @@ func get_current_value(cond: String) -> int:
 		_:
 			return -1
 
+func clear_achievement_popups() -> void:
+	for c in get_children():
+		if c is CanvasLayer:
+			c.queue_free()
+
 func show_achievement_popup(info: Dictionary) -> void:
 	var overlay := CanvasLayer.new()
 	overlay.layer = 100
 	add_child(overlay)
 
+	var vp := get_viewport().get_visible_rect().size
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.05, 0.85)
 	bg.size = Vector2(350, 88)
-	bg.position = Vector2(16, 16)
+	bg.position = Vector2(16, vp.y - 88 - 16)
 	bg.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	var name_lbl := Label.new()

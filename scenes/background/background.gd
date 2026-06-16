@@ -3,7 +3,7 @@ extends ParallaxBackground
 const BIOMES := [
 	{
 		"start": 0,
-		"end": 1300,
+		"end": 2200,
 		"name": "Cordillera",
 		"textures": [
 			"res://Sprites/Fondos/Cordillera/cordillera1.png",
@@ -17,8 +17,8 @@ const BIOMES := [
 		"y_offsets": [-340, -230, -260, -150, -90, -140],
 	},
 	{
-		"start": 1400,
-		"end": 2800,
+		"start": 2200,
+		"end": 4600,
 		"name": "Llanuras",
 		"textures": [
 			"res://Sprites/Fondos/Llanura/llanura1.png",
@@ -34,7 +34,7 @@ const BIOMES := [
 		"y_offsets": [-340, -280, -230, -200, -180, -150, -90, -140],
 	},
 	{
-		"start": 2800,
+		"start": 4600,
 		"end": INF,
 		"name": "Puna",
 		"textures": [
@@ -73,8 +73,8 @@ var fog_scales_run: Array[float] = [2.0, 3.0, 4.0, 6.0]
 var fog_sprite_scales: Array[float] = []
 
 const FOG_ZONES := [
-	{ "start": 1200.0, "peak": 1300.0, "end": 1400.0 },
-	{ "start": 2600.0, "peak": 2700.0, "end": 2800.0 },
+	{ "start": 2100.0, "peak": 2200.0, "end": 2300.0 },
+	{ "start": 4500.0, "peak": 4600.0, "end": 4700.0 },
 ]
 
 signal transition_started(message_out: String)

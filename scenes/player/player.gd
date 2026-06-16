@@ -118,6 +118,7 @@ func _blink() -> void:
 	$Sprite2D.modulate.a = 0.2 if $Sprite2D.modulate.a == 1.0 else 1.0
 
 func reset() -> void:
+	kill_all_tweens()
 	alive = true
 	velocity = Vector2.ZERO
 	position = start_position
