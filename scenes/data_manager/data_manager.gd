@@ -75,10 +75,10 @@ const ACHIEVEMENTS := {
 		{ "target": 6, "desc": "6 tormentas en una partida", "reward_type": "none", "reward_amount": 0 },
 	]},
 	"llanura": { "name": "Llanuras", "cond": "distance", "idx": 12, "levels": [
-		{ "target": 900, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
+		{ "target": 1400, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
 	]},
 	"norte": { "name": "Norte", "cond": "distance", "idx": 13, "levels": [
-		{ "target": 2100, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 2800, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
 		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },

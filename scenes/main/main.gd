@@ -88,6 +88,12 @@ func get_speed(dist: float) -> float:
 		s *= STORM_SPEED_BOOST
 	return s
 
+func get_speed_no_storm(dist: float) -> float:
+	return min(MIN_SPEED + dist * 0.6, MAX_SPEED)
+
+func get_double_chance(dist: float) -> float:
+	return min(0.08 + dist * 0.002, 0.40)
+
 func get_spawn_interval(dist: float) -> float:
 	var i: float = max(MAX_INTERVAL - dist * 0.0012, MIN_INTERVAL)
 	if in_storm:
@@ -354,7 +360,6 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float) -> void:
 	var obs := obstacle_scene.instantiate()
 	obs.speed = speed
 	obs.shape_type = shape_type
-	obs.move_type = 0 if randf() < 0.7 else 1
 	obs.position = Vector2(2100, y)
 	obs.add_to_group("obstacle")
 	add_child(obs)
@@ -375,11 +380,13 @@ func _on_spawn_timer_timeout() -> void:
 			kiwi_cooldown_timer = 0.0
 			return
 
-	var turbo_obs_speed := TURBO_OBSTACLE_SPEED if turbo_active else 1.0
-	var base_speed := get_speed(difficulty_dist) * turbo_obs_speed
+	var turbo_mult_obs := TURBO_OBSTACLE_SPEED if turbo_active else 1.0
+	var storm_mult_obs := STORM_SPEED_BOOST if in_storm else 1.0
+	var combined_obs_mult := min(turbo_mult_obs * storm_mult_obs, 1.5)
+	var base_speed := get_speed_no_storm(difficulty_dist) * combined_obs_mult
 
 	var shape_a := randi() % 3
-	if randf() < 0.08:
+	if randf() < get_double_chance(difficulty_dist):
 		var shape_b := randi() % 3
 		var positions := _safe_double_y(shape_a, shape_b)
 		_spawn_obstacle_at(shape_a, base_speed, positions.x)

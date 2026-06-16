@@ -13,11 +13,11 @@ Godot 4.6.2, resolución 1920×1080 landscape mobile. Stretch `canvas_items` + `
 El juego se llama "El Norte" porque el viaje va de **sur a norte** de Argentina. El hornero vuela desde la Cordillera hasta la Puna.
 
 ### Biomas (en orden del viaje)
-1. **Montaña/Cordillera** (sur, 0–800m) — cielo gris azulado, montañas oscuras
-2. Transición 800–900m: sin obstáculos, mensaje "Las Llanuras se abren..."
-3. **Llanuras** (centro, 900–2000m) — verdes de llanura
-4. Transición 2000–2100m: sin obstáculos, mensaje "La Puna te espera..."
-5. **Puna** (norte, 2100+) — ocres y terracota
+1. **Montaña/Cordillera** (sur, 0–1300m) — cielo gris azulado, montañas oscuras
+2. Transición 1300–1400m: solo neblina, mensaje "Las Llanuras se abren..."
+3. **Llanuras** (centro, 1400–2800m) — verdes de llanura
+4. Transición 2750–2800m: neblina + fade, mensaje "La Puna te espera..."
+5. **Puna** (norte, 2800+) — ocres y terracota
 
 ## Escenas
 - **Menu** (`menu.tscn`): Jugar, Salir, RightBox (Tienda/Skins/Logros), Reset. Staggered fade-in on load.
@@ -97,8 +97,8 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 | birder | Pajarero | all_birds | 1 |
 | trato_hecho | Trato Hecho | kiwi_accepts | 20 |
 | rey_tormentas | Rey de Tormentas | storms_in_run | 6 |
-| llanura | Llanuras | distance | 900m |
-| norte | Norte (Puna) | distance | 2100m |
+| llanura | Llanuras | distance | 1400m |
+| norte | Norte (Puna) | distance | 2800m |
 | por_los_pelos | Por los Pelos | revives_used | 1, 5, 10 |
 | rico | Rico | palitos_balance | 1000, 3000, 8000 |
 | multiuso | Multiuso | bird_uses | 2, 3, 4 |

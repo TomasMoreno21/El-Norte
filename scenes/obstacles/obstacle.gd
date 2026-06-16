@@ -1,14 +1,10 @@
 extends StaticBody2D
 
 enum ShapeType { RECT_H, RECT_V, CIRCLE }
-enum MoveType { STATIC, OSCILLATE }
 
 var speed := 250.0
 var shape_type := ShapeType.RECT_H
-var move_type := MoveType.STATIC
 
-var time := 0.0
-var start_y: float
 var angular_speed := 0.0
 var _sprite: Sprite2D
 var _collision_shape: CollisionShape2D
@@ -26,21 +22,13 @@ const SHAPE_SIZES := {
 }
 
 func _ready() -> void:
-	start_y = position.y
 	angular_speed = randf_range(1.5, 4.0) * (-1 if randi() % 2 == 0 else 1)
 	_setup_visual()
 	_setup_collision()
 
 func _physics_process(delta: float) -> void:
-	time += delta
 	position.x -= speed * delta
 	_sprite.rotation += angular_speed * delta
-
-	match move_type:
-		MoveType.OSCILLATE:
-			position.y = start_y + sin(time * 3.0) * 20.0
-		_:
-			position.y = start_y
 
 	if position.x < -200:
 		queue_free()
