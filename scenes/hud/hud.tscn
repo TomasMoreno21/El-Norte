@@ -1,6 +1,11 @@
 [gd_scene format=3 uid="uid://uflrhrr6hhal"]
 
 [ext_resource type="Script" uid="uid://bkdwx2mdct30" path="res://scenes/hud/hud.gd" id="1"]
+[ext_resource type="Shader" path="res://scenes/effects/border_flash.gdshader" id="2"]
+
+[sub_resource type="ShaderMaterial" id="MatFlash"]
+shader = ExtResource("2")
+shader_parameter/flash_alpha = 0.0
 
 [node name="HUD" type="CanvasLayer" unique_id=1326789121]
 layer = 10
@@ -89,6 +94,15 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 140
 text = "!"
 horizontal_alignment = 1
+
+[node name="MilestoneFlash" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 1, 0, 1)
+material = SubResource("MatFlash")
 
 [node name="TransitionLabel" type="Label" parent="." unique_id=1750067253]
 visible = false
