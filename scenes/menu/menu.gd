@@ -12,13 +12,11 @@ func _ready() -> void:
 
 func _animate_menu() -> void:
 	$Label.modulate.a = 0.0
-	$Jugar.modulate.a = 0.0
 	$Salir.modulate.a = 0.0
 	$RightBox.modulate.a = 0.0
 
 	var tween := create_tween().set_parallel(true)
 	tween.tween_property($Label, "modulate:a", 1.0, 0.5)
-	tween.tween_property($Jugar, "modulate:a", 1.0, 0.5).set_delay(0.1)
 	tween.tween_property($Salir, "modulate:a", 1.0, 0.5).set_delay(0.2)
 	tween.tween_property($RightBox, "modulate:a", 1.0, 0.5).set_delay(0.3)
 
