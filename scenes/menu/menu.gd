@@ -1,7 +1,8 @@
 extends Control
 
 func _ready() -> void:
-	$Jugar.pressed.connect(_on_jugar)
+	process_mode = PROCESS_MODE_ALWAYS
+	$Jugar.gui_input.connect(_on_jugar_touch)
 	$RightBox/Tienda.pressed.connect(_on_tienda)
 	$RightBox/Skins.pressed.connect(_on_skins)
 	$RightBox/Logros.pressed.connect(_on_logros)
@@ -9,6 +10,11 @@ func _ready() -> void:
 	$ResetButton.pressed.connect(_on_reset)
 	_animate_menu()
 	SceneTransition.fade_in()
+
+func _on_jugar_touch(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		DataManager.clear_achievement_popups()
+		get_tree().change_scene_to_file("res://scenes/main/main.tscn")
 
 func _animate_menu() -> void:
 	$Label.modulate.a = 0.0
@@ -19,10 +25,6 @@ func _animate_menu() -> void:
 	tween.tween_property($Label, "modulate:a", 1.0, 0.5)
 	tween.tween_property($Salir, "modulate:a", 1.0, 0.5).set_delay(0.2)
 	tween.tween_property($RightBox, "modulate:a", 1.0, 0.5).set_delay(0.3)
-
-func _on_jugar() -> void:
-	DataManager.clear_achievement_popups()
-	get_tree().change_scene_to_file("res://scenes/main/main.tscn")
 
 func _on_tienda() -> void:
 	SceneTransition.fade_to_scene("res://scenes/shop/shop.tscn")
