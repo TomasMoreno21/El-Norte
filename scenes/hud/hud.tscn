@@ -38,30 +38,35 @@ theme_override_colors/font_color = Color(0.6, 0.35, 0.15, 1)
 theme_override_font_sizes/font_size = 32
 horizontal_alignment = 2
 
-[node name="PalitosLabel" type="Label" parent="." unique_id=1892457836]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -1835.0
-offset_top = 119.0
-offset_right = -1685.0
-offset_bottom = 180.0
-grow_horizontal = 0
-theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
-theme_override_font_sizes/font_size = 44
-
 [node name="PalitosEmoji" type="Label" parent="." unique_id=1892457837]
 anchors_preset = 1
 anchor_left = 1.0
+anchor_top = 0.0
 anchor_right = 1.0
-offset_left = -1889.0
+anchor_bottom = 0.0
+offset_left = -250.0
 offset_top = 118.0
-offset_right = -1829.0
+offset_right = -160.0
 offset_bottom = 179.0
 grow_horizontal = 0
 theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
 theme_override_font_sizes/font_size = 44
 text = "🪵"
+
+[node name="PalitosLabel" type="Label" parent="." unique_id=1892457836]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -150.0
+offset_top = 118.0
+offset_right = -20.0
+offset_bottom = 179.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
+theme_override_font_sizes/font_size = 44
+horizontal_alignment = 2
 
 [node name="PowerUpLabel" type="Label" parent="." unique_id=988080970]
 anchors_preset = 10

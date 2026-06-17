@@ -84,7 +84,7 @@ func update_bolas(amount: int) -> void:
 	bolas_label.text = "Barro: %d" % amount
 
 func update_palitos(amount: int) -> void:
-	palitos_label.text = " %d" % amount
+	palitos_label.text = "%d" % amount
 
 func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, x2p: float = 0.0) -> void:
 	var parts := []
