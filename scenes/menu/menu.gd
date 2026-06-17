@@ -2,17 +2,13 @@ extends Control
 
 func _ready() -> void:
 	$Jugar.pressed.connect(_on_jugar)
-	var empty := StyleBoxEmpty.new()
-	$Jugar.add_theme_stylebox_override("normal", empty)
-	$Jugar.add_theme_stylebox_override("hover", empty)
-	$Jugar.add_theme_stylebox_override("pressed", empty)
 	$RightBox/Tienda.pressed.connect(_on_tienda)
 	$RightBox/Skins.pressed.connect(_on_skins)
 	$RightBox/Logros.pressed.connect(_on_logros)
 	$Salir.pressed.connect(_on_salir)
 	$ResetButton.pressed.connect(_on_reset)
-	SceneTransition.fade_in()
 	_animate_menu()
+	SceneTransition.fade_in()
 
 func _animate_menu() -> void:
 	$Label.modulate.a = 0.0

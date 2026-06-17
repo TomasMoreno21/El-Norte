@@ -47,7 +47,7 @@ theme_override_font_sizes/font_size = 48
 text = "Logros"
 script = ExtResource("2")
 
-[node name="Jugar" type="Button" parent="." unique_id=1647251839]
+[node name="Jugar" type="TextureButton" parent="." unique_id=1647251839]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
@@ -58,10 +58,10 @@ offset_left = 87.0
 offset_top = 6.0
 offset_right = -85.0
 offset_bottom = 6.0
-theme_override_font_sizes/font_size = 120
-icon = ExtResource("3")
-expand_icon = true
-script = ExtResource("2")
+texture_normal = ExtResource("3")
+expand_mode = 1
+ignore_texture_size = true
+stretch_mode = 1
 
 [node name="Salir" type="Button" parent="." unique_id=587563896]
 layout_mode = 0
