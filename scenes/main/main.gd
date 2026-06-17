@@ -33,6 +33,8 @@ var storms_in_run := 0
 var run_bolas := 0
 var run_kiwis := 0
 var x2_palitos_active := false
+var _last_milestone_idx := 0
+const MILESTONES := [500, 1000, 2200, 4600]
 var x2_palitos_start_time := 0.0
 var x2_bolas_active := false
 var miniatura_active := false
@@ -115,6 +117,7 @@ func _ready() -> void:
 	bola_timer.wait_time = BOLA_SPAWN_INTERVAL
 	bola_timer.start()
 	player.died.connect(_on_player_died)
+	player.flapped.connect(_on_player_flapped)
 	revive_popup.revived.connect(_on_revive)
 	revive_popup.rejected.connect(_on_revive_reject)
 	hud.update_bolas(DataManager.bolas_balance)
@@ -124,6 +127,7 @@ func _ready() -> void:
 	storms_in_run = 0
 	run_bolas = 0
 	run_kiwis = 0
+	_last_milestone_idx = 0
 	camera.zoom = Vector2(1.2, 1.2)
 	if turbo_effect_scene:
 		turbo_effect = turbo_effect_scene.instantiate()
@@ -139,12 +143,14 @@ func start_storm() -> void:
 	in_storm = true
 	storm_time = 0.0
 	shake_strength = 16.0
+	player.storm_flap_override = -340
 	AudioManager.play_sfx("storm_start")
 	_update_encounter_mode()
 
 func end_storm() -> void:
 	in_storm = false
 	storm_time = 0.0
+	player.end_storm_gradual()
 	next_storm_distance += STORM_INTERVAL
 	DataManager.storms_survived += 1
 	storms_in_run += 1
@@ -191,6 +197,11 @@ func _update_encounter_mode() -> void:
 		turbo_effect.set_turbo_mode()
 	else:
 		turbo_effect.set_normal_mode()
+
+func _on_player_flapped() -> void:
+	if in_storm or turbo_active:
+		return
+	shake_strength = 6.0
 
 func _on_player_died() -> void:
 	DataManager.deaths += 1
@@ -301,6 +312,9 @@ func _process(delta: float) -> void:
 	difficulty_dist += raw_delta
 	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult
 	hud.update_distance(int(distance))
+	while _last_milestone_idx < MILESTONES.size() and int(distance) >= MILESTONES[_last_milestone_idx]:
+		hud.flash_milestone()
+		_last_milestone_idx += 1
 	var palitos_rate := 1 + DataManager.get_upgrade_level("palitos_base")
 	var bird_palitos_mult: float = DataManager.get_bird_modifiers()["palitos_mult"]
 	var run_palitos := int(distance / 10) * palitos_rate * bird_palitos_mult
@@ -330,7 +344,7 @@ func _process(delta: float) -> void:
 		shake_strength = max(shake_strength - SHAKE_DECAY * delta, target_shake)
 
 	if shake_strength > 0.0:
-		camera.offset = Vector2(randf_range(-shake_strength, shake_strength), 0.0)
+		camera.offset = Vector2(randf_range(-shake_strength, shake_strength), randf_range(-shake_strength, shake_strength))
 	else:
 		camera.offset = Vector2.ZERO
 

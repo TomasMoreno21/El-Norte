@@ -10,10 +10,11 @@ var move_timer: float = 0.0
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	_pick_new_target()
+	queue_redraw()
 
-	var image := Image.create(54, 54, false, Image.FORMAT_RGBA8)
-	image.fill(Color(0.3, 0.8, 1.0, 1.0))
-	$Sprite.texture = ImageTexture.create_from_image(image)
+func _draw() -> void:
+	draw_circle(Vector2.ZERO, 27, Color(0.3, 0.8, 1.0, 0.9))
+	draw_circle(Vector2.ZERO, 27, Color(1, 1, 1, 0.4), false, 3.0)
 
 func _physics_process(delta: float) -> void:
 	time += delta

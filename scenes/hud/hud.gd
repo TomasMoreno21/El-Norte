@@ -11,6 +11,7 @@ extends CanvasLayer
 @onready var pause_overlay := $PauseOverlay
 @onready var tutorial_overlay := $TutorialOverlay
 @onready var tap_arrow := $TutorialOverlay/Panel/TapArrow
+@onready var milestone_flash := $MilestoneFlash
 
 var _storm_warning_active := false
 var _storm_warning_time := 0.0
@@ -79,12 +80,21 @@ func _quit_to_menu() -> void:
 func update_distance(meters: int) -> void:
 	distance_label.text = "%dm" % meters
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
+	_pulse_label(distance_label)
 
 func update_bolas(amount: int) -> void:
 	bolas_label.text = "Barro: %d" % amount
+	_pulse_label(bolas_label)
 
 func update_palitos(amount: int) -> void:
 	palitos_label.text = "%d" % amount
+	_pulse_label(palitos_label)
+
+func _pulse_label(label: Label) -> void:
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2(1.25, 1.25), 0.08)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.25)
 
 func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, x2p: float = 0.0) -> void:
 	var parts := []
@@ -97,6 +107,14 @@ func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, 
 	if x2p > 0:
 		parts.append("x2 Palitos: %.1fs" % x2p)
 	powerup_label.text = "  ".join(parts)
+
+func flash_milestone() -> void:
+	milestone_flash.visible = true
+	var mat := milestone_flash.material as ShaderMaterial
+	mat.set_shader_parameter("flash_alpha", 0.25)
+	var tween := create_tween()
+	tween.tween_method(func(a): mat.set_shader_parameter("flash_alpha", a), 0.25, 0.0, 0.5).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(func(): milestone_flash.visible = false)
 
 func show_storm(active: bool) -> void:
 	storm_label.visible = active

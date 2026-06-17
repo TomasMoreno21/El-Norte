@@ -6,14 +6,22 @@ const FLAP_VELOCITY := -430.0
 @export var start_position := Vector2(400, 540)
 
 signal died
+signal flapped
 
 var alive := true
 var invulnerable := false
 var blink_timer: Timer
+var flap_timer: Timer
 var lives := 1
 var flap_mult := 1.0
+var storm_flap_override := 0.0
 var _original_col_size: Vector2
 var _original_scale: Vector2
+
+var _was_pressed := false
+var _tex_hornero1 := preload("res://Sprites/Pajaros/hornero1.png")
+var _tex_hornero2 := preload("res://Sprites/Pajaros/hornero2.png")
+var _feather_particles: GPUParticles2D
 
 func _ready() -> void:
 	position = start_position
@@ -30,7 +38,43 @@ func _ready() -> void:
 	blink_timer.timeout.connect(_blink)
 	add_child(blink_timer)
 
-var _was_pressed := false
+	flap_timer = Timer.new()
+	flap_timer.wait_time = 0.20
+	flap_timer.timeout.connect(_flap_anim_tick)
+	add_child(flap_timer)
+
+	$Sprite2D.flip_h = true
+	_setup_feather_particles()
+
+func _setup_feather_particles() -> void:
+	_feather_particles = GPUParticles2D.new()
+	_feather_particles.name = "FeatherParticles"
+	_feather_particles.one_shot = true
+	_feather_particles.emitting = false
+	_feather_particles.amount = 10
+	_feather_particles.lifetime = 0.6
+	_feather_particles.explosiveness = 0.9
+	_feather_particles.local_coords = false
+
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(-0.3, -1, 0)
+	mat.spread = 35.0
+	mat.gravity = Vector3(0, 150, 0)
+	mat.initial_velocity_min = 40.0
+	mat.initial_velocity_max = 90.0
+	mat.scale_min = 0.5
+	mat.scale_max = 1.0
+	mat.color = Color(0.95, 0.88, 0.75, 0.85)
+	mat.angle_min = 0.0
+	mat.angle_max = 360.0
+	mat.angular_velocity_min = -180.0
+	mat.angular_velocity_max = 180.0
+	_feather_particles.process_material = mat
+
+	add_child(_feather_particles)
+
+func _flap_anim_tick() -> void:
+	$Sprite2D.texture = _tex_hornero2 if $Sprite2D.texture == _tex_hornero1 else _tex_hornero1
 
 func _physics_process(delta: float) -> void:
 	if not alive:
@@ -40,8 +84,20 @@ func _physics_process(delta: float) -> void:
 	if is_pressed:
 		if not _was_pressed:
 			AudioManager.play_sfx("flap")
-		velocity.y = FLAP_VELOCITY * flap_mult
+			$Sprite2D.texture = _tex_hornero2
+			flap_timer.start()
+			_feather_particles.restart()
+			flapped.emit()
+			if is_inside_tree():
+				var s := $Sprite2D
+				var sq := create_tween().set_ease(Tween.EASE_OUT)
+				sq.tween_property(s, "scale", s.scale * Vector2(1.08, 0.92), 0.05)
+				sq.tween_property(s, "scale", s.scale, 0.1)
+		velocity.y = storm_flap_override if storm_flap_override != 0.0 else FLAP_VELOCITY * flap_mult
 	else:
+		if _was_pressed:
+			flap_timer.stop()
+			$Sprite2D.texture = _tex_hornero1
 		velocity.y += GRAVITY * delta
 	
 	_was_pressed = is_pressed
@@ -62,7 +118,7 @@ func die() -> void:
 	if invulnerable:
 		return
 	if lives > 1:
-		AudioManager.play_sfx("collect") # use a lighter sound for losing a life
+		AudioManager.play_sfx("collect")
 		lives -= 1
 		invulnerable = true
 		collision_mask = 0
@@ -117,6 +173,14 @@ func set_shield(value: bool) -> void:
 func _blink() -> void:
 	$Sprite2D.modulate.a = 0.2 if $Sprite2D.modulate.a == 1.0 else 1.0
 
+func end_storm_gradual() -> void:
+	if storm_flap_override == 0.0:
+		return
+	var target := FLAP_VELOCITY * flap_mult
+	var tween := create_tween()
+	tween.tween_property(self, "storm_flap_override", target, 1.5).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(func(): storm_flap_override = 0.0)
+
 func reset() -> void:
 	kill_all_tweens()
 	alive = true
@@ -126,6 +190,11 @@ func reset() -> void:
 	invulnerable = false
 	collision_mask = 2
 	blink_timer.stop()
+	flap_timer.stop()
 	$Sprite2D.modulate.a = 1.0
 	$Sprite2D.scale = _original_scale
+	$Sprite2D.texture = _tex_hornero1
+	_was_pressed = false
+	storm_flap_override = 0
+	_feather_particles.restart()
 	Engine.time_scale = 1.0
