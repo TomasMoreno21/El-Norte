@@ -35,6 +35,10 @@ window/stretch/aspect="expand"
 
 3d/physics_engine="Jolt Physics"
 
+[input_devices]
+
+pointing/android/enable_touch=true
+
 [rendering]
 
 rendering_device/driver.windows="d3d12"
