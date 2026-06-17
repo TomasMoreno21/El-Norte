@@ -173,13 +173,16 @@ text = "👆"
 horizontal_alignment = 1
 
 [node name="PauseBtn" type="Button" parent="." unique_id=1516378720]
-anchors_preset = 10
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
 anchor_right = 1.0
-offset_left = 1820.0
-offset_top = 29.0
-offset_right = -49.0
-offset_bottom = 104.0
-grow_horizontal = 2
+anchor_bottom = 0.0
+offset_left = -100.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = 80.0
+grow_horizontal = 0
 theme_override_font_sizes/font_size = 48
 text = "☰"
 
