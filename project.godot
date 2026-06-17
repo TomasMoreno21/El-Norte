@@ -31,13 +31,13 @@ window/size/window_height_override=540
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
-[physics]
-
-3d/physics_engine="Jolt Physics"
-
 [input_devices]
 
 pointing/android/enable_touch=true
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
 
 [rendering]
 
