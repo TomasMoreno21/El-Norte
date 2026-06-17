@@ -12,7 +12,12 @@ func _ready() -> void:
 	SceneTransition.fade_in()
 
 func _on_jugar_touch(event: InputEvent) -> void:
+	var touched := false
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		touched = true
+	elif event is InputEventScreenTouch and event.pressed:
+		touched = true
+	if touched:
 		DataManager.clear_achievement_popups()
 		get_tree().change_scene_to_file("res://scenes/main/main.tscn")
 
