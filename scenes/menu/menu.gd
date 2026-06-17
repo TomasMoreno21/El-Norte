@@ -18,7 +18,8 @@ func _on_jugar_touch(event: InputEvent) -> void:
 	elif event is InputEventScreenTouch and event.pressed:
 		touched = true
 	if touched:
-		get_tree().change_scene_to_file("res://scenes/shop/shop.tscn")
+		DataManager.clear_achievement_popups()
+		get_tree().change_scene_to_file("res://scenes/main/main.tscn")
 
 func _animate_menu() -> void:
 	$Label.modulate.a = 0.0
