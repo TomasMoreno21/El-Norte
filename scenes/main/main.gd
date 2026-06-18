@@ -26,8 +26,13 @@ var rafaga_active := false
 var rafaga_time := 0.0
 var calma_active := false
 var calma_time := 0.0
+var lluvia_active := false
+var lluvia_time := 0.0
+var _lluvia_spawn_timer := 0.0
+var _lluvia_bola_top := true
 var last_rafaga_distance := 0.0
 var last_calma_distance := 0.0
+var last_lluvia_distance := 0.0
 var last_check_dist := 0
 var storms_in_run := 0
 var run_bolas := 0
@@ -69,6 +74,9 @@ const RAFAGA_BOOST := 1.5
 const CALMA_COOLDOWN := 800.0
 const CALMA_CHANCE := 0.25
 const CALMA_DURATION := 5.0
+const LLUVIA_INTERVAL := 2500.0
+const LLUVIA_CHANCE := 0.15
+const LLUVIA_DURATION := 6.0
 const REVIVE_COST := 200
 const REVIVE_REWIND := 150.0
 
@@ -121,6 +129,7 @@ func _ready() -> void:
 	revive_popup.revived.connect(_on_revive)
 	revive_popup.rejected.connect(_on_revive_reject)
 	hud.update_bolas(DataManager.bolas_balance)
+	start_lluvia()
 	var mods := DataManager.get_bird_modifiers()
 	bird_speed_mult = mods["speed_mult"]
 	bird_kiwi_bonus = mods["kiwi_bonus"]
@@ -184,6 +193,37 @@ func end_calma() -> void:
 	DataManager.calmas_survived += 1
 	_update_encounter_mode()
 
+func start_lluvia() -> void:
+	lluvia_active = true
+	lluvia_time = 0.0
+	_lluvia_spawn_timer = 0.0
+	hud.show_transition_message("¡LLUVIA DE BARRO!")
+	_update_encounter_mode()
+
+func _spawn_lluvia_bola() -> void:
+	_lluvia_spawn_timer += get_process_delta_time()
+	if _lluvia_spawn_timer < 1.0:
+		return
+	_lluvia_spawn_timer = 0.0
+	if not bola_scene:
+		return
+	var bola := bola_scene.instantiate()
+	bola.speed = get_speed(difficulty_dist)
+	if _lluvia_bola_top:
+		bola.position = Vector2(2100, randf_range(700, 900))
+	else:
+		bola.position = Vector2(2100, randf_range(250, 450))
+	_lluvia_bola_top = not _lluvia_bola_top
+	bola.amount = 2 if x2_bolas_active else 1
+	bola.collected.connect(_on_bola_collected)
+	bola.add_to_group("bola")
+	add_child(bola)
+
+func end_lluvia() -> void:
+	lluvia_active = false
+	hud.hide_transition_message()
+	_update_encounter_mode()
+
 func _update_encounter_mode() -> void:
 	if not turbo_effect:
 		return
@@ -201,7 +241,7 @@ func _update_encounter_mode() -> void:
 func _on_player_flapped() -> void:
 	if in_storm or turbo_active:
 		return
-	shake_strength = 6.0
+	shake_strength = 8.0
 
 func _on_player_died() -> void:
 	DataManager.deaths += 1
@@ -243,6 +283,11 @@ func _process(delta: float) -> void:
 		if randf() < CALMA_CHANCE:
 			start_calma()
 
+	if not lluvia_active and not calma_active and not rafaga_active and not in_storm and distance >= 500 and distance - last_lluvia_distance >= LLUVIA_INTERVAL:
+		last_lluvia_distance = distance
+		if randf() < LLUVIA_CHANCE:
+			start_lluvia()
+
 	kiwi_cooldown_timer += delta
 
 	var current_speed := get_speed(difficulty_dist)
@@ -276,6 +321,12 @@ func _process(delta: float) -> void:
 		calma_time += delta
 		if calma_time >= CALMA_DURATION:
 			end_calma()
+
+	if lluvia_active:
+		lluvia_time += delta
+		_spawn_lluvia_bola()
+		if lluvia_time >= LLUVIA_DURATION:
+			end_lluvia()
 
 	if shield_active:
 		shield_remaining = shield_duration_max - (now - shield_start_time) / 1000.0
@@ -465,7 +516,7 @@ func _on_power_up_selected(type: String) -> void:
 func _on_bola_timer_timeout() -> void:
 	if not player.alive or not bola_scene or $Background.in_transition:
 		return
-	if randf() >= BOLA_SPAWN_CHANCE:
+	if not lluvia_active and randf() >= BOLA_SPAWN_CHANCE:
 		return
 
 	var bola := bola_scene.instantiate()
@@ -507,6 +558,7 @@ func _on_revive() -> void:
 	next_storm_distance = floor(distance / STORM_INTERVAL) * STORM_INTERVAL + STORM_INTERVAL
 	last_rafaga_distance = distance
 	last_calma_distance = distance
+	last_lluvia_distance = distance
 
 	for obs in get_tree().get_nodes_in_group("obstacle"):
 		obs.queue_free()
@@ -525,9 +577,22 @@ func _on_revive() -> void:
 	if calma_active:
 		calma_active = false
 		_update_encounter_mode()
+	if lluvia_active:
+		lluvia_active = false
+		hud.hide_transition_message()
+		_update_encounter_mode()
+	if turbo_active:
+		turbo_active = false
+		turbo_effect.set_normal_mode()
+		hud.update_powerups(0.0, 0.0, false)
+	if shield_active:
+		shield_active = false
+		player.set_shield(false)
+		hud.update_powerups(0.0, 0.0, false)
 
 	shield_active = false
 	turbo_active = false
+	lluvia_active = false
 	x2_palitos_active = false
 	x2_bolas_active = false
 	miniatura_active = false

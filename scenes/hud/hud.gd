@@ -109,11 +109,14 @@ func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, 
 	powerup_label.text = "  ".join(parts)
 
 func flash_milestone() -> void:
+	var strips := [milestone_flash.get_node("Top"), milestone_flash.get_node("Bottom"), milestone_flash.get_node("Left"), milestone_flash.get_node("Right")]
 	milestone_flash.visible = true
-	var mat := milestone_flash.material as ShaderMaterial
-	mat.set_shader_parameter("flash_alpha", 0.25)
+	for s in strips:
+		s.modulate.a = 0.2
 	var tween := create_tween()
-	tween.tween_method(func(a): mat.set_shader_parameter("flash_alpha", a), 0.25, 0.0, 0.5).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(true)
+	for s in strips:
+		tween.tween_property(s, "modulate:a", 0.0, 0.4).set_ease(Tween.EASE_OUT)
 	tween.tween_callback(func(): milestone_flash.visible = false)
 
 func show_storm(active: bool) -> void:

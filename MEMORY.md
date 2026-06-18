@@ -1,6 +1,6 @@
 # El Norte — Memoria del Proyecto
 
-## Estado (5/6/2026)
+## Estado (18/6/2026)
 Godot 4.6.2, resolución 1920×1080 landscape mobile. Stretch `canvas_items` + `expand`. PC dev: windowed 960×540. Cámara zoom 1.2 (visible ~1600×900). Filtro Nearest global.
 
 ## Stack
@@ -12,79 +12,87 @@ Godot 4.6.2, resolución 1920×1080 landscape mobile. Stretch `canvas_items` + `
 ## Dirección del viaje
 El juego se llama "El Norte" porque el viaje va de **sur a norte** de Argentina. El hornero vuela desde la Cordillera hasta la Puna.
 
-### Biomas (en orden del viaje)
-1. **Montaña/Cordillera** (sur, 0–1300m) — cielo gris azulado, montañas oscuras
-2. Transición 1300–1400m: solo neblina, mensaje "Las Llanuras se abren..."
-3. **Llanuras** (centro, 1400–2800m) — verdes de llanura
-4. Transición 2750–2800m: neblina + fade, mensaje "La Puna te espera..."
-5. **Puna** (norte, 2800+) — ocres y terracota
+### Biomas (en orden del viaje, definitivos)
+1. **Cordillera** (sur, 0–2200m)
+2. **Llanuras** (centro, 2200–4600m)
+3. **Puna** (norte, 4600m+ INF)
 
-## Escenas
-- **Menu** (`menu.tscn`): Jugar, Salir, RightBox (Tienda/Skins/Logros), Reset. Staggered fade-in on load.
-- **Main** (`main.tscn`): Player, Camera2D, HUD, DeathScreen, RevivePopup, Background, SpawnTimer, BolaTimer, kiwi/choice_menu/bola_barro/turbo_effect como PackedScene.
-- **Shop** (`shop.tscn`): VBoxContainer centrado, 3 columnas (260/200/260), 100px left spacer.
-- **Skins** (`skins.tscn`): tarjetas horizontales de 240px.
-- **Achievements** (`achievements.tscn`): VBoxContainer centrado, ScrollContainer, progress bars.
-- **Kiwi** (`kiwi/`): Area2D 54×54, cooldown-based (20s + 8% chance).
-- **Choice Menu** (`kiwi/choice_menu.tscn`): CanvasLayer, RightPanel, botones dinámicos desde pool. Sin nodos placeholder.
-- **Death Screen** (`death_screen.tscn`): **Estático, centrado** (anchor 0.25–0.75), pausa inmediata. Sin animación.
-- **Revive Popup** (`revive_popup/`): CanvasLayer layer 20, process_mode=2, REVIVE_COST=200, REVIVE_REWIND=150m.
-- **Background** (`background/`): ParallaxBackground con BIOMES (Cordillera/Llanuras/Puna), 100m transitions, self_modulate. Zonas de transición sin obstáculos + mensaje. Sprites Llanura agregados (8 PNGs 1920×1080) pero código actual usa Cordillera como placeholder para Llanuras.
-- **Effects** (`effects/`): button_feedback.gd (reusable), scene_transition.gd (autoload 0.15s).
+Transiciones de 15m con FADE_OUT de 200m. Neblina 4 capas con shader `fog_fade.gdshader` en zonas 2100–2300 y 4500–4700.
 
-## Mecánicas
-- **Player**: CharacterBody2D, gravity 900, flap -400, hold-to-rise. Start x=400. Muerte y<53.5 o y>1026.5. `reset()` restaura todo incluyendo Engine.time_scale=1.0.
-- **Obstáculos**: 3 shapes (RECT_H 100×25, RECT_V 25×100, CIRCLE ø55), 2 movimientos (70% estático, 30% oscilante), 8% spawn doble, rotación angular aleatoria. **Constraint-based**: `_safe_obstacle_y()` garantiza 90px gap mínimo. Sin ghost_time (eliminado).
-- **Dificultad**: speed = `min(500 + dist×0.6, 1000)`, interval = `max(1.3 − dist×0.0012, 0.5)`. `difficulty_dist` ≠ `distance`.
-- **Tormenta**: cada 500m, 4s, speed ×1.3, interval ×0.7. **Warning "!"** a 50m, pulse rápido, auto-hide 2s.
-- **Ráfaga**: cooldown 1200m, 40% chance, 5s, distance ×1.5, partículas verdes.
-- **Calma**: cooldown 800m, 25% chance, 5s, pausa spawn.
-- **Shield**: 4s base + nivel×0.2s, collision_mask=0, parpadeo.
-- **Turbo**: 6s base + nivel×0.2s, distance ×2, obs speed ×1.5, spawn interval ×1.5, shake 5.
-- **Eventos mutuamente excluyentes**: ráfaga/calma/tormenta no se solapan.
-- **x2 Bolas**: duplica próxima bola.
-- **Miniatura**: 3s, player scale 0.5, collision shape escalada.
-- **Palitos**: `(dist/10) × (1 + nivel_palitos)`.
-- **Revive**: 200 palitos, rewinds 150m, once per run.
-- **Transiciones de bioma**: 100m sin obstáculos, mensaje centrado con fade. **REFACTOR 9/6/2026**: cambió a transiciones por tiempo (1.5s fade-out, 3s empty, 1.5s fade-in) con editor F1 in-game (@export y_offsets/sprite_scales por bioma). Luego revertido a commit original.
-- **Barro**: "+1" flotante al recolectar (o "+2" con x2_bolas).
+## Escenas principales
+- **Menu** (`menu.tscn`): Jugar/Salir como Button con `icon` + `expand_icon`. `gui_input` para mouse+touch. Direct scene change. `process_mode = ALWAYS`.
+- **Main** (`main.tscn`): Player, Camera2D, HUD, DeathScreen, RevivePopup, Background, sistema de encuentros (storm/rafaga/calma/lluvia).
+- **Shop** (`shop.tscn`): VBoxContainer centrado, costos desde `UPGRADE_COST_TABLE`.
+- **Skins** (`skins.tscn`): tarjetas 240px. Carancho oculto (???) hasta "Pajarero".
+- **Achievements**: VBoxContainer, ScrollContainer, progress bars.
+- **Kiwi** (`kiwi/`): `_draw()` círculo azul radio 27 + borde blanco. No Sprite2D.
+- **Death Screen**: estático centrado (anchor 0.25–0.75), pausa inmediata.
+- **Revive Popup**: CanvasLayer layer 20, REVIVE_COST=200, REVIVE_REWIND=150m.
+- **Background**: ParallaxBackground con BIOMES, fmod wrapping, editor F1.
+- **Effects**: SceneTransition (autoload, safety timeouts 0.5s, `PROCESS_MODE_ALWAYS`).
 
-## Game Feel
-- **Slow-motion al morir**: `Engine.time_scale` 1.0 → 0.3 en 0.4s (12 steps con callbacks). Pausa del árbol + tween con TWEEN_PAUSE_PROCESS.
-- **Transiciones de escena**: 0.15s fade to black (SceneTransition autoload).
-- **Button feedback**: scale 0.92 press, 1.05 hover (button_feedback.gd).
-- **Achievement popups**: fade-in 0.3s, stay 5s, fade-out 0.5s. Persisten entre escenas (autoload DataManager).
-- **Storm warning "!"**: pulse rápido, auto-hide 2s.
+## Dificultad (definitiva)
+- `speed = 550 + 650 × (1 − e^(−dist/2500))`
+- `interval = 0.38 + 0.90 × e^(−dist/2600)`
+- `double_chance = min(0.08 + dist × 0.002, 0.40)`
+- `turbo_obs_speed = min(1.5 + dist × 0.00002, 1.7)`
+- Storm: ×1.3 speed, ×0.7 interval. Storm+turbo cap solo cuando ambos activos (×1.5).
+- `_update_encounter_mode()` centralizado con prioridad: calma > storm > rafaga > lluvia > turbo > normal.
 
-## UI Animations
-- **Menu**: staggered fade-in (Label→Jugar→Salir→RightBox, 0.1s delays).
-- **Achievement popups**: fade-in 0.3s, stay 5s, fade-out 0.5s. Creado en DataManager (autoload) para persistir entre escenas.
+## Mecánicas clave
+- **Player**: gravity 900, flap -400, hold-to-rise. Start x=400. Muerte y<53.5 o y>1026.5.
+- **Obstáculos**: 3 shapes, 90px gap mínimo. Doble chance escala con distancia.
+- **Shield**: collision_mask=0, parpadeo.
+- **Turbo**: distance ×2, obs speed ×1.5, spawn interval ×1.5.
+- **Miniatura**: 3s, scale 0.5.
+- **Palitos**: `int(dist/10) × (1 + lv_palitos_base) × biome_mult × bird_mult`. Biome mult: ×1.0/×1.5/×2.0.
+- **Revive**: 200 palitos, 150m rewind. `kill_all_tweens()` en `player.reset()`. Limpia partículas turbo.
+- **Barro**: "+1"/"+2" flotante al recolectar.
+- **Lluvia de barro**: spawn alternado (banda alta 250–450 / banda baja 700–900), cada 1s, duración 6s, 15% chance cada 2500m.
+
+## Game Feel (branch implementacion-sprites)
+- **Shake cámara**: `flapped` → shake_strength=8.0 (antes 6), decay 4/s, X+Y. No durante storm/turbo.
+- **Plumas**: GPUParticles2D 14 partículas crema, one_shot por flap, local_coords=false.
+- **Squash**: scale (1.08, 0.92) 0.05s → 0.1s. Usa `$Sprite2D.scale` como base.
+- **Pulso contadores**: 1.0→1.25→1.0 al actualizar distancia/bolas/palitos.
+- **Flash milestone**: 4 ColorRect strips 30px, alpha 0.2→0 en 0.4s.
+- **Animación aleteo**: Timer 0.08s alterna hornero1/hornero2.
+- **Slow-motion muerte**: Engine.time_scale 1.0→0.3 en 0.4s (12 steps).
+- **Storm flap nerf**: storm_flap_override = -340. Vuelve gradual en 1.5s ease-out.
+
+## Encuentros/Eventos
+| Evento | Gatillo | Duración | Efecto |
+|--------|---------|----------|--------|
+| Tormenta | cada 500m | 4s | ×1.3 speed, ×0.7 interval. Warning "!" escala 0.6–1.4 |
+| Ráfaga | 40% cada 1200m | 5s | ×1.5 distance, partículas verdes. NO afecta parallax |
+| Calma | 25% cada 800m | 5s | Pausa spawn de obstáculos |
+| Lluvia de barro | 15% cada 2500m | 6s | Spawnea barros cada 1s alternando alto/bajo |
+| **Mutuamente excluyentes** | — | — | calma > storm > rafaga > lluvia > turbo > normal |
 
 ## Pájaros (costos en bolas de barro)
 | Pájaro | Costo | flap_mult | speed_mult | kiwi_bonus | palitos_mult | extra_lives |
-|---|---|---|---|---|---|---|
+|--------|-------|-----------|------------|------------|--------------|-------------|
 | Hornero | 0 | 1.0 | 1.0 | 0.0 | 1.0 | 0 |
-| Tero | 50 | 0.8 | 1.4 | 0.0 | 0.85 | 0 |
-| Golondrina | 40 | 1.1 | 1.0 | 0.20 | 0.85 | 0 |
-| Carpintero | 30 | 1.0 | 0.9 | 0.0 | 0.75 | 1 |
-| premio_pajarero | -1 | — | — | — | — | — |
+| Tero | 45 | 0.72 | 1.4 | 0.0 | 0.85 | 0 |
+| Golondrina | 35 | 1.1 | 1.0 | 0.20 | 0.85 | 0 |
+| Carpintero | 25 | 1.0 | 0.9 | 0.0 | 0.75 | 1 |
+| Carancho (secreto) | — | 1.0 | 1.6 | 0.0 | 1.1 | 1 |
 
-## Tienda — Mejoras
-Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
+## Tienda — Costos (UPGRADE_COST_TABLE)
+| Mejora | Lv1 | Lv2 | Lv3 | Lv4 | Lv5 | Lv6 | Lv7 | Lv8 |
+|--------|-----|-----|-----|-----|-----|-----|-----|-----|
+| Velocidad | 200 | 300 | 500 | 700 | 1200 | 2000 | 3000 | 5000 |
+| Kiwi | 150 | 250 | 400 | 600 | 1000 | 1500 | 2500 | 4000 |
+| Palitos Base | 250 | 400 | 600 | 1000 | 1500 | 2500 | 4000 | 6500 |
+| Escudo/Turbo (max5) | 150 | 250 | 400 | 700 | 1000 | — | — | — |
 
-| Mejora | Base | Max | Efecto |
-|---|---|---|---|
-| Velocidad | 30 | 8 | +5% speed acumulativo |
-| Kiwi | 25 | 8 | +5% chance spawn kiwi |
-| Palitos | 40 | 8 | +1 palito cada 10m |
-| Escudo | 30 | 5 | +0.2s duración escudo |
-| Turbo | 30 | 5 | +0.2s duración turbo |
+**Total maxear: ~34.840 🪵**. Pájaros: Carpintero 25🔵, Golondrina 35🔵, Tero 45🔵.
 
 ## Achievements (con niveles)
-`completed_achievements` es Dictionary `{ id: level_index }`.
+`completed_achievements` = `{ id: level_index }`.
 
 | ID | Nombre | Cond | Niveles |
-|---|---|---|---|
+|----|--------|------|---------|
 | first_flight | Primer Vuelo | distance | 100m |
 | explorer | Explorador | distance | 500m |
 | fearless | Sin Miedo | distance | 2000m |
@@ -97,97 +105,250 @@ Costo = `base × 2^nivel`. Cada mejora tiene `UPGRADE_MAX_LEVEL`.
 | birder | Pajarero | all_birds | 1 |
 | trato_hecho | Trato Hecho | kiwi_accepts | 20 |
 | rey_tormentas | Rey de Tormentas | storms_in_run | 6 |
-| llanura | Llanuras | distance | 1400m |
-| norte | Norte (Puna) | distance | 2800m |
+| llanura | Llanuras | distance | 2200m |
+| norte | Norte (Puna) | distance | 4600m |
 | por_los_pelos | Por los Pelos | revives_used | 1, 5, 10 |
 | rico | Rico | palitos_balance | 1000, 3000, 8000 |
 | multiuso | Multiuso | bird_uses | 2, 3, 4 |
 
-## Variables persistentes (data_manager.gd)
+## Kiwi
+- Cooldown: 20s + 8% por spawn. Upgrade ×0.02/lvl.
+- Power-ups: shield(35🪵), turbo(40🪵), x2_bolas(25🪵), miniatura(20🪵), x2_palitos(60🪵), bola_extra(35🪵, requiere Trato Hecho).
+- 1 gratis siempre primero. "Rechazar" al final.
+
+## Variables persistentes (DataManager)
 - palitos_balance, bolas_balance, upgrades, unlocked_birds, active_bird
 - bolas_total, deaths, storms_survived, max_distance, kiwi_accepts, total_upgrades_bought, calmas_survived
-- completed_achievements: Dictionary `{ id: level_index }`
-- revives_used, used_birds[] (trackeados desde 12/6/2026)
-- Save/load: `user://save.data`
+- completed_achievements: Dictionary, revives_used, used_birds[]
+- first_milestones_claimed[], record_bolas_claimed[], tutorial_done
+- Achievement popups persistentes (autoload), bottom-left
 
-### Migración de saves viejos
-- `calandria_accepts` → `kiwi_accepts`
-- `upgrades["calandria"]` → `upgrades["kiwi"]`
-- `completed_achievements` Array → Dict
-
-## Datos de kiwi
-- **Cooldown por tiempo**: KIWI_COOLDOWN=20s, KIWI_SPAWN_CHANCE=8%. Upgrade ×0.02/lvl.
-- Power-ups: shield, turbo, x2_bolas, miniatura, x2_palitos, precognicion (+ bola_extra con Trato Hecho).
-- Menú 3 opciones; con Trato Hecho: 4.
-
-## Bugs conocidos y fixes
-- `x2_bolas_active` no estaba declarada → agregada
-- `choice_menu.tscn` referenciaba calandria → corregido a kiwi
-- GDScript `:=` con Dictionary.get() devuelve Variant → tipado explícito
-- **Softlock al morir con logro** (5/6/2026): `_show_popups` usaba `await` con árbol pausado → movido después de UI decision
-- **kill_tweens() no existe** en Godot 4 → usar `get_tree().get_processed_tweens()`
-- **Engine.time_scale no se tweenea** con `tween_property` → usar callbacks con steps
-- **Enums Tween en mayúsculas**: `TRANS_QUAD`, `EASE_OUT`, etc.
-- **Señales conectadas dentro de `_on_power_up_selected`** (9/6/2026): causaba conexiones duplicadas en cada power-up. Mover a `_ready()`.
-- **Parallax + texturas no tileables** (9/6/2026): ninguna técnica (flip_h, 3 copias, shader wrap, shader blend) elimina la costura si la textura no tilea. El usuario prefiere modificar las imágenes a usar shaders.
-- **ShaderMaterial compartido** (9/6/2026): si varias capas comparten el mismo ShaderMaterial, cambiar un uniform en una afecta a todas. Crear instancias independientes.
-- **Dict `["key"]` devuelve Variant** (12/6/2026): aunque el valor guardado sea `int`, `float` o `String`, indexar un Dictionary siempre retorna Variant. Usar `var x: <tipo> = dict["key"]` en lugar de `var x := dict["key"]`. Lo mismo aplica a funciones que devuelven Dictionary.
-- **Achievement popups** (12/6/2026): `hud.show_achievement_popup()` creaba popups en el HUD (se destruía al recargar escena). Movido a `DataManager.show_achievement_popup()` que cuelga del autoload y persiste entre escenas. Duración aumentada de ~2.65s a ~5.8s (0.3 fade in + 5s visible + 0.5 fade out).
-
-## Limpieza (5/6/2026)
-- `_miniatura` write-only eliminada de player.gd
-- `hide_effect()` y `show_effect()` muertas eliminadas de turbo_effect.gd
-- `ghost_time` + `_alive` + lógica ghost eliminados de obstacle.gd (nunca se activaban)
-- 3 nodos placeholder (BarroSeco, PlumaViento, Semilla) eliminados de choice_menu
-
-## Lecciones Aprendidas
-- `dict["key"]` siempre devuelve Variant en GDScript 4 → usar `var x: Tipo = dict["key"]`, no `var x := dict["key"]`
-- `Array[var] := [{...}]` infiere `Array`, no `Array[Dictionary]` → tipar explícitamente
-- `Engine.time_scale` no se puede tweenear con `tween_property` → usar callbacks con steps
-- `kill_tweens()` no existe en Godot 4 → usar `get_tree().get_processed_tweens()`
-- Conectar señales dentro de callbacks (ej. `_on_power_up_selected`) causa conexiones duplicadas → conectar en `_ready()`
-- ShaderMaterial compartido entre múltiples nodos: cambiar un uniform afecta a todos → crear instancias independientes
-- `TRANS_QUAD` no `TRANS_quad` — enum en mayúscula en Godot 4
-
-## Branch: economia-final
-
-### Ingreso de palitos
-- Fórmula: `int(dist/10) × (1 + lv_palitos_base) × biome_mult × bird_mult`
-- **Biome mult**: Cordillera ×1.0, Llanuras (2200+) ×1.5, Puna (4600+) ×2.0
-- **Bonos únicos por hito**: 500m=+10, 1000m=+25, 2200m=+75, 4600m=+150 🪵
-
-### Bolas por récord
-- Umbrales: 500m=1🔵, 1000m=2🔵, 2200m=3🔵, 4600m=5🔵
-- Solo cuando rompés `max_distance`. Usa `_death_old_max` guardado antes de actualizar.
-
-### Costos (UPGRADE_COST_TABLE, tabla hardcodeada)
-| Mejora | Lv1 | Lv2 | Lv3 | Lv4 | Lv5 | Lv6 | Lv7 | Lv8 |
-|--------|-----|-----|-----|-----|-----|-----|-----|-----|
-| Velocidad | 200 | 300 | 500 | 700 | 1200 | 2000 | 3000 | 5000 |
-| Kiwi | 150 | 250 | 400 | 600 | 1000 | 1500 | 2500 | 4000 |
-| Palitos Base | 250 | 400 | 600 | 1000 | 1500 | 2500 | 4000 | 6500 |
-| Escudo/Turbo (max5) | 150 | 250 | 400 | 700 | 1000 | — | — | — |
-
-**Total maxear: ~34.840 🪵**. Pájaros: Carpintero 25🔵, Golondrina 35🔵, Tero 45🔵.
-
-### Archivos modificados
-- `data_manager.gd`: UPGRADE_COST_TABLE, biome_mult en calculate_palitos_earned(), claim_distance_milestones(), claim_record_bolas(), nuevas variables + persistencia
-- `death_screen.gd`: bonus milestones/récords en UI + BonusLabel
-- `death_screen.tscn`: BonusLabel agregado
-- `main.gd`: _death_old_max, pase a death_screen
-- `shop.gd`: base_cost actualizados
-
-### Flujo récord
+## Flujo récord
 1. `_on_player_died()` guarda `_death_old_max` → actualiza `max_distance`
-2. `show_screen()` pasa `old_max` a `claim_record_bolas()`
-3. `claim_record_bolas()` compara distance vs old_max → solo paga si es récord
+2. `show_screen(old_max)` → claim_record_bolas(distance, old_max)
+3. Solo paga si distance > old_max
 4. `_on_revive_reject()` también pasa `_death_old_max`
 
-## Pendiente
-- Sprites pixel art (bird 137×73, obst 100×25/25×100/55×55, kiwi 54×54, bola 70×70)
-- Sonido/música
-- Nubes/elementos en fondo parallax (esperando sprites)
-- Más variedad de encuentros (tailwind, bird flock)
-- Definir skin reward para "Pajarero"
-- Texturas tileables de parallax (eliminar costura)
-- Review/finalizar targets y rewards de logros
+## Lecciones Aprendidas
+- `dict["key"]` siempre devuelve Variant en GDScript 4
+- `Array[var] := [{...}]` infiere `Array`, no `Array[Dictionary]`
+- `Engine.time_scale` no se puede tweenear → callbacks con steps
+- `kill_tweens()` no existe → `get_tree().get_processed_tweens()`
+- Conectar señales en callbacks causa conexiones duplicadas
+- ShaderMaterial compartido: cambios afectan a todos
+- Android touch = `InputEventScreenTouch`, no `InputEventMouseButton`
+- `mouse_entered`/`mouse_exited` rompen botones en Android
+- `ImageTexture.create_from_image()` falla en Android → usar `_draw()`
+
+## Branch: implementacion-sprites (sin mergear)
+Contiene: game feel completo, kiwi _draw(), storm tuning, menu sprites, lluvia de barro, etc.
+
+---
+
+# 🪵 BANCO DE IDEAS — Mejoras Potenciales
+
+*Guardado el 18/6/2026. Ideas clasificadas por área, priorizadas por facilidad de integración y valor.*
+
+---
+
+## 🎮 GAME FEEL (Juice) — 30 ideas
+
+1. **Efecto elástico en contador de barro**: Label rebota con `ease out back`
+2. **Pop de spawn en obstáculos**: escala 0→1 en 0.15s
+3. **Línea de guía predictiva**: trayectoria punteada si soltás
+4. **Screen shake al tocar techo/piso**
+5. **VHS glitch sutil al cambiar de bioma**
+6. **Estrellitas al comprar upgrade**: partículas amarillas
+7. **Latido del HUD cerca del récord personal**
+8. **Onda de choque circular al activar turbo**
+9. **Score animado**: números rotan al incrementarse
+10. **Chispas en bordes del pájaro a alta velocidad**
+11. **Splash de color al entrar a nuevo bioma**
+12. **Barro brilla al estar por desaparecer**
+13. **Ondulación de calor en Puna** (shader simple)
+14. **Viñeta dinámica según altura del pájaro**
+15. **Flash breve en HUD cada 100m**
+16. **Rebote gelatinoso en botones**
+17. **Círculo expansivo al morir**
+18. **Parpadeo del pájaro si está idle >2s**
+19. **Contracción horizontal al cambiar de dirección**
+20. **Barro se agranda con la distancia**
+21. **Cámara "respira" (zoom leve) antes del slow-motion de muerte**
+22. **Polvo al aterrizar después de estar en techo**
+23. **Pixelación/glitch progresivo cuanto más cerca de morir**
+24. **Horizonte se tiñe del color del próximo bioma 50m antes**
+25. **Micro-sacudón al pasar múltiplos de 100 en score**
+26. **Tono de luz cambia según distancia (atardecer simulado)**
+27. **Estela de polvo de estrellas en turbo**
+28. **Brillo especular en barros según sol virtual**
+29. **After-image fantasma de obstáculos al pasar**
+30. **Lluvia fina permanente en Cordillera (partículas continuas)**
+
+## ⚙️ GAMEPLAY — 30 ideas
+
+1. **Elección de mejora temporal a los 1000m** (tipo roguelite)
+2. **Knockback al golpear con escudo** (empuja, no mata)
+3. **Fatiga**: 10 flaps rápidos → cooldown 1s
+4. **Planeo**: soltar da pequeño lift extra
+5. **Barro de riesgo**: rozar obstáculo da +1 barro
+6. **Muerte barata gratis hasta 500m** (primera no cuenta)
+7. **Power-up congelar**: obstáculos quietos 2s
+8. **Hold-to-mine**: más barro si mantenés
+9. **Modo ayuda tras 3 muertes seguidas <1000m**
+10. **Vender upgrades**: recuperar 50%
+11. **Convertir palitos → barro** (ratio variable)
+12. **Tap arriba/abajo como control alternativo**
+13. **Doble tap = mini turbo gratuito** (5s cd)
+14. **Línea de altura segura en obstáculos altos**
+15. **Hitbox se reduce 10% a alta velocidad**
+16. **Invlunerabilidad creciente**: 0.5s→1s tras racha
+17. **Cerrar kiwi tocando afuera del menú**
+18. **Descuento por muerte en tienda** (5% c/u, max 50%)
+19. **Reset de mejoras pagando palitos**
+20. **Indicador de peligro si estás mucho en misma altura**
+21. **Power-up rebote**: tocar borde rebota 1 vez
+22. **Empuje extra al aletear justo saliendo de obstáculo**
+23. **Combo**: 3 barros seguido rápido → ×1.5
+24. **Aire caliente en Puna**: eleva al pájaro gratis
+25. **Skill shot**: gap muy justo entre obstáculos da bonus
+26. **Inercia al soltar**: desacelera suave, no instantáneo
+27. **Barros en oleadas sinusoidales** (no estáticos)
+28. **Obstáculos que rotan 360° lentamente**
+29. **Obstáculos rompibles si venís muy rápido**
+30. **Barro magnético**: atrae desde más lejos 5s
+
+## 🎨 VARIEDAD DE CONTENIDO — 30 ideas
+
+1. **Cactus rodador**: obstáculo circular con textura de cactus
+2. **Pájaros enemigos estáticos** en distancias fijas
+3. **Power-up brújula**: muestra distancia al próximo kiwi
+4. **Logro "Maratón"**: llegar a 10000m
+5. **Logro "Coleccionista"**: comprar todos los pájaros
+6. **Logro "Sin manos"**: 2000m sin tocar pantalla
+7. **Logro "Ladrón"**: 1000 barros totales acumulados
+8. **Logro "Superviviente"**: 3 tormentas en una partida
+9. **Logro "Veloz"**: 3000m en menos de 90s
+10. **Logro "Rico"**: 1000 palitos sin gastar
+11. **Logro "Atrevido"**: gap entre obstáculos ≤110px
+12. **Pájaro Cardenal**: +10% flap, +5% palitos (1000 palitos totales)
+13. **Pájaro Benteveo**: +1 vida, -10% velocidad (50 partidas)
+14. **Escudo con 3 cargas** si upgrade al máximo
+15. **Modo espejo**: todo invertido horizontalmente
+16. **Modo nocturno**: fondo oscuro, siluetas
+17. **Evento "fiesta" cada 2000m**: barros como confeti
+18. **Item "alas extra"**: vida extra por 100 palitos
+19. **Item "detector de barro"**: radar en HUD
+20. **Logro "Pampeano"**: 5000m con cada pájaro
+21. **Evento "langostas"**: 60s, evitalas o perdés barro
+22. **Moneda "plumas"**: coleccionable raro para skins
+23. **Power-up fantasma**: atravesar obstáculos 2s
+24. **Logro "Veterano"**: 100 partidas jugadas
+25. **Pájaro Lechuza**: visión nocturna (modo noche)
+26. **Cactácea rodante que rebota** (va y viene)
+27. **Troncos diagonales** (obstáculo 45°)
+28. **Cardones/arbustos altos** que obligan a bajar
+29. **Rocas colgantes**: caen desde arriba
+30. **Plataformas móviles verticales**: suben y bajan
+
+## 🧩 UI / SETTINGS / QoL — 30 ideas
+
+1. **Icono kiwi disponible parpadea en HUD**
+2. **Tooltip en power-ups del kiwi** (explicación + precio)
+3. **Botón compartir puntuación**: screenshot al morir
+4. **Slider de sensibilidad de flap**
+5. **Opción Hold vs Tap**
+6. **Opción tamaño del pájaro**: chico/mediano/grande
+7. **Tema claro/oscuro para la UI**
+8. **Modo reducir movimiento**: desactiva shake y partículas
+9. **Beneficio exacto en tienda**: "+15% velocidad"
+10. **Stats comparativas en Skins** vs pájaro activo
+11. **Barra de progreso del próximo upgrade en tienda**
+12. **Alerta de fin de power-up** (destello)
+13. **Mostrar "quedaste a Xm del récord" al morir**
+14. **Stats de partida en pausa**: barros, palitos, kmh
+15. **Confirmación antes de gastar >200 palitos**
+16. **Tip aleatorio en pantalla de muerte**
+17. **Atajo muerte → menú principal sin transición extra**
+18. **Historial de últimas 10 partidas**
+19. **Botón "reset data" oculto (doble confirmación)**
+20. **Autopause al perder foco**
+21. **Modo ahorro batería (30fps)**
+22. **Feedback háptico**: vibrar al agarrar barro/chocar
+23. **Notificación kiwi listo desde el menú**
+24. **Preview hitbox del pájaro (debug toggle)**
+25. **Tooltip "primera vez" en cada power-up del kiwi**
+26. **Widget "próximo hito"**: cuánto falta para el milestone
+27. **Mapa minimalista del viaje (sur→norte) en esquina**
+28. **Icono de evento activo en HUD** (ráfaga/tormenta/calma)
+29. **Botón "siguiente partida" directo desde muerte**
+30. **Opción de texto más grande (accesibilidad)****
+
+## 💰 ECONOMÍA / PROGRESIÓN — 30 ideas
+
+1. **Bono bienvenida**: 50 palitos al abrir primera vez
+2. **Bono por volver a jugar inmediato**: +20% palitos
+3. **Racha de partidas**: +5% c/u hasta +25%
+4. **Precio dinámico**: comprar sube leve el costo
+5. **Descuento rotativo semanal en upgrades**
+6. **Canjear barros → palitos**: 1 barro = 5 palitos
+7. **Bono explorador**: llegar a nuevo bioma da palitos
+8. **Inversión con el kiwi**: prestás, devuelve con interés
+9. **Límite de gasto diario en tienda**
+10. **Palitos no gastados → conversión parcial a barros al morir**
+11. **Bonificación por distancia exacta**: morir en múltiplo de 500m → bonus
+12. **Interés compuesto**: palitos no gastados generan 1% por partida
+13. **Logro "inversor"**: 5000 palitos sin gastar
+14. **Logro "gastador"**: gastar 10000 palitos totales
+15. **Oferta del día**: upgrade aleatorio 30% desc.
+16. **Bono de regreso**: no jugar 24h → palitos gratis al volver
+17. **Bono horario**: jugar de noche da ×1.1 palitos
+18. **Megabono 5000m**: palitos ×3 (además de biome)
+19. **Fianza**: pagar palitos para no perder barros al morir
+20. **Seguro de barro**: 50 palitos pre-partida, si morís <1000m conservás mitad
+21. **Tarjeta fidelidad**: cada 10 partidas, una con ×2 palitos
+22. **Ascenso a 3000m**: desbloquea upgrades "élite"
+23. **Palitos por anuncio** (opcional)
+24. **Barro por compartir resultado**
+25. **Bono racha semanal**: 7 días seguidos → bonus grande
+26. **Tasa mejora de conversión barro→palitos con nivel**
+27. **Multa por revive**: cada revive cuesta +50 palitos
+28. **Bono explorador extremo**: 8000m → bonus permanente
+29. **Barra de viaje total**: cada 10000m acumulados → bonus
+30. **Regalo de cumpleaños** (fecha configurable → bonus)**
+
+## 🌪️ ENCUENTROS / EVENTOS NUEVOS — 30 ideas
+
+1. **Túnel de viento**: 3s sin aletear, avanza solo
+2. **Río vertical**: obstáculos suben desde abajo
+3. **Granizo**: partículas caen, frenan 0.3s
+4. **Eclipse**: 2s oscuro total, solo brillan barros
+5. **Espejismo**: barros falsos que se desvanecen
+6. **Corriente ascendente**: 2s sube solo
+7. **Muro de ramas**: obstáculo horizontal ancho
+8. **Zona de nubes**: obstáculos semitransparentes
+9. **Abejas**: enjambre persigue al pájaro
+10. **Multiplicador ×2 global**: 60s palitos dobles
+11. **Viento en contra**: 4s, velocidad mitad, más aleteo
+12. **Marea de barro**: el piso sube temporalmente
+13. **Enjambre de mosquitos**: nube que tapa visión parcial
+14. **Espejismo de agua**: fondo como lago, distrae
+15. **Terremoto**: pantalla tiembla 2s, obstáculos erráticos
+16. **Lluvia oblicua**: partículas diagonales
+17. **Corriente de chorro**: 3s velocidad ×3, sin control
+18. **Aire polvoriento**: partículas densas reducen visión
+19. **Campo magnético**: barros atraídos/repelidos
+20. **Oleada de energía**: pulso visual L→R
+21. **Neblina tóxica**: baja altura empuja hacia abajo
+22. **Gravedad cero**: 2s no caés, solo aleteo te mueve
+23. **Lluvia de estrellas**: partículas brillantes + 1 barro
+24. **Eclipse solar**: todo oscuro salvo horizonte 3s
+25. **Tromba de agua**: cilindro desplaza obstáculos
+26. **Frente frío**: todo más lento (pájaro incluido)
+27. **Frente cálido**: todo más rápido
+28. **Avalancha (Puna)**: obstáculos caen desde arriba
+29. **Geiser (Puna)**: chorro vertical empuja arriba
+30. **Migración de mariposas**: cruzando, 1 barro al tocarlas
+
+---
+
+*Próximo paso sugerido: elegir 3–5 ideas del banco y arrancar implementación.*
