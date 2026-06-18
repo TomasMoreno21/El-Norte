@@ -115,6 +115,14 @@ func update_distance(meters: int) -> void:
 		_flash_100m()
 
 func _flash_100m() -> void:
+	var flash := ColorRect.new()
+	flash.color = Color(1, 1, 1, 0.08)
+	flash.anchors_preset = Control.PRESET_FULL_RECT
+	flash.mouse_filter = Control.MOUSE_FILTER_PASS
+	add_child(flash)
+	var tween := create_tween()
+	tween.tween_property(flash, "color:a", 0.0, 0.3)
+	tween.tween_callback(flash.queue_free)
 
 func update_bolas(amount: int) -> void:
 	bolas_label.text = "Barro: %d" % amount
