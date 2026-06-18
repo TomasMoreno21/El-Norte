@@ -50,8 +50,11 @@ var _combo_count := 0
 var _combo_timer := 0.0
 const COMBO_WINDOW := 1.5
 const COMBO_THRESHOLD := 3
-var _double_tap_time := 0.0
+var _tap_count := 0
+var _tap_window := 0.0
 var _was_tapping := false
+const TAP_WINDOW := 0.4
+const TAPS_REQUIRED := 3
 var _mini_turbo_active := false
 var _mini_turbo_time := 0.0
 const MINI_TURBO_DURATION := 1.0
@@ -322,10 +325,11 @@ func _process(delta: float) -> void:
 
 	var p := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE)
 	if p and not _was_tapping:
-		var now := Time.get_ticks_msec()
-		if now - _double_tap_time < 300 and _mini_turbo_cd <= 0:
+		_tap_count += 1
+		_tap_window = TAP_WINDOW
+		if _tap_count >= TAPS_REQUIRED and _mini_turbo_cd <= 0:
 			_activate_mini_turbo()
-		_double_tap_time = now
+			_tap_count = 0
 	_was_tapping = p
 
 	if _mini_turbo_active:
@@ -337,6 +341,11 @@ func _process(delta: float) -> void:
 
 	if _mini_turbo_cd > 0:
 		_mini_turbo_cd -= delta
+
+	if _tap_window > 0:
+		_tap_window -= delta
+		if _tap_window <= 0:
+			_tap_count = 0
 
 	if _combo_timer > 0:
 		_combo_timer -= delta
