@@ -42,7 +42,7 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 		$ColorRect/VBoxContainer/BonusLabel.text = bonus_text.strip_edges()
 		$ColorRect/VBoxContainer/BonusLabel.visible = true
 
-	var tip := TIPS[randi() % TIPS.size()]
+	var tip: String = TIPS[randi() % TIPS.size()]
 	$ColorRect/VBoxContainer/TipLabel.text = "💡 " + tip
 
 	visible = true
