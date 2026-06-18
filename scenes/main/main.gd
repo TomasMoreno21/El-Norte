@@ -46,20 +46,6 @@ var miniatura_active := false
 var miniatura_start_time := 0.0
 var _revive_available := true
 var _death_old_max := 0
-var _combo_count := 0
-var _combo_timer := 0.0
-const COMBO_WINDOW := 1.5
-const COMBO_THRESHOLD := 3
-var _tap_count := 0
-var _tap_window := 0.0
-var _was_tapping := false
-const TAP_WINDOW := 0.4
-const TAPS_REQUIRED := 3
-var _mini_turbo_active := false
-var _mini_turbo_time := 0.0
-const MINI_TURBO_DURATION := 1.0
-const MINI_TURBO_COOLDOWN := 5.0
-var _mini_turbo_cd := 0.0
 var _contra_viento_active := false
 var _contra_viento_time := 0.0
 const CONTRA_VIENTO_DURATION := 4.0
@@ -260,18 +246,10 @@ func _update_encounter_mode() -> void:
 		turbo_effect.set_rafaga_mode(0.5)
 	elif _contra_viento_active:
 		turbo_effect.set_storm_mode()
-	elif _mini_turbo_active:
-		turbo_effect.set_turbo_mode()
 	elif turbo_active:
 		turbo_effect.set_turbo_mode()
 	else:
 		turbo_effect.set_normal_mode()
-
-func _activate_mini_turbo() -> void:
-	_mini_turbo_active = true
-	_mini_turbo_time = 0.0
-	AudioManager.play_sfx("collect")
-	_update_encounter_mode()
 
 func _on_player_flapped() -> void:
 	if in_storm or turbo_active:
@@ -322,35 +300,6 @@ func _process(delta: float) -> void:
 		last_lluvia_distance = distance
 		if randf() < LLUVIA_CHANCE:
 			start_lluvia()
-
-	var p := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE)
-	if p and not _was_tapping:
-		_tap_count += 1
-		_tap_window = TAP_WINDOW
-		if _tap_count >= TAPS_REQUIRED and _mini_turbo_cd <= 0:
-			_activate_mini_turbo()
-			_tap_count = 0
-	_was_tapping = p
-
-	if _mini_turbo_active:
-		_mini_turbo_time += delta
-		if _mini_turbo_time >= MINI_TURBO_DURATION:
-			_mini_turbo_active = false
-			_mini_turbo_cd = MINI_TURBO_COOLDOWN
-			_update_encounter_mode()
-
-	if _mini_turbo_cd > 0:
-		_mini_turbo_cd -= delta
-
-	if _tap_window > 0:
-		_tap_window -= delta
-		if _tap_window <= 0:
-			_tap_count = 0
-
-	if _combo_timer > 0:
-		_combo_timer -= delta
-		if _combo_timer <= 0:
-			_combo_count = 0
 
 	if not _contra_viento_active and not _ascendente_active and not calma_active and not in_storm and distance >= 1000 and distance - _last_contra_viento_distance >= CONTRA_VIENTO_COOLDOWN:
 		_last_contra_viento_distance = distance
@@ -452,11 +401,9 @@ func _process(delta: float) -> void:
 
 	var raw_delta := current_speed * delta / PIXEL_TO_METER
 	difficulty_dist += raw_delta
-	var mini_mult := 1.5 if _mini_turbo_active else 1.0
 	var contra_mult := 0.5 if _contra_viento_active else 1.0
-	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult * mini_mult * contra_mult
+	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult * contra_mult
 	hud.update_distance(int(distance))
-	hud.update_next_milestone(int(distance))
 	while _last_milestone_idx < MILESTONES.size() and int(distance) >= MILESTONES[_last_milestone_idx]:
 		hud.flash_milestone()
 		_last_milestone_idx += 1
@@ -627,13 +574,6 @@ func _on_bola_collected() -> void:
 	DataManager.add_bolas(amount)
 	run_bolas += amount
 	AudioManager.play_sfx("collect")
-	_combo_count += 1
-	_combo_timer = COMBO_WINDOW
-	if _combo_count >= COMBO_THRESHOLD:
-		var bonus := 1
-		DataManager.add_bolas(bonus)
-		run_bolas += bonus
-		_combo_count = 0
 	var nuevos := DataManager.check_achievements({})
 	_show_popups(nuevos)
 	hud.update_bolas(DataManager.bolas_balance)

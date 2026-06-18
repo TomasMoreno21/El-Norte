@@ -7,7 +7,6 @@ extends CanvasLayer
 @onready var storm_warning := $StormWarningLabel
 @onready var bolas_label := $BolasLabel
 @onready var palitos_label := $PalitosLabel
-@onready var milestone_label := $MilestoneLabel
 @onready var pause_btn := $PauseBtn
 @onready var pause_overlay := $PauseOverlay
 @onready var tutorial_overlay := $TutorialOverlay
@@ -116,28 +115,6 @@ func update_distance(meters: int) -> void:
 		_flash_100m()
 
 func _flash_100m() -> void:
-	var flash := ColorRect.new()
-	flash.color = Color(1, 1, 1, 0.08)
-	flash.anchors_preset = Control.PRESET_FULL_RECT
-	flash.mouse_filter = Control.MOUSE_FILTER_PASS
-	add_child(flash)
-	var tween := create_tween()
-	tween.tween_property(flash, "color:a", 0.0, 0.3)
-	tween.tween_callback(flash.queue_free)
-
-func update_next_milestone(meters: int) -> void:
-	var milestones := [500, 1000, 2200, 4600, 10000]
-	var next := -1
-	for m in milestones:
-		if meters < m:
-			next = m
-			break
-	if next > 0:
-		var dist_remaining := next - meters
-		milestone_label.text = "Siguiente hito: %dm  (falta %dm)" % [next, dist_remaining]
-		milestone_label.visible = true
-	else:
-		milestone_label.visible = false
 
 func update_bolas(amount: int) -> void:
 	bolas_label.text = "Barro: %d" % amount
