@@ -46,6 +46,27 @@ var miniatura_active := false
 var miniatura_start_time := 0.0
 var _revive_available := true
 var _death_old_max := 0
+var _combo_count := 0
+var _combo_timer := 0.0
+const COMBO_WINDOW := 1.5
+const COMBO_THRESHOLD := 3
+var _double_tap_time := 0.0
+var _was_tapping := false
+var _mini_turbo_active := false
+var _mini_turbo_time := 0.0
+const MINI_TURBO_DURATION := 1.0
+const MINI_TURBO_COOLDOWN := 5.0
+var _mini_turbo_cd := 0.0
+var _contra_viento_active := false
+var _contra_viento_time := 0.0
+const CONTRA_VIENTO_DURATION := 4.0
+const CONTRA_VIENTO_COOLDOWN := 2000.0
+var _last_contra_viento_distance := 0.0
+var _ascendente_active := false
+var _ascendente_time := 0.0
+const ASCENDENTE_DURATION := 2.0
+const ASCENDENTE_COOLDOWN := 1500.0
+var _last_ascendente_distance := 0.0
 
 const SPEED_BASE := 550.0
 const SPEED_AMP := 650.0
@@ -129,7 +150,6 @@ func _ready() -> void:
 	revive_popup.revived.connect(_on_revive)
 	revive_popup.rejected.connect(_on_revive_reject)
 	hud.update_bolas(DataManager.bolas_balance)
-	start_lluvia()
 	var mods := DataManager.get_bird_modifiers()
 	bird_speed_mult = mods["speed_mult"]
 	bird_kiwi_bonus = mods["kiwi_bonus"]
@@ -233,10 +253,22 @@ func _update_encounter_mode() -> void:
 		turbo_effect.set_storm_mode()
 	elif rafaga_active:
 		turbo_effect.set_rafaga_mode(_rafaga_progress)
+	elif _ascendente_active:
+		turbo_effect.set_rafaga_mode(0.5)
+	elif _contra_viento_active:
+		turbo_effect.set_storm_mode()
+	elif _mini_turbo_active:
+		turbo_effect.set_turbo_mode()
 	elif turbo_active:
 		turbo_effect.set_turbo_mode()
 	else:
 		turbo_effect.set_normal_mode()
+
+func _activate_mini_turbo() -> void:
+	_mini_turbo_active = true
+	_mini_turbo_time = 0.0
+	AudioManager.play_sfx("collect")
+	_update_encounter_mode()
 
 func _on_player_flapped() -> void:
 	if in_storm or turbo_active:
@@ -273,20 +305,70 @@ func _process(delta: float) -> void:
 		var warning := distance >= storm_dist - STORM_WARNING_DIST and distance < storm_dist
 		hud.show_storm_warning(warning)
 
-	if not rafaga_active and not calma_active and not in_storm and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
+	if not rafaga_active and not calma_active and not in_storm and not _contra_viento_active and not _ascendente_active and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
 		last_rafaga_distance = distance
 		if randf() < RAFAGA_CHANCE:
 			start_rafaga()
 
-	if not calma_active and not rafaga_active and not in_storm and distance >= 500 and distance - last_calma_distance >= CALMA_COOLDOWN:
+	if not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and not _ascendente_active and distance >= 500 and distance - last_calma_distance >= CALMA_COOLDOWN:
 		last_calma_distance = distance
 		if randf() < CALMA_CHANCE:
 			start_calma()
 
-	if not lluvia_active and not calma_active and not rafaga_active and not in_storm and distance >= 500 and distance - last_lluvia_distance >= LLUVIA_INTERVAL:
+	if not lluvia_active and not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and not _ascendente_active and distance >= 500 and distance - last_lluvia_distance >= LLUVIA_INTERVAL:
 		last_lluvia_distance = distance
 		if randf() < LLUVIA_CHANCE:
 			start_lluvia()
+
+	var p := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE)
+	if p and not _was_tapping:
+		var now := Time.get_ticks_msec()
+		if now - _double_tap_time < 300 and _mini_turbo_cd <= 0:
+			_activate_mini_turbo()
+		_double_tap_time = now
+	_was_tapping = p
+
+	if _mini_turbo_active:
+		_mini_turbo_time += delta
+		if _mini_turbo_time >= MINI_TURBO_DURATION:
+			_mini_turbo_active = false
+			_mini_turbo_cd = MINI_TURBO_COOLDOWN
+			_update_encounter_mode()
+
+	if _mini_turbo_cd > 0:
+		_mini_turbo_cd -= delta
+
+	if _combo_timer > 0:
+		_combo_timer -= delta
+		if _combo_timer <= 0:
+			_combo_count = 0
+
+	if not _contra_viento_active and not _ascendente_active and not calma_active and not in_storm and distance >= 1000 and distance - _last_contra_viento_distance >= CONTRA_VIENTO_COOLDOWN:
+		_last_contra_viento_distance = distance
+		if randf() < 0.35:
+			_contra_viento_active = true
+			_contra_viento_time = 0.0
+			hud.show_transition_message("¡VIENTO EN CONTRA!")
+
+	if _contra_viento_active:
+		_contra_viento_time += delta
+		if _contra_viento_time >= CONTRA_VIENTO_DURATION:
+			_contra_viento_active = false
+			hud.hide_transition_message()
+
+	if not _ascendente_active and not _contra_viento_active and not calma_active and not in_storm and distance >= 1000 and distance - _last_ascendente_distance >= ASCENDENTE_COOLDOWN:
+		_last_ascendente_distance = distance
+		if randf() < 0.30:
+			_ascendente_active = true
+			_ascendente_time = 0.0
+			hud.show_transition_message("¡CORRIENTE ASCENDENTE!")
+
+	if _ascendente_active:
+		_ascendente_time += delta
+		player.velocity.y = -200
+		if _ascendente_time >= ASCENDENTE_DURATION:
+			_ascendente_active = false
+			hud.hide_transition_message()
 
 	kiwi_cooldown_timer += delta
 
@@ -361,8 +443,11 @@ func _process(delta: float) -> void:
 
 	var raw_delta := current_speed * delta / PIXEL_TO_METER
 	difficulty_dist += raw_delta
-	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult
+	var mini_mult := 1.5 if _mini_turbo_active else 1.0
+	var contra_mult := 0.5 if _contra_viento_active else 1.0
+	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult * mini_mult * contra_mult
 	hud.update_distance(int(distance))
+	hud.update_next_milestone(int(distance))
 	while _last_milestone_idx < MILESTONES.size() and int(distance) >= MILESTONES[_last_milestone_idx]:
 		hud.flash_milestone()
 		_last_milestone_idx += 1
@@ -379,6 +464,7 @@ func _process(delta: float) -> void:
 		_show_popups(nuevos)
 	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining)
 	hud.show_storm(in_storm)
+	hud._update_pause_stats(int(distance), run_bolas, int(run_palitos), storms_in_run, run_kiwis)
 	$Background.set_run_distance(distance, turbo_mult)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult
@@ -532,6 +618,13 @@ func _on_bola_collected() -> void:
 	DataManager.add_bolas(amount)
 	run_bolas += amount
 	AudioManager.play_sfx("collect")
+	_combo_count += 1
+	_combo_timer = COMBO_WINDOW
+	if _combo_count >= COMBO_THRESHOLD:
+		var bonus := 1
+		DataManager.add_bolas(bonus)
+		run_bolas += bonus
+		_combo_count = 0
 	var nuevos := DataManager.check_achievements({})
 	_show_popups(nuevos)
 	hud.update_bolas(DataManager.bolas_balance)
@@ -581,6 +674,12 @@ func _on_revive() -> void:
 		lluvia_active = false
 		hud.hide_transition_message()
 		_update_encounter_mode()
+	if _contra_viento_active:
+		_contra_viento_active = false
+		hud.hide_transition_message()
+	if _ascendente_active:
+		_ascendente_active = false
+		hud.hide_transition_message()
 	if turbo_active:
 		turbo_active = false
 		turbo_effect.set_normal_mode()
@@ -611,5 +710,15 @@ func _on_revive_reject() -> void:
 func _on_transition_started(msg: String) -> void:
 	hud.show_transition_message(msg)
 
-func _on_transition_ended(_biome_name: String) -> void:
+func _on_transition_ended(biome_name: String) -> void:
 	hud.hide_transition_message()
+	var biome_idx := -1
+	match biome_name:
+		"Llanuras": biome_idx = 1
+		"Puna": biome_idx = 2
+	if biome_idx >= 0:
+		var bonus := DataManager.claim_explorer_bonus(biome_idx)
+		if bonus > 0:
+			hud.show_transition_message("+%d palitos por explorar!" % bonus)
+			await get_tree().create_timer(1.5).timeout
+			hud.hide_transition_message()

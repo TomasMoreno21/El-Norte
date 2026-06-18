@@ -25,6 +25,9 @@ func _ready() -> void:
 	angular_speed = randf_range(1.5, 4.0) * (-1 if randi() % 2 == 0 else 1)
 	_setup_visual()
 	_setup_collision()
+	scale = Vector2.ZERO
+	var tween := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(self, "scale", Vector2.ONE, 0.15)
 
 func _physics_process(delta: float) -> void:
 	position.x -= speed * delta

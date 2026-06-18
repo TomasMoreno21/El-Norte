@@ -55,6 +55,13 @@ text = ""
 horizontal_alignment = 1
 visible = false
 
+[node name="TipLabel" type="Label" parent="ColorRect/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = ""
+horizontal_alignment = 1
+
 [node name="RestartButton" type="Button" parent="ColorRect/VBoxContainer" unique_id=1332674319]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2

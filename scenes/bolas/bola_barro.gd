@@ -19,6 +19,12 @@ func _physics_process(delta: float) -> void:
 	time += delta
 	position.x -= speed * delta
 	position.y = base_y + sin(time * 2.0) * 20.0
+	if position.x < 150 and position.x > 50:
+		modulate = Color(1, 1, 0.5 + 0.5 * sin(time * 8.0), 1)
+	elif position.x <= 50:
+		modulate = Color(0.8, 0.8, 0.3, 0.5)
+	else:
+		modulate = Color.WHITE
 	if position.x < -100:
 		queue_free()
 

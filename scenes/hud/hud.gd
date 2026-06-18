@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var storm_warning := $StormWarningLabel
 @onready var bolas_label := $BolasLabel
 @onready var palitos_label := $PalitosLabel
+@onready var milestone_label := $MilestoneLabel
 @onready var pause_btn := $PauseBtn
 @onready var pause_overlay := $PauseOverlay
 @onready var tutorial_overlay := $TutorialOverlay
@@ -20,6 +21,10 @@ const STORM_WARNING_DURATION := 2.0
 var _tutorial_timer := 0.0
 var _tutorial_arrow_time := 0.0
 const TUTORIAL_DURATION := 5.0
+
+var _last_flash_100m := 0
+var _pause_stats_labels: Array[Label] = []
+var _pause_stats_visible := false
 
 func _process(delta: float) -> void:
 	if _tutorial_timer > 0:
@@ -45,6 +50,30 @@ func _ready() -> void:
 	pause_btn.pressed.connect(_toggle_pause)
 	$PauseOverlay/ContinueBtn.pressed.connect(_toggle_pause)
 	$PauseOverlay/QuitBtn.pressed.connect(_quit_to_menu)
+	_setup_pause_stats()
+
+func _setup_pause_stats() -> void:
+	var labels_data := ["Distancia: 0m", "Barro: 0", "Palitos: 0", "Tormentas: 0", "Kiwis: 0"]
+	var y := 300
+	for text in labels_data:
+		var lbl := Label.new()
+		lbl.text = text
+		lbl.add_theme_font_size_override("font_size", 24)
+		lbl.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.position = Vector2(0, y)
+		lbl.size = Vector2(1920, 30)
+		pause_overlay.add_child(lbl)
+		_pause_stats_labels.append(lbl)
+		y += 36
+
+func _update_pause_stats(dist: int, bolas: int, palitos: int, storms: int, kiwis: int) -> void:
+	if _pause_stats_labels.size() >= 5:
+		_pause_stats_labels[0].text = "Distancia: %dm" % dist
+		_pause_stats_labels[1].text = "Barro: %d" % bolas
+		_pause_stats_labels[2].text = "Palitos: %d" % palitos
+		_pause_stats_labels[3].text = "Tormentas: %d" % storms
+		_pause_stats_labels[4].text = "Kiwis: %d" % kiwis
 
 func _toggle_pause() -> void:
 	var paused := not get_tree().paused
@@ -78,9 +107,37 @@ func _quit_to_menu() -> void:
 	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")
 
 func update_distance(meters: int) -> void:
+	var prev := int(distance_label.text.trim_suffix("m"))
 	distance_label.text = "%dm" % meters
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
 	_pulse_label(distance_label)
+	if meters / 100 > _last_flash_100m:
+		_last_flash_100m = meters / 100
+		_flash_100m()
+
+func _flash_100m() -> void:
+	var flash := ColorRect.new()
+	flash.color = Color(1, 1, 1, 0.08)
+	flash.anchors_preset = Control.PRESET_FULL_RECT
+	flash.mouse_filter = Control.MOUSE_FILTER_PASS
+	add_child(flash)
+	var tween := create_tween()
+	tween.tween_property(flash, "color:a", 0.0, 0.3)
+	tween.tween_callback(flash.queue_free)
+
+func update_next_milestone(meters: int) -> void:
+	var milestones := [500, 1000, 2200, 4600, 10000]
+	var next := -1
+	for m in milestones:
+		if meters < m:
+			next = m
+			break
+	if next > 0:
+		var dist_remaining := next - meters
+		milestone_label.text = "Siguiente hito: %dm  (falta %dm)" % [next, dist_remaining]
+		milestone_label.visible = true
+	else:
+		milestone_label.visible = false
 
 func update_bolas(amount: int) -> void:
 	bolas_label.text = "Barro: %d" % amount
@@ -92,9 +149,9 @@ func update_palitos(amount: int) -> void:
 
 func _pulse_label(label: Label) -> void:
 	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "scale", Vector2(1.25, 1.25), 0.08)
-	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.25)
+	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.1)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.3)
 
 func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, x2p: float = 0.0) -> void:
 	var parts := []

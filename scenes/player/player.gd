@@ -98,7 +98,13 @@ func _physics_process(delta: float) -> void:
 		if _was_pressed:
 			flap_timer.stop()
 			$Sprite2D.texture = _tex_hornero1
-		velocity.y += GRAVITY * delta
+			if is_inside_tree():
+				var s := $Sprite2D
+				var sq := create_tween().set_ease(Tween.EASE_OUT)
+				sq.tween_property(s, "scale", s.scale * Vector2(0.85, 1.0), 0.06).set_trans(Tween.TRANS_QUAD)
+				sq.tween_property(s, "scale", s.scale, 0.15)
+		velocity.y += GRAVITY * delta * 0.5
+		velocity.y = min(velocity.y, GRAVITY * 0.6)
 	
 	_was_pressed = is_pressed
 	move_and_slide()

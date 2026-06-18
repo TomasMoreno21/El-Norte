@@ -117,6 +117,15 @@ const ACHIEVEMENTS := {
 		{ "target": 3, "desc": "Usar 3 pájaros distintos", "reward_type": "palitos", "reward_amount": 80 },
 		{ "target": 4, "desc": "Usar los 4 pájaros", "reward_type": "bolas", "reward_amount": 5 },
 	]},
+	"maraton": { "name": "Maratón", "cond": "distance", "idx": 17, "levels": [
+		{ "target": 10000, "desc": "Llegar a 10000m", "reward_type": "bolas", "reward_amount": 5 },
+	]},
+	"ladron": { "name": "Ladrón", "cond": "bolas_total", "idx": 18, "levels": [
+		{ "target": 1000, "desc": "1000 barros en total", "reward_type": "palitos", "reward_amount": 500 },
+	]},
+	"veterano": { "name": "Veterano", "cond": "deaths", "idx": 19, "levels": [
+		{ "target": 100, "desc": "Morir 100 veces", "reward_type": "bolas", "reward_amount": 3 },
+	]},
 }
 
 var palitos_balance := 0
@@ -137,9 +146,30 @@ var used_birds := []
 var first_milestones_claimed := []
 var record_bolas_claimed := []
 var tutorial_done := false
+var welcome_bonus_given := false
+var explored_biomes := []
 
 func _ready() -> void:
 	load_data()
+	_grant_welcome_bonus()
+
+func _grant_welcome_bonus() -> void:
+	if not welcome_bonus_given:
+		welcome_bonus_given = true
+		palitos_balance += 50
+		save_data()
+
+func claim_explorer_bonus(biome_idx: int) -> int:
+	if biome_idx in explored_biomes:
+		return 0
+	explored_biomes.append(biome_idx)
+	var bonus := 0
+	match biome_idx:
+		1: bonus = 30
+		2: bonus = 60
+	palitos_balance += bonus
+	save_data()
+	return bonus
 
 func get_upgrade_level(key: String) -> int:
 	return upgrades.get(key, 0)
@@ -275,6 +305,8 @@ func reset_data() -> void:
 	first_milestones_claimed = []
 	record_bolas_claimed = []
 	tutorial_done = false
+	welcome_bonus_given = false
+	explored_biomes = []
 	save_data()
 
 func mark_bird_used(bird: String) -> void:
@@ -437,6 +469,8 @@ func save_data() -> void:
 		"first_milestones_claimed": first_milestones_claimed,
 		"record_bolas_claimed": record_bolas_claimed,
 		"tutorial_done": tutorial_done,
+		"welcome_bonus_given": welcome_bonus_given,
+		"explored_biomes": explored_biomes,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -464,6 +498,8 @@ func load_data() -> void:
 				first_milestones_claimed = data.get("first_milestones_claimed", [])
 				record_bolas_claimed = data.get("record_bolas_claimed", [])
 				tutorial_done = data.get("tutorial_done", false)
+				welcome_bonus_given = data.get("welcome_bonus_given", false)
+				explored_biomes = data.get("explored_biomes", [])
 				var u = data.get("upgrades", {})
 				if u.has("calandria") and not u.has("kiwi"):
 					u["kiwi"] = u["calandria"]
