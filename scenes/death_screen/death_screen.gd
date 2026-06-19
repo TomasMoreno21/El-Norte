@@ -1,5 +1,21 @@
 extends CanvasLayer
 
+const TIPS := [
+	"Mantené el ritmo: aletear seguido cansa menos que aletear fuerte.",
+	"Los barros cerca del piso son más fáciles de agarrar.",
+	"Si ves el signo '!', prepárate para la tormenta.",
+	"El kiwi aparece cada 20 segundos... estate atento.",
+	"Llegar a las Llanuras da ×1.5 de palitos.",
+	"Llegar a la Puna da ×2 de palitos.",
+	"El Carancho es el pájaro más rápido del juego.",
+	"Las calmas son un respiro... pero no duran para siempre.",
+	"Usá el escudo en zonas de obstáculos densos.",
+	"El turbo duplica tu distancia recorrida.",
+	"Agarrar 3 barros seguido rápido da combo +1.",
+	"Doble toque rápido = mini turbo gratis.",
+	"Cada pájaro tiene stats únicos. ¡Probalos todos!",
+]
+
 func _ready() -> void:
 	$ColorRect/VBoxContainer/RestartButton.pressed.connect(_on_restart)
 	$ColorRect/VBoxContainer/MenuButton.pressed.connect(_on_menu)
@@ -25,6 +41,17 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 	if bonus_text != "":
 		$ColorRect/VBoxContainer/BonusLabel.text = bonus_text.strip_edges()
 		$ColorRect/VBoxContainer/BonusLabel.visible = true
+
+	if old_max >= 0 and distance < old_max:
+		var diff := old_max - distance
+		if diff <= 50:
+			$ColorRect/VBoxContainer/RecordDiffLabel.text = "¡Te quedaste a %dm del récord!" % diff
+		else:
+			$ColorRect/VBoxContainer/RecordDiffLabel.text = "Quedaste a %dm del récord" % diff
+		$ColorRect/VBoxContainer/RecordDiffLabel.visible = true
+
+	var tip: String = TIPS[randi() % TIPS.size()]
+	$ColorRect/VBoxContainer/TipLabel.text = "💡 " + tip
 
 	visible = true
 	get_tree().paused = true

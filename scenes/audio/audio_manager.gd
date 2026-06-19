@@ -42,6 +42,8 @@ func _ready() -> void:
 
 ## Reproduce un efecto de sonido breve
 func play_sfx(sound_name: String) -> void:
+	if not DataManager.sound_enabled:
+		return
 	if not SOUNDS.has(sound_name):
 		push_warning("AudioManager: Sound name '%s' not found in SOUNDS dictionary." % sound_name)
 		return
@@ -58,6 +60,8 @@ func play_sfx(sound_name: String) -> void:
 
 ## Reproduce música de fondo con crossfade simple
 func play_music(track_name: String, fade_time: float = 1.0) -> void:
+	if not DataManager.sound_enabled:
+		return
 	if not MUSIC.has(track_name):
 		push_warning("AudioManager: Music track '%s' not found in MUSIC dictionary." % track_name)
 		return

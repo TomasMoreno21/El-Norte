@@ -8,6 +8,7 @@ func _ready() -> void:
 	$RightBox/Logros.pressed.connect(_on_logros)
 	$Salir.pressed.connect(_on_salir)
 	$ResetButton.pressed.connect(_on_reset)
+	$SettingsBtn.pressed.connect(_toggle_settings)
 	_animate_menu()
 	SceneTransition.fade_in()
 
@@ -45,3 +46,6 @@ func _on_salir() -> void:
 
 func _on_reset() -> void:
 	DataManager.reset_data()
+
+func _toggle_settings() -> void:
+	$SettingsPanel.visible = not $SettingsPanel.visible

@@ -60,62 +60,74 @@ const ACHIEVEMENTS := {
 	"fearless": { "name": "Sin Miedo", "cond": "distance", "idx": 2, "levels": [
 		{ "target": 2000, "desc": "Llegar a 2000m", "reward_type": "palitos", "reward_amount": 80 },
 	]},
-	"collector": { "name": "Coleccionista", "cond": "bolas_total", "idx": 3, "levels": [
-		{ "target": 3, "desc": "3 barro total", "reward_type": "palitos", "reward_amount": 100 },
-		{ "target": 5, "desc": "5 barro total", "reward_type": "palitos", "reward_amount": 150 },
-		{ "target": 10, "desc": "10 barro total", "reward_type": "palitos", "reward_amount": 200 },
-	]},
-	"persistent": { "name": "Persistente", "cond": "deaths", "idx": 4, "levels": [
-		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 30 },
-		{ "target": 35, "desc": "Morir 35 veces", "reward_type": "palitos", "reward_amount": 50 },
-		{ "target": 50, "desc": "Morir 50 veces", "reward_type": "palitos", "reward_amount": 80 },
-	]},
-	"storm_survivor": { "name": "Tormentero", "cond": "storms", "idx": 5, "levels": [
-		{ "target": 3, "desc": "3 tormentas", "reward_type": "bolas", "reward_amount": 1 },
-		{ "target": 10, "desc": "10 tormentas", "reward_type": "bolas", "reward_amount": 3 },
-		{ "target": 25, "desc": "25 tormentas", "reward_type": "bolas", "reward_amount": 5 },
-	]},
-	"buyer": { "name": "Comprador", "cond": "total_upgrades_bought", "idx": 6, "levels": [
-		{ "target": 3, "desc": "Comprar 3 mejoras", "reward_type": "palitos", "reward_amount": 20 },
-		{ "target": 7, "desc": "Comprar 7 mejoras", "reward_type": "palitos", "reward_amount": 50 },
-		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 100 },
-	]},
-	"calma_survivor": { "name": "Sereno", "cond": "calmas_survived", "idx": 7, "levels": [
-		{ "target": 3, "desc": "3 calmas", "reward_type": "bolas", "reward_amount": 1 },
-		{ "target": 10, "desc": "10 calmas", "reward_type": "bolas", "reward_amount": 3 },
-	]},
-	"maxed_out": { "name": "Al Máximo", "cond": "all_maxed", "idx": 8, "levels": [
-		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 5 },
-	]},
-	"birder": { "name": "Pajarero", "cond": "all_birds", "idx": 9, "levels": [
-		{ "target": 1, "desc": "Desbloquear todos los pájaros", "reward_type": "unlock_bird", "reward_amount": 0 },
-	]},
-	"trato_hecho": { "name": "Trato Hecho", "cond": "kiwi_accepts", "idx": 10, "levels": [
-		{ "target": 20, "desc": "Aceptar 20 ofertas del kiwi", "reward_type": "none", "reward_amount": 0 },
-	]},
-	"rey_tormentas": { "name": "Rey de Tormentas", "cond": "storms_in_run", "idx": 11, "levels": [
-		{ "target": 6, "desc": "6 tormentas en una partida", "reward_type": "none", "reward_amount": 0 },
-	]},
 	"llanura": { "name": "Llanuras", "cond": "distance", "idx": 12, "levels": [
 		{ "target": 2200, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
 	]},
 	"norte": { "name": "Norte", "cond": "distance", "idx": 13, "levels": [
 		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
 	]},
-	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
-		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },
-		{ "target": 5, "desc": "Usar 5 revives", "reward_type": "palitos", "reward_amount": 60 },
-		{ "target": 10, "desc": "Usar 10 revives", "reward_type": "palitos", "reward_amount": 100 },
+	"maraton": { "name": "Maratón", "cond": "distance", "idx": 17, "levels": [
+		{ "target": 10000, "desc": "Llegar a 10000m", "reward_type": "bolas", "reward_amount": 5 },
+	]},
+	"collector": { "name": "Coleccionista", "cond": "bolas_total", "idx": 3, "levels": [
+		{ "target": 3, "desc": "3 barro total", "reward_type": "palitos", "reward_amount": 100 },
+		{ "target": 5, "desc": "5 barro total", "reward_type": "palitos", "reward_amount": 150 },
+		{ "target": 10, "desc": "10 barro total", "reward_type": "palitos", "reward_amount": 200 },
+	]},
+	"ladron": { "name": "Ladrón", "cond": "bolas_total", "idx": 18, "levels": [
+		{ "target": 1000, "desc": "1000 barros en total", "reward_type": "palitos", "reward_amount": 500 },
 	]},
 	"rico": { "name": "Rico", "cond": "palitos_balance", "idx": 15, "levels": [
 		{ "target": 1000, "desc": "Tener 1000 palitos", "reward_type": "bolas", "reward_amount": 2 },
 		{ "target": 3000, "desc": "Tener 3000 palitos", "reward_type": "bolas", "reward_amount": 4 },
 		{ "target": 8000, "desc": "Tener 8000 palitos", "reward_type": "bolas", "reward_amount": 6 },
 	]},
+	"buyer": { "name": "Comprador", "cond": "total_upgrades_bought", "idx": 6, "levels": [
+		{ "target": 3, "desc": "Comprar 3 mejoras", "reward_type": "palitos", "reward_amount": 20 },
+		{ "target": 7, "desc": "Comprar 7 mejoras", "reward_type": "palitos", "reward_amount": 50 },
+		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 100 },
+	]},
+	"birder": { "name": "Pajarero", "cond": "all_birds", "idx": 9, "levels": [
+		{ "target": 1, "desc": "Desbloquear todos los pájaros", "reward_type": "unlock_bird", "reward_amount": 0 },
+	]},
+	"pampeano": { "name": "Pampeano", "cond": "all_birds_5000", "idx": 20, "levels": [
+		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 4 },
+	]},
+	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
+		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },
+		{ "target": 5, "desc": "Usar 5 revives", "reward_type": "palitos", "reward_amount": 60 },
+		{ "target": 10, "desc": "Usar 10 revives", "reward_type": "palitos", "reward_amount": 100 },
+	]},
+	"storm_survivor": { "name": "Tormentero", "cond": "storms", "idx": 5, "levels": [
+		{ "target": 3, "desc": "3 tormentas", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 10, "desc": "10 tormentas", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 25, "desc": "25 tormentas", "reward_type": "bolas", "reward_amount": 5 },
+	]},
+	"calma_survivor": { "name": "Sereno", "cond": "calmas_survived", "idx": 7, "levels": [
+		{ "target": 3, "desc": "3 calmas", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 10, "desc": "10 calmas", "reward_type": "bolas", "reward_amount": 3 },
+	]},
+	"persistent": { "name": "Persistente", "cond": "deaths", "idx": 4, "levels": [
+		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 30 },
+		{ "target": 35, "desc": "Morir 35 veces", "reward_type": "palitos", "reward_amount": 50 },
+		{ "target": 50, "desc": "Morir 50 veces", "reward_type": "palitos", "reward_amount": 80 },
+	]},
+	"veterano": { "name": "Veterano", "cond": "deaths", "idx": 19, "levels": [
+		{ "target": 100, "desc": "Morir 100 veces", "reward_type": "bolas", "reward_amount": 3 },
+	]},
+	"maxed_out": { "name": "Al Máximo", "cond": "all_maxed", "idx": 8, "levels": [
+		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 5 },
+	]},
 	"multiuso": { "name": "Multiuso", "cond": "bird_uses", "idx": 16, "levels": [
 		{ "target": 2, "desc": "Usar 2 pájaros distintos", "reward_type": "palitos", "reward_amount": 40 },
 		{ "target": 3, "desc": "Usar 3 pájaros distintos", "reward_type": "palitos", "reward_amount": 80 },
 		{ "target": 4, "desc": "Usar los 4 pájaros", "reward_type": "bolas", "reward_amount": 5 },
+	]},
+	"trato_hecho": { "name": "Trato Hecho", "cond": "kiwi_accepts", "idx": 10, "levels": [
+		{ "target": 20, "desc": "Aceptar 20 ofertas del kiwi", "reward_type": "none", "reward_amount": 0 },
+	]},
+	"rey_tormentas": { "name": "Rey de Tormentas", "cond": "storms_in_run", "idx": 11, "levels": [
+		{ "target": 6, "desc": "6 tormentas en una partida", "reward_type": "none", "reward_amount": 0 },
 	]},
 }
 
@@ -137,9 +149,34 @@ var used_birds := []
 var first_milestones_claimed := []
 var record_bolas_claimed := []
 var tutorial_done := false
+var welcome_bonus_given := false
+var explored_biomes := []
+var bird_max_distances := {}
+var reduce_motion := false
+var sound_enabled := true
+var minimap_visible := false
 
 func _ready() -> void:
 	load_data()
+	_grant_welcome_bonus()
+
+func _grant_welcome_bonus() -> void:
+	if not welcome_bonus_given:
+		welcome_bonus_given = true
+		palitos_balance += 50
+		save_data()
+
+func claim_explorer_bonus(biome_idx: int) -> int:
+	if biome_idx in explored_biomes:
+		return 0
+	explored_biomes.append(biome_idx)
+	var bonus := 0
+	match biome_idx:
+		1: bonus = 30
+		2: bonus = 60
+	palitos_balance += bonus
+	save_data()
+	return bonus
 
 func get_upgrade_level(key: String) -> int:
 	return upgrades.get(key, 0)
@@ -275,12 +312,22 @@ func reset_data() -> void:
 	first_milestones_claimed = []
 	record_bolas_claimed = []
 	tutorial_done = false
+	welcome_bonus_given = false
+	explored_biomes = []
 	save_data()
 
 func mark_bird_used(bird: String) -> void:
 	if not bird in used_birds:
 		used_birds.append(bird)
 		save_data()
+
+func mark_bird_distance(bird: String, dist: int) -> Array:
+	var prev: int = bird_max_distances.get(bird, 0)
+	if dist > prev:
+		bird_max_distances[bird] = dist
+		save_data()
+		return check_achievements({})
+	return []
 
 func add_palitos(amount: int) -> Array:
 	palitos_balance += amount
@@ -315,7 +362,7 @@ func check_achievements(conditions: Dictionary) -> Array:
 						break
 			"all_birds":
 				achieved = true
-				for bid in ["hornero", "tero", "golondrina", "carpintero"]:
+				for bid: String in ["hornero", "tero", "golondrina", "carpintero"]:
 					if not bid in unlocked_birds:
 						achieved = false
 						break
@@ -333,6 +380,12 @@ func check_achievements(conditions: Dictionary) -> Array:
 				achieved = palitos_balance >= level_data["target"]
 			"bird_uses":
 				achieved = used_birds.size() >= level_data["target"]
+			"all_birds_5000":
+				achieved = true
+				for bid: String in ["hornero", "tero", "golondrina", "carpintero"]:
+					if bird_max_distances.get(bid, 0) < 5000:
+						achieved = false
+						break
 		if achieved:
 			completed_achievements[id] = next_idx
 			var rtype: String = level_data["reward_type"]
@@ -370,6 +423,12 @@ func get_current_value(cond: String) -> int:
 			return palitos_balance
 		"bird_uses":
 			return used_birds.size()
+		"all_birds_5000":
+			var count := 0
+			for bid: String in ["hornero", "tero", "golondrina", "carpintero"]:
+				if bird_max_distances.get(bid, 0) >= 5000:
+					count += 1
+			return count
 		_:
 			return -1
 
@@ -437,6 +496,12 @@ func save_data() -> void:
 		"first_milestones_claimed": first_milestones_claimed,
 		"record_bolas_claimed": record_bolas_claimed,
 		"tutorial_done": tutorial_done,
+		"welcome_bonus_given": welcome_bonus_given,
+		"explored_biomes": explored_biomes,
+		"bird_max_distances": bird_max_distances,
+		"reduce_motion": reduce_motion,
+		"sound_enabled": sound_enabled,
+		"minimap_visible": minimap_visible,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -464,6 +529,12 @@ func load_data() -> void:
 				first_milestones_claimed = data.get("first_milestones_claimed", [])
 				record_bolas_claimed = data.get("record_bolas_claimed", [])
 				tutorial_done = data.get("tutorial_done", false)
+				welcome_bonus_given = data.get("welcome_bonus_given", false)
+				explored_biomes = data.get("explored_biomes", [])
+				bird_max_distances = data.get("bird_max_distances", {})
+				reduce_motion = data.get("reduce_motion", false)
+				sound_enabled = data.get("sound_enabled", true)
+				minimap_visible = data.get("minimap_visible", false)
 				var u = data.get("upgrades", {})
 				if u.has("calandria") and not u.has("kiwi"):
 					u["kiwi"] = u["calandria"]

@@ -2,6 +2,7 @@ extends CanvasLayer
 
 @onready var distance_label := $DistanceLabel
 @onready var max_dist_label := $MaxDistLabel
+@onready var minimap := $Minimap
 @onready var powerup_label := $PowerUpLabel
 @onready var storm_label := $StormLabel
 @onready var storm_warning := $StormWarningLabel
@@ -21,6 +22,13 @@ var _tutorial_timer := 0.0
 var _tutorial_arrow_time := 0.0
 const TUTORIAL_DURATION := 5.0
 
+var _last_flash_100m := 0
+var _pause_stats_labels: Array[Label] = []
+var _pause_stats_visible := false
+var _heartbeat_time := 0.0
+var _last_dist_value := 0
+var _idle_time := 0.0
+
 func _process(delta: float) -> void:
 	if _tutorial_timer > 0:
 		_tutorial_timer -= delta
@@ -39,12 +47,47 @@ func _process(delta: float) -> void:
 		var s := 1.0 + 0.4 * t
 		storm_warning.scale = Vector2(s, s)
 
+	var dist := int(distance_label.text.trim_suffix("m"))
+	_idle_time += delta
+	var idle := 1.0 + 0.012 * sin(_idle_time * 2.5)
+	if dist > 0 and DataManager.max_distance > 0 and dist >= DataManager.max_distance - 200:
+		_heartbeat_time += delta
+		idle += 0.03 * sin(_heartbeat_time * 5.0)
+		distance_label.modulate = Color(1, 0.85 + 0.15 * sin(_heartbeat_time * 5.0), 0.85 + 0.15 * sin(_heartbeat_time * 5.0))
+	else:
+		distance_label.modulate = Color.WHITE
+	distance_label.scale = Vector2(idle, idle)
+
 func _ready() -> void:
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	pause_btn.pressed.connect(_toggle_pause)
 	$PauseOverlay/ContinueBtn.pressed.connect(_toggle_pause)
 	$PauseOverlay/QuitBtn.pressed.connect(_quit_to_menu)
+	_setup_pause_stats()
+
+func _setup_pause_stats() -> void:
+	var labels_data := ["Distancia: 0m", "Barro: 0", "Palitos: 0", "Tormentas: 0", "Kiwis: 0"]
+	var y := 300
+	for text in labels_data:
+		var lbl := Label.new()
+		lbl.text = text
+		lbl.add_theme_font_size_override("font_size", 24)
+		lbl.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.position = Vector2(0, y)
+		lbl.size = Vector2(1920, 30)
+		pause_overlay.add_child(lbl)
+		_pause_stats_labels.append(lbl)
+		y += 36
+
+func _update_pause_stats(dist: int, bolas: int, palitos: int, storms: int, kiwis: int) -> void:
+	if _pause_stats_labels.size() >= 5:
+		_pause_stats_labels[0].text = "Distancia: %dm" % dist
+		_pause_stats_labels[1].text = "Barro: %d" % bolas
+		_pause_stats_labels[2].text = "Palitos: %d" % palitos
+		_pause_stats_labels[3].text = "Tormentas: %d" % storms
+		_pause_stats_labels[4].text = "Kiwis: %d" % kiwis
 
 func _toggle_pause() -> void:
 	var paused := not get_tree().paused
@@ -78,9 +121,27 @@ func _quit_to_menu() -> void:
 	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")
 
 func update_distance(meters: int) -> void:
+	var prev := int(distance_label.text.trim_suffix("m"))
 	distance_label.text = "%dm" % meters
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
-	_pulse_label(distance_label)
+	minimap.set_distance(meters)
+	if meters != prev:
+		var tween := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(distance_label, "scale", Vector2(1.12, 1.12), 0.08)
+		tween.tween_property(distance_label, "scale", Vector2(1.0, 1.0), 0.25)
+	if meters / 100 > _last_flash_100m:
+		_last_flash_100m = meters / 100
+		_flash_100m()
+
+func _flash_100m() -> void:
+	var flash := ColorRect.new()
+	flash.color = Color(1, 1, 1, 0.08)
+	flash.anchors_preset = Control.PRESET_FULL_RECT
+	flash.mouse_filter = Control.MOUSE_FILTER_PASS
+	add_child(flash)
+	var tween := create_tween()
+	tween.tween_property(flash, "color:a", 0.0, 0.3)
+	tween.tween_callback(flash.queue_free)
 
 func update_bolas(amount: int) -> void:
 	bolas_label.text = "Barro: %d" % amount
@@ -92,9 +153,9 @@ func update_palitos(amount: int) -> void:
 
 func _pulse_label(label: Label) -> void:
 	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "scale", Vector2(1.25, 1.25), 0.08)
-	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.25)
+	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.1)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.3)
 
 func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, x2p: float = 0.0) -> void:
 	var parts := []
@@ -144,3 +205,6 @@ func hide_transition_message() -> void:
 	var tween := create_tween()
 	tween.tween_property($TransitionLabel, "modulate:a", 0.0, 0.6).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	tween.tween_callback(func(): $TransitionLabel.visible = false)
+
+func set_biome(name: String) -> void:
+	minimap.set_distance(int(distance_label.text.trim_suffix("m")), name)

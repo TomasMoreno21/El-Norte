@@ -46,6 +46,14 @@ var miniatura_active := false
 var miniatura_start_time := 0.0
 var _revive_available := true
 var _death_old_max := 0
+var _contra_viento_active := false
+var _contra_viento_time := 0.0
+const CONTRA_VIENTO_DURATION := 4.0
+const CONTRA_VIENTO_COOLDOWN := 2000.0
+var _last_contra_viento_distance := 0.0
+var _current_biome := "Cordillera"
+var _heat_overlay: ColorRect
+var _rain_particles: GPUParticles2D
 
 const SPEED_BASE := 550.0
 const SPEED_AMP := 650.0
@@ -129,7 +137,6 @@ func _ready() -> void:
 	revive_popup.revived.connect(_on_revive)
 	revive_popup.rejected.connect(_on_revive_reject)
 	hud.update_bolas(DataManager.bolas_balance)
-	start_lluvia()
 	var mods := DataManager.get_bird_modifiers()
 	bird_speed_mult = mods["speed_mult"]
 	bird_kiwi_bonus = mods["kiwi_bonus"]
@@ -147,6 +154,7 @@ func _ready() -> void:
 	parallax_editor.set_background($Background)
 	if not DataManager.tutorial_done:
 		hud.start_tutorial()
+	_setup_biome_effects()
 
 func start_storm() -> void:
 	in_storm = true
@@ -155,6 +163,7 @@ func start_storm() -> void:
 	player.storm_flap_override = -340
 	AudioManager.play_sfx("storm_start")
 	_update_encounter_mode()
+	_update_existing_obstacle_speeds()
 
 func end_storm() -> void:
 	in_storm = false
@@ -164,6 +173,7 @@ func end_storm() -> void:
 	DataManager.storms_survived += 1
 	storms_in_run += 1
 	AudioManager.play_sfx("storm_end")
+	_update_existing_obstacle_speeds()
 	var nuevos := DataManager.check_achievements({ "storms_in_run": storms_in_run })
 	_show_popups(nuevos)
 	if "rey_tormentas" in DataManager.completed_achievements:
@@ -233,6 +243,8 @@ func _update_encounter_mode() -> void:
 		turbo_effect.set_storm_mode()
 	elif rafaga_active:
 		turbo_effect.set_rafaga_mode(_rafaga_progress)
+	elif _contra_viento_active:
+		turbo_effect.set_storm_mode()
 	elif turbo_active:
 		turbo_effect.set_turbo_mode()
 	else:
@@ -248,6 +260,7 @@ func _on_player_died() -> void:
 	_death_old_max = DataManager.max_distance
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
 	DataManager.mark_bird_used(DataManager.active_bird)
+	DataManager.mark_bird_distance(DataManager.active_bird, int(distance))
 	var nuevos := DataManager.check_achievements({ "distance": int(distance), "storms_in_run": storms_in_run })
 	if DataManager.palitos_balance >= REVIVE_COST and _revive_available:
 		_revive_available = false
@@ -273,20 +286,33 @@ func _process(delta: float) -> void:
 		var warning := distance >= storm_dist - STORM_WARNING_DIST and distance < storm_dist
 		hud.show_storm_warning(warning)
 
-	if not rafaga_active and not calma_active and not in_storm and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
+	if not rafaga_active and not calma_active and not in_storm and not _contra_viento_active and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
 		last_rafaga_distance = distance
 		if randf() < RAFAGA_CHANCE:
 			start_rafaga()
 
-	if not calma_active and not rafaga_active and not in_storm and distance >= 500 and distance - last_calma_distance >= CALMA_COOLDOWN:
+	if not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and distance >= 500 and distance - last_calma_distance >= CALMA_COOLDOWN:
 		last_calma_distance = distance
 		if randf() < CALMA_CHANCE:
 			start_calma()
 
-	if not lluvia_active and not calma_active and not rafaga_active and not in_storm and distance >= 500 and distance - last_lluvia_distance >= LLUVIA_INTERVAL:
+	if not lluvia_active and not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and distance >= 500 and distance - last_lluvia_distance >= LLUVIA_INTERVAL:
 		last_lluvia_distance = distance
 		if randf() < LLUVIA_CHANCE:
 			start_lluvia()
+
+	if not _contra_viento_active and not calma_active and not in_storm and distance >= 1000 and distance - _last_contra_viento_distance >= CONTRA_VIENTO_COOLDOWN:
+		_last_contra_viento_distance = distance
+		if randf() < 0.35:
+			_contra_viento_active = true
+			_contra_viento_time = 0.0
+			hud.show_transition_message("¡VIENTO EN CONTRA!")
+
+	if _contra_viento_active:
+		_contra_viento_time += delta
+		if _contra_viento_time >= CONTRA_VIENTO_DURATION:
+			_contra_viento_active = false
+			hud.hide_transition_message()
 
 	kiwi_cooldown_timer += delta
 
@@ -341,6 +367,7 @@ func _process(delta: float) -> void:
 			turbo_active = false
 			turbo_remaining = 0.0
 			_update_encounter_mode()
+			_update_existing_obstacle_speeds()
 		else:
 			turbo_mult = 2.0
 
@@ -361,7 +388,8 @@ func _process(delta: float) -> void:
 
 	var raw_delta := current_speed * delta / PIXEL_TO_METER
 	difficulty_dist += raw_delta
-	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult
+	var contra_mult := 0.5 if _contra_viento_active else 1.0
+	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult * contra_mult
 	hud.update_distance(int(distance))
 	while _last_milestone_idx < MILESTONES.size() and int(distance) >= MILESTONES[_last_milestone_idx]:
 		hud.flash_milestone()
@@ -369,8 +397,6 @@ func _process(delta: float) -> void:
 	var palitos_rate := 1 + DataManager.get_upgrade_level("palitos_base")
 	var bird_palitos_mult: float = DataManager.get_bird_modifiers()["palitos_mult"]
 	var run_palitos := int(distance / 10) * palitos_rate * bird_palitos_mult
-	if x2_palitos_active:
-		run_palitos *= 2
 	hud.update_palitos(int(run_palitos))
 	var curr_dist := int(distance)
 	if curr_dist >= last_check_dist + 25:
@@ -379,12 +405,15 @@ func _process(delta: float) -> void:
 		_show_popups(nuevos)
 	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining)
 	hud.show_storm(in_storm)
-	$Background.set_run_distance(distance, turbo_mult)
+	hud._update_pause_stats(int(distance), run_bolas, int(run_palitos), storms_in_run, run_kiwis)
+	$Background.set_run_distance(distance, 1.0)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult
 
 	var target_shake := 0.0
-	if in_storm:
+	if DataManager.reduce_motion:
+		target_shake = 0.0
+	elif in_storm:
 		target_shake = 8.0
 	elif turbo_active:
 		target_shake = 5.0
@@ -433,12 +462,13 @@ func _safe_double_y(shape_a: int, shape_b: int) -> Vector2:
 
 	return Vector2(_safe_obstacle_y(shape_a), _safe_obstacle_y(shape_b))
 
-func _spawn_obstacle(shape_type: int, speed: float) -> void:
-	_spawn_obstacle_at(shape_type, speed, _safe_obstacle_y(shape_type))
+func _spawn_obstacle(shape_type: int, speed: float, base_speed: float = 0.0) -> void:
+	_spawn_obstacle_at(shape_type, speed, _safe_obstacle_y(shape_type), base_speed)
 
-func _spawn_obstacle_at(shape_type: int, speed: float, y: float) -> void:
+func _spawn_obstacle_at(shape_type: int, speed: float, y: float, base_speed: float = 0.0) -> void:
 	var obs := obstacle_scene.instantiate()
 	obs.speed = speed
+	obs.base_speed = base_speed
 	obs.shape_type = shape_type
 	obs.position = Vector2(2100, y)
 	obs.add_to_group("obstacle")
@@ -465,16 +495,17 @@ func _on_spawn_timer_timeout() -> void:
 	var combined_obs_mult: float = turbo_obs_speed * storm_mult_obs
 	if in_storm and turbo_active:
 		combined_obs_mult = min(combined_obs_mult, 1.5)
-	var base_speed: float = get_base_speed(difficulty_dist) * combined_obs_mult
+	var obs_base_speed: float = get_base_speed(difficulty_dist)
+	var obs_speed := obs_base_speed * combined_obs_mult
 
 	var shape_a := randi() % 3
 	if randf() < get_double_chance(difficulty_dist):
 		var shape_b := randi() % 3
 		var positions := _safe_double_y(shape_a, shape_b)
-		_spawn_obstacle_at(shape_a, base_speed, positions.x)
-		_spawn_obstacle_at(shape_b, base_speed, positions.y)
+		_spawn_obstacle_at(shape_a, obs_speed, positions.x, obs_base_speed)
+		_spawn_obstacle_at(shape_b, obs_speed, positions.y, obs_base_speed)
 	else:
-		_spawn_obstacle(shape_a, base_speed)
+		_spawn_obstacle(shape_a, obs_speed, obs_base_speed)
 
 func _on_kiwi_collected() -> void:
 	run_kiwis += 1
@@ -499,6 +530,8 @@ func _on_power_up_selected(type: String) -> void:
 			turbo_duration_max = 6.0 + DataManager.get_upgrade_level("turbo_duration") * 0.2
 			shake_strength = 10.0
 			_update_encounter_mode()
+			_spawn_shockwave()
+			_update_existing_obstacle_speeds()
 		"x2_bolas":
 			x2_bolas_active = true
 		"bola_extra":
@@ -581,6 +614,9 @@ func _on_revive() -> void:
 		lluvia_active = false
 		hud.hide_transition_message()
 		_update_encounter_mode()
+	if _contra_viento_active:
+		_contra_viento_active = false
+		hud.hide_transition_message()
 	if turbo_active:
 		turbo_active = false
 		turbo_effect.set_normal_mode()
@@ -603,6 +639,63 @@ func _on_revive() -> void:
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist)
 	get_tree().paused = false
 
+func _spawn_shockwave() -> void:
+	var sw := Node2D.new()
+	sw.set_script(preload("res://scenes/effects/shockwave.gd"))
+	sw.position = player.global_position
+	add_child(sw)
+
+func _update_existing_obstacle_speeds() -> void:
+	var turbo_mult := get_turbo_obs_speed(difficulty_dist) if turbo_active else 1.0
+	var storm_mult := STORM_SPEED_BOOST if in_storm else 1.0
+	var combined := turbo_mult * storm_mult
+	if in_storm and turbo_active:
+		combined = min(combined, 1.5)
+	for obs in get_tree().get_nodes_in_group("obstacle"):
+		obs.speed = obs.base_speed * combined
+
+func _setup_biome_effects() -> void:
+	var shader_mat := ShaderMaterial.new()
+	shader_mat.shader = preload("res://scenes/effects/heat_distortion.gdshader")
+	_heat_overlay = ColorRect.new()
+	_heat_overlay.material = shader_mat
+	_heat_overlay.color = Color.WHITE
+	_heat_overlay.anchors_preset = Control.PRESET_FULL_RECT
+	_heat_overlay.mouse_filter = Control.MOUSE_FILTER_PASS
+	_heat_overlay.z_index = 100
+	var layer := CanvasLayer.new()
+	layer.layer = 9
+	layer.add_child(_heat_overlay)
+	add_child(layer)
+
+	_rain_particles = GPUParticles2D.new()
+	var rain_mat := ParticleProcessMaterial.new()
+	rain_mat.direction = Vector3(-0.3, 1, 0)
+	rain_mat.gravity = Vector3(0, 500, 0)
+	rain_mat.initial_velocity_min = 400.0
+	rain_mat.initial_velocity_max = 700.0
+	rain_mat.scale_min = 0.5
+	rain_mat.scale_max = 1.5
+	rain_mat.color = Color(0.7, 0.8, 1, 0.25)
+	rain_mat.angle_min = -15.0
+	rain_mat.angle_max = 15.0
+	rain_mat.flatness = 1.0
+	rain_mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	rain_mat.emission_box_extents = Vector3(1000, 2, 0)
+	_rain_particles.process_material = rain_mat
+	_rain_particles.amount = 150
+	_rain_particles.lifetime = 0.5
+	_rain_particles.one_shot = false
+	_rain_particles.emitting = false
+	_rain_particles.position = Vector2(960, -50)
+	_rain_particles.z_index = 50
+	add_child(_rain_particles)
+	_set_biome_effects()
+
+func _set_biome_effects() -> void:
+	_heat_overlay.visible = _current_biome == "Puna"
+	_rain_particles.emitting = _current_biome == "Cordillera" and not DataManager.reduce_motion
+
 func _on_revive_reject() -> void:
 	Engine.time_scale = 1.0
 	revive_popup.visible = false
@@ -611,5 +704,18 @@ func _on_revive_reject() -> void:
 func _on_transition_started(msg: String) -> void:
 	hud.show_transition_message(msg)
 
-func _on_transition_ended(_biome_name: String) -> void:
+func _on_transition_ended(biome_name: String) -> void:
+	_current_biome = biome_name
+	_set_biome_effects()
+	hud.set_biome(biome_name)
 	hud.hide_transition_message()
+	var biome_idx := -1
+	match biome_name:
+		"Llanuras": biome_idx = 1
+		"Puna": biome_idx = 2
+	if biome_idx >= 0:
+		var bonus := DataManager.claim_explorer_bonus(biome_idx)
+		if bonus > 0:
+			hud.show_transition_message("+%d palitos por explorar!" % bonus)
+			await get_tree().create_timer(1.5).timeout
+			hud.hide_transition_message()

@@ -11,6 +11,15 @@ const POOL := [
 	{ "text": "Barro extra", "type": "bola_extra", "cost": 35 },
 ]
 
+const DESCRIPTIONS := {
+	"shield": "Protege de obstáculos por 4s",
+	"turbo": "Duplica la distancia por 6s",
+	"x2_bolas": "Duplica barros por 4s",
+	"miniatura": "Reduce el pájaro 3s",
+	"x2_palitos": "Duplica palitos por 4s",
+	"bola_extra": "Da 1 barro extra",
+}
+
 func _ready() -> void:
 	var pool: Array[Dictionary] = []
 	for p in POOL:
@@ -48,6 +57,7 @@ func _ready() -> void:
 func _add_choice(text: String, type: String, cost: int) -> void:
 	var btn := Button.new()
 	btn.text = text
+	btn.tooltip_text = DESCRIPTIONS.get(type, "")
 	btn.custom_minimum_size = Vector2(0, 64)
 	btn.add_theme_font_size_override("font_size", 36)
 	btn.size_flags_horizontal = 4

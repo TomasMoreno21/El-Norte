@@ -1,11 +1,7 @@
 [gd_scene format=3 uid="uid://uflrhrr6hhal"]
 
 [ext_resource type="Script" uid="uid://bkdwx2mdct30" path="res://scenes/hud/hud.gd" id="1"]
-[ext_resource type="Shader" path="res://scenes/effects/border_flash.gdshader" id="2"]
-
-[sub_resource type="ShaderMaterial" id="MatFlash"]
-shader = ExtResource("2")
-shader_parameter/flash_alpha = 0.0
+[ext_resource type="Script" uid="uid://b75a77b3ouy13" path="res://scenes/hud/minimap.gd" id="3"]
 
 [node name="HUD" type="CanvasLayer" unique_id=1326789121]
 layer = 10
@@ -30,6 +26,13 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 22
 text = "Récord: 0m"
 
+[node name="Minimap" type="Control" parent="." unique_id=1311487202]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 34.0
+mouse_filter = 2
+script = ExtResource("3")
+
 [node name="BolasLabel" type="Label" parent="." unique_id=1815625439]
 anchors_preset = 1
 anchor_left = 1.0
@@ -44,21 +47,19 @@ theme_override_font_sizes/font_size = 32
 horizontal_alignment = 2
 
 [node name="PalitosEmoji" type="Label" parent="." unique_id=1892457837]
-layout_mode = 0
-offset_left = 47.0
-offset_top = 120.0
-offset_right = 107.0
-offset_bottom = 181.0
+offset_left = -468.0
+offset_top = 139.0
+offset_right = -408.0
+offset_bottom = 200.0
 theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
 theme_override_font_sizes/font_size = 44
 text = "🪵"
 
 [node name="PalitosLabel" type="Label" parent="." unique_id=1892457836]
-layout_mode = 0
-offset_left = 114.0
-offset_top = 120.0
-offset_right = 300.0
-offset_bottom = 181.0
+offset_left = 34.0
+offset_top = 125.0
+offset_right = 220.0
+offset_bottom = 186.0
 theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
 theme_override_font_sizes/font_size = 44
 
@@ -95,35 +96,36 @@ theme_override_font_sizes/font_size = 140
 text = "!"
 horizontal_alignment = 1
 
-[node name="MilestoneFlash" type="Control" parent="."]
+[node name="MilestoneFlash" type="Control" parent="." unique_id=63912113]
 visible = false
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 
-[node name="Top" type="ColorRect" parent="MilestoneFlash"]
-anchors_preset = 0
+[node name="Top" type="ColorRect" parent="MilestoneFlash" unique_id=1027048248]
+layout_mode = 0
 anchor_right = 1.0
 offset_bottom = 30.0
 color = Color(0, 1, 0, 1)
 
-[node name="Bottom" type="ColorRect" parent="MilestoneFlash"]
-anchors_preset = 0
+[node name="Bottom" type="ColorRect" parent="MilestoneFlash" unique_id=2029944372]
+layout_mode = 0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -30.0
 color = Color(0, 1, 0, 1)
 
-[node name="Left" type="ColorRect" parent="MilestoneFlash"]
-anchors_preset = 0
+[node name="Left" type="ColorRect" parent="MilestoneFlash" unique_id=484478421]
+layout_mode = 0
 anchor_bottom = 1.0
 offset_right = 30.0
 color = Color(0, 1, 0, 1)
 
-[node name="Right" type="ColorRect" parent="MilestoneFlash"]
-anchors_preset = 0
+[node name="Right" type="ColorRect" parent="MilestoneFlash" unique_id=2015467931]
+layout_mode = 0
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -147,6 +149,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 1
 
 [node name="Bg" type="ColorRect" parent="TutorialOverlay" unique_id=1368516804]
@@ -215,9 +219,9 @@ horizontal_alignment = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -100.0
+offset_left = -120.0
 offset_top = 16.0
-offset_right = -20.0
+offset_right = -30.0
 offset_bottom = 80.0
 grow_horizontal = 0
 theme_override_font_sizes/font_size = 48

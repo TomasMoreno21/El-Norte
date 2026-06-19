@@ -86,7 +86,8 @@ func _physics_process(delta: float) -> void:
 			AudioManager.play_sfx("flap")
 			$Sprite2D.texture = _tex_hornero2
 			flap_timer.start()
-			_feather_particles.restart()
+			if not DataManager.reduce_motion:
+				_feather_particles.restart()
 			flapped.emit()
 			if is_inside_tree():
 				var s := $Sprite2D
@@ -196,5 +197,6 @@ func reset() -> void:
 	$Sprite2D.texture = _tex_hornero1
 	_was_pressed = false
 	storm_flap_override = 0
-	_feather_particles.restart()
+	if not DataManager.reduce_motion:
+		_feather_particles.restart()
 	Engine.time_scale = 1.0
