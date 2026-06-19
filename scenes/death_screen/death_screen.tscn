@@ -55,6 +55,14 @@ text = ""
 horizontal_alignment = 1
 visible = false
 
+[node name="RecordDiffLabel" type="Label" parent="ColorRect/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = ""
+horizontal_alignment = 1
+visible = false
+
 [node name="TipLabel" type="Label" parent="ColorRect/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20

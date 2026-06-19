@@ -11,7 +11,13 @@ func _ready() -> void:
 	_setup_emitter(bottom_emitter, Vector2(960, 1055), Vector3(-1, 0, 0))
 	_setup_rafaga_emitter(rafaga_top, Vector2(960, 25))
 	_setup_rafaga_emitter(rafaga_bottom, Vector2(960, 1055))
-	set_normal_mode()
+	if DataManager.reduce_motion:
+		top_emitter.emitting = false
+		bottom_emitter.emitting = false
+		rafaga_top.emitting = false
+		rafaga_bottom.emitting = false
+	else:
+		set_normal_mode()
 
 func _setup_emitter(emitter: GPUParticles2D, pos: Vector2, dir: Vector3) -> void:
 	emitter.position = pos
@@ -52,19 +58,31 @@ func _setup_rafaga_emitter(emitter: GPUParticles2D, pos: Vector2) -> void:
 	img.fill(Color(0.3, 0.9, 0.3))
 	emitter.texture = ImageTexture.create_from_image(img)
 
+func _reduce_motion_check() -> bool:
+	if DataManager.reduce_motion:
+		top_emitter.emitting = false
+		bottom_emitter.emitting = false
+		rafaga_top.emitting = false
+		rafaga_bottom.emitting = false
+		calma_label.visible = false
+		return true
+	return false
+
 func set_normal_mode() -> void:
-	top_emitter.amount = 10
-	bottom_emitter.amount = 10
+	if _reduce_motion_check():
+		return
+	top_emitter.amount = 20
+	bottom_emitter.amount = 20
 	top_emitter.lifetime = 1.0
 	bottom_emitter.lifetime = 1.0
 	top_emitter.scale = Vector2(1, 1)
 	bottom_emitter.scale = Vector2(1, 1)
-	top_emitter.process_material.initial_velocity_min = 200.0
-	top_emitter.process_material.initial_velocity_max = 400.0
-	bottom_emitter.process_material.initial_velocity_min = 200.0
-	bottom_emitter.process_material.initial_velocity_max = 400.0
-	top_emitter.process_material.color = Color(1, 1, 1, 0.2)
-	bottom_emitter.process_material.color = Color(1, 1, 1, 0.2)
+	top_emitter.process_material.initial_velocity_min = 300.0
+	top_emitter.process_material.initial_velocity_max = 500.0
+	bottom_emitter.process_material.initial_velocity_min = 300.0
+	bottom_emitter.process_material.initial_velocity_max = 500.0
+	top_emitter.process_material.color = Color(1, 1, 1, 0.35)
+	bottom_emitter.process_material.color = Color(1, 1, 1, 0.35)
 	top_emitter.emitting = true
 	bottom_emitter.emitting = true
 	rafaga_top.emitting = false
@@ -72,18 +90,20 @@ func set_normal_mode() -> void:
 	calma_label.visible = false
 
 func set_turbo_mode() -> void:
-	top_emitter.amount = 25
-	bottom_emitter.amount = 25
+	if _reduce_motion_check():
+		return
+	top_emitter.amount = 35
+	bottom_emitter.amount = 35
 	top_emitter.lifetime = 0.9
 	bottom_emitter.lifetime = 0.9
 	top_emitter.scale = Vector2(2.5, 2.5)
 	bottom_emitter.scale = Vector2(2.5, 2.5)
-	top_emitter.process_material.initial_velocity_min = 600.0
-	top_emitter.process_material.initial_velocity_max = 1200.0
-	bottom_emitter.process_material.initial_velocity_min = 600.0
-	bottom_emitter.process_material.initial_velocity_max = 1200.0
-	top_emitter.process_material.color = Color(1, 1, 1, 0.45)
-	bottom_emitter.process_material.color = Color(1, 1, 1, 0.45)
+	top_emitter.process_material.initial_velocity_min = 800.0
+	top_emitter.process_material.initial_velocity_max = 1500.0
+	bottom_emitter.process_material.initial_velocity_min = 800.0
+	bottom_emitter.process_material.initial_velocity_max = 1500.0
+	top_emitter.process_material.color = Color(1, 1, 1, 0.6)
+	bottom_emitter.process_material.color = Color(1, 1, 1, 0.6)
 	top_emitter.emitting = true
 	bottom_emitter.emitting = true
 	rafaga_top.emitting = false
@@ -91,6 +111,8 @@ func set_turbo_mode() -> void:
 	calma_label.visible = false
 
 func set_storm_mode() -> void:
+	if _reduce_motion_check():
+		return
 	top_emitter.amount = 50
 	bottom_emitter.amount = 50
 	top_emitter.lifetime = 1.2
@@ -110,6 +132,8 @@ func set_storm_mode() -> void:
 	calma_label.visible = false
 
 func set_rafaga_mode(progress: float) -> void:
+	if _reduce_motion_check():
+		return
 	var p := clampf(progress, 0.0, 1.0)
 	top_emitter.emitting = false
 	bottom_emitter.emitting = false
@@ -130,6 +154,8 @@ func set_rafaga_mode(progress: float) -> void:
 	calma_label.visible = false
 
 func set_calma_mode() -> void:
+	if _reduce_motion_check():
+		return
 	top_emitter.emitting = false
 	bottom_emitter.emitting = false
 	rafaga_top.emitting = false

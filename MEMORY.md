@@ -1,5 +1,9 @@
 # El Norte — Memoria del Proyecto
 
+## Pendientes para próxima sesión
+- **Minimapa no centrado en celular**: la barra horizontal con BAR_LEFT=200/BAR_RIGHT=1720 se ve corrida a la izquierda en mobile. Revisar si el Control con anchors_preset=10 (TOP_WIDE) soluciona o si se necesita otro approach (ej: usar get_viewport_rect().size.x en _draw).
+- **Botones Jugar/Salir se ven distintos en celular vs PC**: los sprites con expand_icon=true no cubren todo el botón en mobile. Revisar theme, padding del button, o usar TextureRect en vez de Button+icon.
+
 ## Estado (18/6/2026)
 Godot 4.6.2, resolución 1920×1080 landscape mobile. Stretch `canvas_items` + `expand`. PC dev: windowed 960×540. Cámara zoom 1.2 (visible ~1600×900). Filtro Nearest global.
 
@@ -96,20 +100,24 @@ Transiciones de 15m con FADE_OUT de 200m. Neblina 4 capas con shader `fog_fade.g
 | first_flight | Primer Vuelo | distance | 100m |
 | explorer | Explorador | distance | 500m |
 | fearless | Sin Miedo | distance | 2000m |
-| collector | Coleccionista | bolas_total | 3, 5, 10 |
-| persistent | Persistente | deaths | 20, 35, 50 |
-| storm_survivor | Tormentero | storms | 3, 10, 25 |
-| buyer | Comprador | total_upgrades_bought | 3, 7, 15 |
-| calma_survivor | Sereno | calmas_survived | 3, 10 |
-| maxed_out | Al Maximo | all_maxed | 1 |
-| birder | Pajarero | all_birds | 1 |
-| trato_hecho | Trato Hecho | kiwi_accepts | 20 |
-| rey_tormentas | Rey de Tormentas | storms_in_run | 6 |
 | llanura | Llanuras | distance | 2200m |
 | norte | Norte (Puna) | distance | 4600m |
-| por_los_pelos | Por los Pelos | revives_used | 1, 5, 10 |
+| maraton | Maratón | distance | 10000m |
+| collector | Coleccionista | bolas_total | 3, 5, 10 |
+| ladron | Ladrón | bolas_total | 1000 |
 | rico | Rico | palitos_balance | 1000, 3000, 8000 |
+| buyer | Comprador | total_upgrades_bought | 3, 7, 15 |
+| maxed_out | Al Maximo | all_maxed | 1 |
 | multiuso | Multiuso | bird_uses | 2, 3, 4 |
+| birder | Pajarero | all_birds | 1 |
+| pampeano | Pampeano | all_birds_5000 | 4 pájaros a 5000m |
+| trato_hecho | Trato Hecho | kiwi_accepts | 20 |
+| por_los_pelos | Por los Pelos | revives_used | 1, 5, 10 |
+| storm_survivor | Tormentero | storms | 3, 10, 25 |
+| calma_survivor | Sereno | calmas_survived | 3, 10 |
+| rey_tormentas | Rey de Tormentas | storms_in_run | 6 |
+| persistent | Persistente | deaths | 20, 35, 50 |
+| veterano | Veterano | deaths | 100 |
 
 ## Kiwi
 - Cooldown: 20s + 8% por spawn. Upgrade ×0.02/lvl.
@@ -119,7 +127,7 @@ Transiciones de 15m con FADE_OUT de 200m. Neblina 4 capas con shader `fog_fade.g
 ## Variables persistentes (DataManager)
 - palitos_balance, bolas_balance, upgrades, unlocked_birds, active_bird
 - bolas_total, deaths, storms_survived, max_distance, kiwi_accepts, total_upgrades_bought, calmas_survived
-- completed_achievements: Dictionary, revives_used, used_birds[]
+- completed_achievements: Dictionary, revives_used, used_birds[], bird_max_distances: {}
 - first_milestones_claimed[], record_bolas_claimed[], tutorial_done
 - Achievement popups persistentes (autoload), bottom-left
 
@@ -139,6 +147,13 @@ Transiciones de 15m con FADE_OUT de 200m. Neblina 4 capas con shader `fog_fade.g
 - Android touch = `InputEventScreenTouch`, no `InputEventMouseButton`
 - `mouse_entered`/`mouse_exited` rompen botones en Android
 - `ImageTexture.create_from_image()` falla en Android → usar `_draw()`
+- `ParticleProcessMaterial` NO tiene `scale_y_min`/`scale_y_max` ni `lifetime_min`/`lifetime_max`. Escala es uniforme (un solo float `scale_min`/`scale_max`). Lifetime se setea en `GPUParticles2D.lifetime`.
+- `GPUParticles2D.position` usa coordenadas del padre (Node2D). Usar `global_position` si se necesita posición absoluta.
+- Background offset NO debe duplicar multiplicadores que ya están en `distance`. Si `distance` ya acumula con `turbo_mult`, pasar `speed_mult=1.0` al background, no `turbo_mult`.
+- Multiplicadores de score aplicados a `distance` tienen efecto permanente (distancia inflada para toda la run). Si se quiere un bonus temporal sin inflar distancia, aplicar el mult directamente al score, no a `distance`.
+- Al aplicar x2 a palitos: NO hacer `run_palitos *= 2` si ya `distance` acumula al doble por `palitos_dist_mult`. Es doble-doble → cuadruplicación con salto visual.
+- Score flip animation (scale:y 0→cambio→1) rechazada por el usuario. Prefiere animación continua sutil (idle + pulso al cambiar).
+- Achievement cond type "all_birds_5000": requiere nueva variable Dictionary persistente (bird_max_distances), save/load, función mark_bird_distance, handler en check_achievements + get_current_value, y llamada desde _on_player_died.
 
 ## Branch: implementacion-sprites (sin mergear)
 Contiene: game feel completo, kiwi _draw(), storm tuning, menu sprites, lluvia de barro, etc.
@@ -318,7 +333,7 @@ Contiene: game feel completo, kiwi _draw(), storm tuning, menu sprites, lluvia d
 19. **Item "detector de barro"**: radar en HUD
     → Mini radar que muestra la dirección del barro más cercano
 20. **Logro "Pampeano"**: 5000m con cada pájaro
-    → Llegar a 5000m con cada uno de los pájaros disponibles
+    → ✅ Llegar a 5000m con cada uno de los pájaros disponibles
 21. **Evento "langostas"**: 60s, evitalas o perdés barro
     → Nube de langostas que si te tocan, perdés barro acumulado
 22. **Moneda "plumas"**: coleccionable raro para skins

@@ -3,6 +3,7 @@ extends StaticBody2D
 enum ShapeType { RECT_H, RECT_V, CIRCLE }
 
 var speed := 250.0
+var base_speed := 0.0
 var shape_type := ShapeType.RECT_H
 
 var angular_speed := 0.0

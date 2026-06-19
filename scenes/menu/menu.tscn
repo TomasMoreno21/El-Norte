@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bflsbndb8q1hm" path="res://scenes/menu/menu.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://bqoeif76oiq7q" path="res://Sprites/Inteface/jugar.png" id="2"]
 [ext_resource type="Texture2D" uid="uid://chjt7ehnbojoq" path="res://Sprites/Inteface/salida.png" id="3"]
+[ext_resource type="Script" path="res://scenes/hud/settings_panel.gd" id="4"]
 
 [node name="Menu" type="Control" unique_id=2052919699]
 layout_mode = 3
@@ -94,3 +95,28 @@ offset_bottom = 140.0
 theme_override_font_sizes/font_size = 140
 text = "El Norte"
 horizontal_alignment = 1
+
+[node name="SettingsBtn" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_top = 16.0
+offset_right = -30.0
+offset_bottom = 56.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 28
+text = "⚙"
+
+[node name="SettingsPanel" type="ColorRect" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -450.0
+offset_top = 60.0
+offset_right = -20.0
+offset_bottom = 380.0
+grow_horizontal = 0
+color = Color(0.1, 0.1, 0.1, 0.92)
+mouse_filter = 2
+script = ExtResource("4")

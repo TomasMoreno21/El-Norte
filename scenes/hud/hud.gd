@@ -2,6 +2,7 @@ extends CanvasLayer
 
 @onready var distance_label := $DistanceLabel
 @onready var max_dist_label := $MaxDistLabel
+@onready var minimap := $Minimap
 @onready var powerup_label := $PowerUpLabel
 @onready var storm_label := $StormLabel
 @onready var storm_warning := $StormWarningLabel
@@ -24,6 +25,9 @@ const TUTORIAL_DURATION := 5.0
 var _last_flash_100m := 0
 var _pause_stats_labels: Array[Label] = []
 var _pause_stats_visible := false
+var _heartbeat_time := 0.0
+var _last_dist_value := 0
+var _idle_time := 0.0
 
 func _process(delta: float) -> void:
 	if _tutorial_timer > 0:
@@ -42,6 +46,17 @@ func _process(delta: float) -> void:
 		var t := sin(_storm_warning_time * 12.0)
 		var s := 1.0 + 0.4 * t
 		storm_warning.scale = Vector2(s, s)
+
+	var dist := int(distance_label.text.trim_suffix("m"))
+	_idle_time += delta
+	var idle := 1.0 + 0.012 * sin(_idle_time * 2.5)
+	if dist > 0 and DataManager.max_distance > 0 and dist >= DataManager.max_distance - 200:
+		_heartbeat_time += delta
+		idle += 0.03 * sin(_heartbeat_time * 5.0)
+		distance_label.modulate = Color(1, 0.85 + 0.15 * sin(_heartbeat_time * 5.0), 0.85 + 0.15 * sin(_heartbeat_time * 5.0))
+	else:
+		distance_label.modulate = Color.WHITE
+	distance_label.scale = Vector2(idle, idle)
 
 func _ready() -> void:
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
@@ -109,7 +124,11 @@ func update_distance(meters: int) -> void:
 	var prev := int(distance_label.text.trim_suffix("m"))
 	distance_label.text = "%dm" % meters
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
-	_pulse_label(distance_label)
+	minimap.set_distance(meters)
+	if meters != prev:
+		var tween := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(distance_label, "scale", Vector2(1.12, 1.12), 0.08)
+		tween.tween_property(distance_label, "scale", Vector2(1.0, 1.0), 0.25)
 	if meters / 100 > _last_flash_100m:
 		_last_flash_100m = meters / 100
 		_flash_100m()
@@ -186,3 +205,6 @@ func hide_transition_message() -> void:
 	var tween := create_tween()
 	tween.tween_property($TransitionLabel, "modulate:a", 0.0, 0.6).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	tween.tween_callback(func(): $TransitionLabel.visible = false)
+
+func set_biome(name: String) -> void:
+	minimap.set_distance(int(distance_label.text.trim_suffix("m")), name)

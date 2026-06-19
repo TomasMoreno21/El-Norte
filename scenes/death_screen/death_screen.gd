@@ -42,6 +42,14 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 		$ColorRect/VBoxContainer/BonusLabel.text = bonus_text.strip_edges()
 		$ColorRect/VBoxContainer/BonusLabel.visible = true
 
+	if old_max >= 0 and distance < old_max:
+		var diff := old_max - distance
+		if diff <= 50:
+			$ColorRect/VBoxContainer/RecordDiffLabel.text = "¡Te quedaste a %dm del récord!" % diff
+		else:
+			$ColorRect/VBoxContainer/RecordDiffLabel.text = "Quedaste a %dm del récord" % diff
+		$ColorRect/VBoxContainer/RecordDiffLabel.visible = true
+
 	var tip: String = TIPS[randi() % TIPS.size()]
 	$ColorRect/VBoxContainer/TipLabel.text = "💡 " + tip
 
