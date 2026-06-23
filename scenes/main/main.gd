@@ -403,9 +403,8 @@ func _process(delta: float) -> void:
 		last_check_dist = curr_dist
 		var nuevos := DataManager.check_achievements({ "distance": curr_dist })
 		_show_popups(nuevos)
-	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining)
+	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, 0.0)
 	hud.show_storm(in_storm)
-	hud._update_pause_stats(int(distance), run_bolas, int(run_palitos), storms_in_run, run_kiwis)
 	$Background.set_run_distance(distance, 1.0)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult

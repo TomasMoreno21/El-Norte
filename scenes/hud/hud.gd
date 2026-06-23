@@ -23,8 +23,6 @@ var _tutorial_arrow_time := 0.0
 const TUTORIAL_DURATION := 5.0
 
 var _last_flash_100m := 0
-var _pause_stats_labels: Array[Label] = []
-var _pause_stats_visible := false
 var _heartbeat_time := 0.0
 var _last_dist_value := 0
 var _idle_time := 0.0
@@ -50,44 +48,24 @@ func _process(delta: float) -> void:
 	var dist := int(distance_label.text.trim_suffix("m"))
 	_idle_time += delta
 	var idle := 1.0 + 0.012 * sin(_idle_time * 2.5)
-	if dist > 0 and DataManager.max_distance > 0 and dist >= DataManager.max_distance - 200:
+	if dist > 0 and DataManager.max_distance > 0 and dist >= DataManager.max_distance - 100 and dist < DataManager.max_distance:
 		_heartbeat_time += delta
 		idle += 0.03 * sin(_heartbeat_time * 5.0)
 		distance_label.modulate = Color(1, 0.85 + 0.15 * sin(_heartbeat_time * 5.0), 0.85 + 0.15 * sin(_heartbeat_time * 5.0))
 	else:
 		distance_label.modulate = Color.WHITE
+		_heartbeat_time = 0.0
 	distance_label.scale = Vector2(idle, idle)
 
 func _ready() -> void:
 	max_dist_label.text = "Récord: %dm" % DataManager.max_distance
+	palitos_label.modulate = Color(1.0, 0.75, 0.06)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	pause_btn.pressed.connect(_toggle_pause)
 	$PauseOverlay/ContinueBtn.pressed.connect(_toggle_pause)
 	$PauseOverlay/QuitBtn.pressed.connect(_quit_to_menu)
-	_setup_pause_stats()
 
-func _setup_pause_stats() -> void:
-	var labels_data := ["Distancia: 0m", "Barro: 0", "Palitos: 0", "Tormentas: 0", "Kiwis: 0"]
-	var y := 300
-	for text in labels_data:
-		var lbl := Label.new()
-		lbl.text = text
-		lbl.add_theme_font_size_override("font_size", 24)
-		lbl.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl.position = Vector2(0, y)
-		lbl.size = Vector2(1920, 30)
-		pause_overlay.add_child(lbl)
-		_pause_stats_labels.append(lbl)
-		y += 36
-
-func _update_pause_stats(dist: int, bolas: int, palitos: int, storms: int, kiwis: int) -> void:
-	if _pause_stats_labels.size() >= 5:
-		_pause_stats_labels[0].text = "Distancia: %dm" % dist
-		_pause_stats_labels[1].text = "Barro: %d" % bolas
-		_pause_stats_labels[2].text = "Palitos: %d" % palitos
-		_pause_stats_labels[3].text = "Tormentas: %d" % storms
-		_pause_stats_labels[4].text = "Kiwis: %d" % kiwis
+# pause stats removed
 
 func _toggle_pause() -> void:
 	var paused := not get_tree().paused
@@ -129,18 +107,20 @@ func update_distance(meters: int) -> void:
 		var tween := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tween.tween_property(distance_label, "scale", Vector2(1.12, 1.12), 0.08)
 		tween.tween_property(distance_label, "scale", Vector2(1.0, 1.0), 0.25)
-	if meters / 100 > _last_flash_100m:
-		_last_flash_100m = meters / 100
+	var curr_100 := floori(meters / 100.0)
+	if curr_100 > _last_flash_100m:
+		_last_flash_100m = curr_100
 		_flash_100m()
 
 func _flash_100m() -> void:
 	var flash := ColorRect.new()
-	flash.color = Color(1, 1, 1, 0.08)
+	flash.color = Color(1, 1, 1, 0.25)
 	flash.anchors_preset = Control.PRESET_FULL_RECT
 	flash.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(flash)
 	var tween := create_tween()
-	tween.tween_property(flash, "color:a", 0.0, 0.3)
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_property(flash, "color:a", 0.0, 0.4)
 	tween.tween_callback(flash.queue_free)
 
 func update_bolas(amount: int) -> void:
@@ -170,15 +150,17 @@ func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, 
 	powerup_label.text = "  ".join(parts)
 
 func flash_milestone() -> void:
-	var strips := [milestone_flash.get_node("Top"), milestone_flash.get_node("Bottom"), milestone_flash.get_node("Left"), milestone_flash.get_node("Right")]
-	milestone_flash.visible = true
-	for s in strips:
-		s.modulate.a = 0.2
+	print("flash_milestone called")
+	var flash := ColorRect.new()
+	flash.color = Color(1, 1, 0, 0.5)
+	flash.anchors_preset = Control.PRESET_FULL_RECT
+	flash.mouse_filter = Control.MOUSE_FILTER_PASS
+	add_child(flash)
+	flash.show()
 	var tween := create_tween()
-	tween.set_parallel(true)
-	for s in strips:
-		tween.tween_property(s, "modulate:a", 0.0, 0.4).set_ease(Tween.EASE_OUT)
-	tween.tween_callback(func(): milestone_flash.visible = false)
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_property(flash, "color:a", 0.0, 1.0)
+	tween.tween_callback(flash.queue_free)
 
 func show_storm(active: bool) -> void:
 	storm_label.visible = active

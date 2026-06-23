@@ -19,6 +19,7 @@ var _original_col_size: Vector2
 var _original_scale: Vector2
 
 var _was_pressed := false
+var _miniatura_active := false
 var _tex_hornero1 := preload("res://Sprites/Pajaros/hornero1.png")
 var _tex_hornero2 := preload("res://Sprites/Pajaros/hornero2.png")
 var _feather_particles: GPUParticles2D
@@ -91,9 +92,11 @@ func _physics_process(delta: float) -> void:
 			flapped.emit()
 			if is_inside_tree():
 				var s := $Sprite2D
+				kill_all_tweens()
+				var base := _original_scale * (0.5 if _miniatura_active else 1.0)
 				var sq := create_tween().set_ease(Tween.EASE_OUT)
-				sq.tween_property(s, "scale", s.scale * Vector2(1.08, 0.92), 0.05)
-				sq.tween_property(s, "scale", s.scale, 0.1)
+				sq.tween_property(s, "scale", base * Vector2(1.08, 0.92), 0.05)
+				sq.tween_property(s, "scale", base, 0.1)
 		velocity.y = storm_flap_override if storm_flap_override != 0.0 else FLAP_VELOCITY * flap_mult
 	else:
 		if _was_pressed:
@@ -156,6 +159,7 @@ func kill_all_tweens() -> void:
 		t.kill()
 
 func set_miniatura(active: bool) -> void:
+	_miniatura_active = active
 	var col_shape := $CollisionShape2D.shape as RectangleShape2D
 	if col_shape:
 		col_shape.size = _original_col_size * (0.5 if active else 1.0)

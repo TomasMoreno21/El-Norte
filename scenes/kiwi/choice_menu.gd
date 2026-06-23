@@ -30,7 +30,7 @@ func _ready() -> void:
 	var free_option: Dictionary = pool.pop_front()
 
 	var palitos_label := Label.new()
-	palitos_label.text = "🪵 " + str(DataManager.palitos_balance) + " palitos"
+	palitos_label.text = "$" + str(DataManager.palitos_balance) + " palitos"
 	palitos_label.add_theme_font_size_override("font_size", 28)
 	palitos_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	palitos_label.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2))
@@ -50,7 +50,7 @@ func _ready() -> void:
 		max_paid = 3
 	for i in range(min(max_paid, paid.size())):
 		var p := paid[i]
-		_add_choice(p["text"] + "  🪵" + str(p["cost"]), p["type"], p["cost"])
+		_add_choice(p["text"] + "  $" + str(p["cost"]), p["type"], p["cost"])
 
 	_add_reject()
 

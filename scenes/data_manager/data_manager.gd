@@ -471,10 +471,21 @@ func show_achievement_popup(info: Dictionary) -> void:
 
 	bg.modulate = Color(1, 1, 1, 0)
 	var tween := create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
-	tween.tween_interval(5.0)
-	tween.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
-	tween.tween_callback(overlay.queue_free)
+	tween.tween_callback(func():
+		if not is_instance_valid(overlay):
+			return
+		var t := get_tree().create_timer(4.0, false, true)
+		await t.timeout
+		if not is_instance_valid(overlay):
+			return
+		var out := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		out.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
+		await out.finished
+		if is_instance_valid(overlay):
+			overlay.queue_free()
+	)
 
 func save_data() -> void:
 	var data := {

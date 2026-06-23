@@ -42,24 +42,38 @@ text = "¡HORNERO CAÍDO!"
 theme_override_font_sizes/font_size = 48
 horizontal_alignment = 1
 
-[node name="CostLabel" type="Label" parent="Panel/VBox"]
+[node name="PalitosLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+text = "Palitos: 0"
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="CostLabel" type="RichTextLabel" parent="Panel/VBox"]
 layout_mode = 2
 text = "Revivir por 0 palitos?"
-theme_override_font_sizes/font_size = 36
-horizontal_alignment = 1
+theme_override_font_sizes/normal_font_size = 44
+fit_content = true
+scroll_active = false
+bbcode_enabled = true
 
 [node name="Spacer" type="Control" parent="Panel/VBox"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 20)
 
-[node name="ReviveBtn" type="Button" parent="Panel/VBox"]
+[node name="ButtonRow" type="HBoxContainer" parent="Panel/VBox"]
 layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ReviveBtn" type="Button" parent="Panel/VBox/ButtonRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "REVIVIR"
 custom_minimum_size = Vector2(0, 80)
 theme_override_font_sizes/font_size = 56
 
-[node name="RejectBtn" type="Button" parent="Panel/VBox"]
+[node name="RejectBtn" type="Button" parent="Panel/VBox/ButtonRow"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "RENDIRSE"
 custom_minimum_size = Vector2(0, 80)
 theme_override_font_sizes/font_size = 48

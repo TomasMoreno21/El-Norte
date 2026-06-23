@@ -33,6 +33,7 @@ enabled = true
 [node name="HUD" parent="." instance=ExtResource("4")]
 
 [node name="DeathScreen" parent="." instance=ExtResource("5")]
+visible = false
 
 [node name="RevivePopup" parent="." instance=ExtResource("11")]
 

@@ -27,6 +27,10 @@ Basado en los mockups generados para el TP de Arte Aplicado UI/UX (junio 2026).
 
 Esta codificación sigue la teoría del color del resumen de catedra: verde=frío/calma, rojo=cálido/alerta, dorado=análogo al marrón de la pampa.
 
+## Tamaños fijos menú
+- **Jugar**: 367×97px (no cambiar)
+- **Salir**: 567×77px (no cambiar)
+
 ## Estado (18/6/2026)
 Godot 4.6.2, resolución 1920×1080 landscape mobile. Stretch `canvas_items` + `expand`. PC dev: windowed 960×540. Cámara zoom 1.2 (visible ~1600×900). Filtro Nearest global.
 

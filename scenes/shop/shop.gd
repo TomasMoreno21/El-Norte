@@ -8,11 +8,46 @@ const UPGRADE_DATA := [
 	{ "key": "turbo_duration", "name": "+Turbo", "base_cost": 100, "desc": "+0.2s turbo por nivel" },
 ]
 
+const STRIPE_COLORS := {
+	"speed": Color(0.15, 0.5, 0.15),
+	"kiwi": Color(0.2, 0.4, 0.7),
+	"palitos_base": Color(0.7, 0.55, 0.15),
+	"shield_duration": Color(0.2, 0.4, 0.7),
+	"turbo_duration": Color(0.2, 0.4, 0.7),
+}
+
 func _ready() -> void:
 	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
+	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
+	$Bg/VBoxContainer/Volver.custom_minimum_size = Vector2(800, 96)
+	$Bg/VBoxContainer/Volver.add_theme_font_size_override("font_size", 28)
 	_update_balance()
 	_populate_upgrades()
 	SceneTransition.fade_in()
+
+func _style_button(btn: Button, color: Color, disabled_color := Color()) -> void:
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = color
+	normal.corner_radius_top_left = 6
+	normal.corner_radius_top_right = 6
+	normal.corner_radius_bottom_left = 6
+	normal.corner_radius_bottom_right = 6
+	btn.add_theme_stylebox_override("normal", normal)
+	var hover := StyleBoxFlat.new()
+	hover.bg_color = color.lightened(0.15)
+	hover.corner_radius_top_left = 6
+	hover.corner_radius_top_right = 6
+	hover.corner_radius_bottom_left = 6
+	hover.corner_radius_bottom_right = 6
+	btn.add_theme_stylebox_override("hover", hover)
+	if disabled_color.a > 0:
+		var disabled := StyleBoxFlat.new()
+		disabled.bg_color = disabled_color
+		disabled.corner_radius_top_left = 6
+		disabled.corner_radius_top_right = 6
+		disabled.corner_radius_bottom_left = 6
+		disabled.corner_radius_bottom_right = 6
+		btn.add_theme_stylebox_override("disabled", disabled)
 
 func _update_balance() -> void:
 	$Bg/VBoxContainer/PalitosLabel.text = "Palitos: %d" % DataManager.palitos_balance
@@ -26,57 +61,71 @@ func _populate_upgrades() -> void:
 		var level := DataManager.get_upgrade_level(u.key)
 		var max_lv: int = DataManager.UPGRADE_MAX_LEVEL.get(u.key, DataManager.MAX_LEVEL)
 		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 120)
+		row.custom_minimum_size = Vector2(0, 110)
+		row.size_flags_horizontal = 3
+		row.add_theme_constant_override("separation", 14)
 
-		var spacer := Control.new()
-		spacer.custom_minimum_size = Vector2(100, 0)
-		row.add_child(spacer)
+		var stripe := ColorRect.new()
+		stripe.color = STRIPE_COLORS[u.key]
+		stripe.custom_minimum_size = Vector2(6, 0)
+		stripe.size_flags_vertical = 3
+		stripe.mouse_filter = 2
+		row.add_child(stripe)
 
 		var info_col := VBoxContainer.new()
-		info_col.custom_minimum_size = Vector2(260, 0)
+		info_col.size_flags_horizontal = 3
+		info_col.size_flags_vertical = 3
 		info_col.add_theme_constant_override("separation", 2)
 
 		var name_label := Label.new()
 		name_label.text = u.name
-		name_label.add_theme_font_size_override("font_size", 36)
+		name_label.add_theme_font_size_override("font_size", 30)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		var desc_label := Label.new()
 		desc_label.text = u.desc
-		desc_label.add_theme_font_size_override("font_size", 20)
+		desc_label.add_theme_font_size_override("font_size", 18)
 		desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		desc_label.modulate = Color(0.7, 0.7, 0.7)
 
 		info_col.add_child(name_label)
 		info_col.add_child(desc_label)
+		row.add_child(info_col)
 
 		var level_label := Label.new()
 		level_label.text = "Nivel %d/%d" % [level, max_lv]
-		level_label.custom_minimum_size = Vector2(200, 0)
-		level_label.add_theme_font_size_override("font_size", 36)
+		level_label.size_flags_horizontal = 3
+		level_label.size_flags_vertical = 3
+		level_label.add_theme_font_size_override("font_size", 24)
 		level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		level_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 		var buy_btn := Button.new()
-		buy_btn.custom_minimum_size = Vector2(260, 96)
-		buy_btn.add_theme_font_size_override("font_size", 36)
+		buy_btn.size_flags_horizontal = 3
+		buy_btn.custom_minimum_size = Vector2(0, 48)
+		buy_btn.add_theme_font_size_override("font_size", 24)
 		var cost := DataManager.get_upgrade_cost(u.key)
 		if cost == -1:
 			buy_btn.text = "COMPLETO"
 			buy_btn.disabled = true
+			_style_button(buy_btn, Color(0.12, 0.4, 0.12), Color(0.12, 0.4, 0.12))
 		else:
 			buy_btn.text = "%d palitos" % cost
-			buy_btn.disabled = DataManager.palitos_balance < cost
+			var can_buy: bool = DataManager.palitos_balance >= cost
+			buy_btn.disabled = not can_buy
+			if can_buy:
+				_style_button(buy_btn, Color(0.55, 0.45, 0.15))
+				buy_btn.add_theme_color_override("font_color", Color.WHITE)
+			else:
+				_style_button(buy_btn, Color(0.3, 0.3, 0.3), Color(0.3, 0.3, 0.3))
 			var key: String = u.key
 			buy_btn.pressed.connect(func(): _buy(key, buy_btn.global_position))
 
-		row.add_theme_constant_override("separation", 60)
-
-		row.add_child(info_col)
 		row.add_child(level_label)
 		row.add_child(buy_btn)
 		list.add_child(row)
 
-		_update_balance()
+	_update_balance()
 
 func _buy(upgrade_key: String, btn_pos: Vector2) -> void:
 	var nuevos := DataManager.buy_upgrade(upgrade_key)

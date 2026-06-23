@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/skins/skins.gd" id="1"]
 
@@ -15,32 +15,43 @@ anchor_bottom = 1.0
 color = Color(0.05, 0.05, 0.05, 0.95)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Bg"]
-anchors_preset = 1
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
-offset_left = -550.0
-offset_top = 160.0
-offset_right = 550.0
-offset_bottom = 880.0
+anchor_bottom = 0.5
+offset_left = -864.0
+offset_top = -500.0
+offset_right = 867.0
+offset_bottom = 500.0
 grow_horizontal = 2
-theme_override_constants/separation = 24
+grow_vertical = 2
+theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="Bg/VBoxContainer"]
+layout_mode = 2
 text = "SKINS"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 100
+theme_override_font_sizes/font_size = 72
 
 [node name="BolasLabel" type="Label" parent="Bg/VBoxContainer"]
+layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 40
 
-[node name="CenterContainer" type="CenterContainer" parent="Bg/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer"]
+layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="BirdList" type="HBoxContainer" parent="Bg/VBoxContainer/CenterContainer"]
-theme_override_constants/separation = 50
+[node name="BirdList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 30
 
 [node name="Volver" type="Button" parent="Bg/VBoxContainer"]
+layout_mode = 2
 text = "Volver"
-custom_minimum_size = Vector2(0, 112)
-theme_override_font_sizes/font_size = 52
+custom_minimum_size = Vector2(800, 96)
+theme_override_font_sizes/font_size = 28
