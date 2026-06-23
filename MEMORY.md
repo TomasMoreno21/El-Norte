@@ -3,6 +3,29 @@
 ## Pendientes para próxima sesión
 - **Minimapa no centrado en celular**: la barra horizontal con BAR_LEFT=200/BAR_RIGHT=1720 se ve corrida a la izquierda en mobile. Revisar si el Control con anchors_preset=10 (TOP_WIDE) soluciona o si se necesita otro approach (ej: usar get_viewport_rect().size.x en _draw).
 - **Botones Jugar/Salir se ven distintos en celular vs PC**: los sprites con expand_icon=true no cubren todo el botón en mobile. Revisar theme, padding del button, o usar TextureRect en vez de Button+icon.
+- **(opcional) TP Integrador UI/UX**: generar diagrama de flujo (punto a) si hace falta para la entrega. Mockups completos: 05_logros_aplicado.png finalizado (circulos de items 2-4 eliminados, item 1 con panel verde sólido + barra COMPLETADO).
+
+## UI mockups TP — ideas para implementar en el proyecto
+Basado en los mockups generados para el TP de Arte Aplicado UI/UX (junio 2026).
+
+### Organización de pantallas (mockups aplicados)
+- **Menú**: fondo RGB(13,13,13). Título "EL NORTE" en dorado (#E6B233), Georgia Bold 26px, centrado a x=585, y=100. Tiene línea dorada delgada debajo (y=128) y pequeños adornos rombo a los costados. Sin "VIAJE PAMPEANO". Posición basada en regla de tercios (cuadrante superior derecho).
+- **Botones**: columna principal a x=460-710 (250px). Estilo: fondo oscuro (30,30,35) con borde de 3px arriba/abajo y 6px a los costados del color correspondiente. JUGAR (verde #50C850) y=275-351 (76px). SALIR (rojo #DC4628) y=375-411 (36px). Gap entre ellos ~24px.
+- **Cuadrados emoji** a la derecha (x=730-766, 36×36px), mismo estilo de borde. TIENDA 🛒 dorado y=285-321, LOGROS 🏆 azul (#3C82C8) y=325-361, SKINS 👕 teal (#50B4B4) y=365-401. Emoji font Segoe UI Emoji 22px.
+- **HUD**: distancia y récord arriba a la izq con borde redondeado, barra de progreso al récord debajo, power-ups con iconos, minimapa abajo con indicador de próximo hito (línea dorada), pausa círculo arriba a la der.
+- **Muerte**: panel central (150,100 a 650,400) con borde rojo superior de 4px, stats agrupadas con iconos, bonus en recuadro verde, record diff en rojo, tip con fondo sutil, botones Volver a volar (verde) / Volver al menú (rojo).
+- **Tienda**: tarjetas con borde lateral de color por categoría (azul=velocidad, verde=kiwi, dorado=palitos, azul=escudo), botón COMPLETO en verde con fondo.
+- **Logros**: ítems de logro con icono + texto. En versión aplicado final: item 1 completado con panel verde sólido y barra COMPLETADO; items 2-4 sin círculos de color. Botón Volver rojo.
+- **Revive popup**: overlay con viñeta, panel con borde rojo superior, botones en zona inferior (y 165-210 para mobile), cuenta regresiva.
+
+### Codificación de color por función
+- **Verde** (`#50C850`): avance, acción positiva, JUGAR, REVIVIR, Volver a volar, COMPLETO, bonus, logros completados
+- **Rojo** (`#DC4628`): retroceso, salir, peligro, Salir, Volver al menú, RENDIRSE, Volver (tienda/logros), diferencia con récord, alertas
+- **Dorado** (`#E6B233`): economía, moneda, palitos, precio, título principal, MEJORAS, highlights
+- **Azul** (`#3C82C8`): informativo, categorías, power-ups, escudo, velocidad
+- **Gris** (`#8C8C8C`): secundario, tips, descripciones, niveles, stats no críticas
+
+Esta codificación sigue la teoría del color del resumen de catedra: verde=frío/calma, rojo=cálido/alerta, dorado=análogo al marrón de la pampa.
 
 ## Estado (18/6/2026)
 Godot 4.6.2, resolución 1920×1080 landscape mobile. Stretch `canvas_items` + `expand`. PC dev: windowed 960×540. Cámara zoom 1.2 (visible ~1600×900). Filtro Nearest global.
