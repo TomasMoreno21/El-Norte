@@ -16,9 +16,31 @@ const TIPS := [
 	"Cada pájaro tiene stats únicos. ¡Probalos todos!",
 ]
 
+const RED := Color(0.86, 0.27, 0.16)
+const GREEN := Color(0.3, 0.7, 0.3)
+const DARK_GREEN := Color(0.12, 0.35, 0.12)
+
 func _ready() -> void:
-	$ColorRect/VBoxContainer/RestartButton.pressed.connect(_on_restart)
-	$ColorRect/VBoxContainer/MenuButton.pressed.connect(_on_menu)
+	$Panel/VBox/RestartButton.pressed.connect(_on_restart)
+	$Panel/VBox/MenuButton.pressed.connect(_on_menu)
+	_style_button($Panel/VBox/RestartButton, GREEN)
+	_style_button($Panel/VBox/MenuButton, RED)
+
+func _style_button(btn: Button, color: Color) -> void:
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = color
+	normal.corner_radius_top_left = 6
+	normal.corner_radius_top_right = 6
+	normal.corner_radius_bottom_left = 6
+	normal.corner_radius_bottom_right = 6
+	btn.add_theme_stylebox_override("normal", normal)
+	var hover := StyleBoxFlat.new()
+	hover.bg_color = color.lightened(0.15)
+	hover.corner_radius_top_left = 6
+	hover.corner_radius_top_right = 6
+	hover.corner_radius_bottom_left = 6
+	hover.corner_radius_bottom_right = 6
+	btn.add_theme_stylebox_override("hover", hover)
 
 func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0, old_max: int = -1) -> void:
 	var palitos := DataManager.calculate_palitos_earned(distance)
@@ -29,9 +51,11 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 	for a in nuevos:
 		DataManager.show_achievement_popup(a)
 
-	$ColorRect/VBoxContainer/DistanceLabel.text = "%dm" % distance
-	$ColorRect/VBoxContainer/PalitosLabel.text = "Palitos: +%d  (Total: %d)" % [total_palitos, DataManager.palitos_balance]
-	$ColorRect/VBoxContainer/StatsLabel.text = "Tormentas: %d  |  Barro: %d  |  Kiwis: %d" % [storms, bolas, kiwis]
+	$Panel/VBox/DistanceLabel.text = "%dm" % distance
+	$Panel/VBox/StatsHBox/TormentasLabel.text = "\U0001f32a\ufe0f %d" % storms
+	$Panel/VBox/StatsHBox/BarroLabel.text = "\U0001f4a7 %d" % bolas
+	$Panel/VBox/StatsHBox/KiwiLabel.text = "\U0001f95d %d" % kiwis
+	$Panel/VBox/PalitosLabel.text = "\U0001fab5 +%d  (Total: %d)" % [total_palitos, DataManager.palitos_balance]
 
 	var bonus_text := ""
 	if bonus_palitos > 0:
@@ -39,19 +63,21 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 	if bonus_bolas > 0:
 		bonus_text += "+%d bolas por record!" % bonus_bolas
 	if bonus_text != "":
-		$ColorRect/VBoxContainer/BonusLabel.text = bonus_text.strip_edges()
-		$ColorRect/VBoxContainer/BonusLabel.visible = true
+		$Panel/VBox/BonusPanel.show()
+		$Panel/VBox/BonusPanel/BonusLabel.text = bonus_text.strip_edges()
 
 	if old_max >= 0 and distance < old_max:
 		var diff := old_max - distance
 		if diff <= 50:
-			$ColorRect/VBoxContainer/RecordDiffLabel.text = "¡Te quedaste a %dm del récord!" % diff
+			$Panel/VBox/RecordDiffLabel.text = "Te quedaste a %dm del r\u00e9cord!" % diff
 		else:
-			$ColorRect/VBoxContainer/RecordDiffLabel.text = "Quedaste a %dm del récord" % diff
-		$ColorRect/VBoxContainer/RecordDiffLabel.visible = true
+			$Panel/VBox/RecordDiffLabel.text = "Quedaste a %dm del r\u00e9cord" % diff
+		$Panel/VBox/RecordDiffLabel.show()
+	else:
+		$Panel/VBox/RecordDiffLabel.hide()
 
 	var tip: String = TIPS[randi() % TIPS.size()]
-	$ColorRect/VBoxContainer/TipLabel.text = "💡 " + tip
+	$Panel/VBox/TipPanel/TipLabel.text = "\U0001f4a1 " + tip
 
 	visible = true
 	get_tree().paused = true

@@ -1,58 +1,65 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://du7xlccdfjbpg"]
 
-[ext_resource type="Script" path="res://scenes/achievements/achievements.gd" id="1"]
+[ext_resource type="Script" uid="uid://k5kjrvbgucpv" path="res://scenes/achievements/achievements.gd" id="1"]
 
-[node name="Achievements" type="CanvasLayer"]
+[node name="Achievements" type="CanvasLayer" unique_id=1230665661]
 layer = 10
 script = ExtResource("1")
 
-[node name="Bg" type="ColorRect" parent="."]
+[node name="Bg" type="ColorRect" parent="." unique_id=2113146541]
 anchors_preset = 15
-anchor_left = 0.0
-anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.05, 0.05, 0.05, 0.95)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Bg"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Bg" unique_id=1997658921]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -560.0
+offset_left = -811.0
 offset_top = -480.0
-offset_right = 560.0
+offset_right = 798.0
 offset_bottom = 480.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="Title" type="Label" parent="Bg/VBoxContainer"]
+[node name="Title" type="Label" parent="Bg/VBoxContainer" unique_id=1218645073]
+layout_mode = 2
+theme_override_font_sizes/font_size = 72
 text = "LOGROS"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 72
 
-[node name="Estadisticas" type="Label" parent="Bg/VBoxContainer"]
-horizontal_alignment = 1
+[node name="Estadisticas" type="Label" parent="Bg/VBoxContainer" unique_id=1555574770]
+layout_mode = 2
 theme_override_font_sizes/font_size = 40
+horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer" unique_id=1164669491]
+layout_mode = 2
 size_flags_vertical = 3
 
-[node name="AchievementList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer"]
+[node name="AchievementList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer" unique_id=312078758]
+layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ButtonRow" type="HBoxContainer" parent="Bg/VBoxContainer"]
+[node name="ButtonRow" type="HBoxContainer" parent="Bg/VBoxContainer" unique_id=274864352]
+layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Volver" type="Button" parent="Bg/VBoxContainer/ButtonRow"]
-text = "Volver"
+[node name="Volver" type="Button" parent="Bg/VBoxContainer/ButtonRow" unique_id=1194011997]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 140)
 theme_override_font_sizes/font_size = 56
+text = "Volver"
 
-[node name="ResetLogros" type="Button" parent="Bg/VBoxContainer/ButtonRow"]
-text = "Reset Logros"
-size_flags_horizontal = 1
+[node name="ResetLogros" type="Button" parent="Bg/VBoxContainer/ButtonRow" unique_id=569723525]
 custom_minimum_size = Vector2(0, 140)
-theme_override_font_sizes/font_size = 40
+layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 40
+text = "Reset Logros"
