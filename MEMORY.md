@@ -1,9 +1,7 @@
 # El Norte — Memoria del Proyecto
 
 ## Pendientes para próxima sesión
-- **Minimapa no centrado en celular**: la barra horizontal con BAR_LEFT=200/BAR_RIGHT=1720 se ve corrida a la izquierda en mobile. Revisar si el Control con anchors_preset=10 (TOP_WIDE) soluciona o si se necesita otro approach (ej: usar get_viewport_rect().size.x en _draw).
-- **Botones Jugar/Salir se ven distintos en celular vs PC**: los sprites con expand_icon=true no cubren todo el botón en mobile. Revisar theme, padding del button, o usar TextureRect en vez de Button+icon.
-- **(opcional) TP Integrador UI/UX**: generar diagrama de flujo (punto a) si hace falta para la entrega. Mockups completos: 05_logros_aplicado.png finalizado (circulos de items 2-4 eliminados, item 1 con panel verde sólido + barra COMPLETADO).
+- **(opcional) TP Integrador UI/UX**: generar diagrama de flujo (punto a) si hace falta para la entrega.
 
 ## UI mockups TP — ideas para implementar en el proyecto
 Basado en los mockups generados para el TP de Arte Aplicado UI/UX (junio 2026).
