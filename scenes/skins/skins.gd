@@ -155,6 +155,7 @@ func _populate_birds() -> void:
 	_update_balance()
 
 func _buy(bird_id: String) -> void:
+	AudioManager.play_sfx("buy")
 	var nuevos := DataManager.unlock_bird(bird_id)
 	if not nuevos.is_empty():
 		for a in nuevos:

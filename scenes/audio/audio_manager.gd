@@ -15,7 +15,10 @@ const SOUNDS := {
 	"kiwi_appear": "res://audio/sfx/kiwi_appear.wav",
 	"revive": "res://audio/sfx/revive.wav",
 	"achievement": "res://audio/sfx/achievement.wav",
-	"wind_ambient": "res://audio/sfx/wind_ambient.wav",
+	"wind_ambient": "res://audio/sfx/sonido de viento.mp3",
+	"buy": "res://audio/sfx/sonido de compra.mp3",
+	"popup": "res://audio/sfx/sonido de popup logro.mp3",
+	"storm_wind": "res://audio/sfx/sonido de viento de tormenta.mp3",
 }
 
 const MUSIC := {
@@ -26,6 +29,7 @@ const MUSIC := {
 
 var _music_player: AudioStreamPlayer
 var _ambient_player: AudioStreamPlayer
+var _storm_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 const SFX_POOL_SIZE := 8
 
@@ -39,6 +43,12 @@ func _ready() -> void:
 	_ambient_player = AudioStreamPlayer.new()
 	_ambient_player.bus = "SFX"
 	add_child(_ambient_player)
+
+	# Configurar reproductor de viento de tormenta
+	_storm_player = AudioStreamPlayer.new()
+	_storm_player.bus = "SFX"
+	_storm_player.volume_db = -80.0
+	add_child(_storm_player)
 	
 	# Configurar pool de SFX para permitir sonidos solapados
 	for i in range(SFX_POOL_SIZE):
@@ -119,11 +129,33 @@ func start_ambient_wind() -> void:
 		if stream is AudioStreamWAV:
 			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 		_ambient_player.stream = stream
-		_ambient_player.volume_db = -6.0
+		_ambient_player.volume_db = -18.0
 		_ambient_player.play()
 
 func stop_ambient_wind() -> void:
 	_ambient_player.stop()
+
+func start_storm_wind(fade_time: float = 0.3) -> void:
+	if not DataManager.sound_enabled:
+		return
+	stop_ambient_wind()
+	var stream = load(SOUNDS["storm_wind"])
+	if stream is AudioStream:
+		if stream is AudioStreamWAV:
+			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		_storm_player.stream = stream
+		_storm_player.volume_db = -80.0
+		_storm_player.play()
+		var tw := create_tween()
+		tw.tween_property(_storm_player, "volume_db", -6.0, fade_time)
+
+func stop_storm_wind(fade_time: float = 0.3) -> void:
+	var tw := create_tween()
+	tw.tween_property(_storm_player, "volume_db", -80.0, fade_time)
+	tw.tween_callback(func():
+		_storm_player.stop()
+		start_ambient_wind()
+	)
 
 func _get_available_sfx_player() -> AudioStreamPlayer:
 	for p in _sfx_pool:

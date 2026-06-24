@@ -186,6 +186,7 @@ func start_storm() -> void:
 	shake_strength = 16.0
 	player.storm_flap_override = -340
 	AudioManager.play_sfx("storm_start")
+	AudioManager.start_storm_wind()
 	_update_encounter_mode()
 	_update_existing_obstacle_speeds()
 
@@ -197,6 +198,7 @@ func end_storm() -> void:
 	DataManager.storms_survived += 1
 	storms_in_run += 1
 	AudioManager.play_sfx("storm_end")
+	AudioManager.stop_storm_wind()
 	_update_existing_obstacle_speeds()
 	var nuevos := DataManager.check_achievements({ "storms_in_run": storms_in_run })
 	_show_popups(nuevos)
@@ -712,6 +714,7 @@ func _show_popups(nuevos: Array) -> void:
 	if nuevos.is_empty():
 		return
 	for a in nuevos:
+		AudioManager.play_sfx("popup")
 		AudioManager.play_sfx("achievement")
 		DataManager.show_achievement_popup(a)
 		await get_tree().create_timer(2.8, false, true).timeout

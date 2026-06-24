@@ -128,6 +128,7 @@ func _populate_upgrades() -> void:
 	_update_balance()
 
 func _buy(upgrade_key: String, btn_pos: Vector2) -> void:
+	AudioManager.play_sfx("buy")
 	var nuevos := DataManager.buy_upgrade(upgrade_key)
 	if not nuevos.is_empty():
 		for a in nuevos:
