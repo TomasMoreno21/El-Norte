@@ -8,6 +8,11 @@ const BIRD_COLORS := {
 	"premio_pajarero": Color(0.55, 0.27, 0.07),
 }
 
+const BIRD_SPRITES := {
+	"hornero": preload("res://Sprites/Pajaros/hornero1.png"),
+	"carpintero": preload("res://Sprites/Pajaros/carpintero1.png"),
+}
+
 func _ready() -> void:
 	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
 	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
@@ -39,6 +44,27 @@ func _style_button(btn: Button, color: Color, disabled_color := Color()) -> void
 		disabled.corner_radius_bottom_right = 6
 		btn.add_theme_stylebox_override("disabled", disabled)
 
+func _make_bird_display(bird_id: String, owned: bool) -> Control:
+	var tex := BIRD_SPRITES.get(bird_id)
+	if tex != null and (owned or DataManager.BIRDS[bird_id].get("cost", 0) == 0):
+		var tr := TextureRect.new()
+		tr.texture = tex
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tr.custom_minimum_size = Vector2(100, 0)
+		tr.size_flags_vertical = 3
+		tr.mouse_filter = 2
+		return tr
+	else:
+		var cr := ColorRect.new()
+		if not owned and DataManager.BIRDS[bird_id].get("cost", 0) < 0:
+			cr.color = Color(0.15, 0.15, 0.15)
+		else:
+			cr.color = BIRD_COLORS.get(bird_id, Color.WHITE)
+		cr.custom_minimum_size = Vector2(100, 0)
+		cr.size_flags_vertical = 3
+		cr.mouse_filter = 2
+		return cr
+
 func _update_balance() -> void:
 	$Bg/VBoxContainer/BolasLabel.text = "Barro: %d" % DataManager.bolas_balance
 
@@ -57,15 +83,8 @@ func _populate_birds() -> void:
 		row.size_flags_horizontal = 3
 		row.add_theme_constant_override("separation", 20)
 
-		var swatch := ColorRect.new()
-		if not owned and bird.get("cost", 0) < 0:
-			swatch.color = Color(0.15, 0.15, 0.15)
-		else:
-			swatch.color = BIRD_COLORS.get(id, Color.WHITE)
-		swatch.custom_minimum_size = Vector2(100, 0)
-		swatch.size_flags_vertical = 3
-		swatch.mouse_filter = 2
-		row.add_child(swatch)
+		var display := _make_bird_display(id, owned)
+		row.add_child(display)
 
 		var info_col := VBoxContainer.new()
 		info_col.size_flags_horizontal = 3

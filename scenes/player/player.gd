@@ -20,12 +20,17 @@ var _original_scale: Vector2
 
 var _was_pressed := false
 var _miniatura_active := false
+var _tex_carpintero1 := preload("res://Sprites/Pajaros/carpintero1.png")
+var _tex_carpintero2 := preload("res://Sprites/Pajaros/carpintero2.png")
 var _tex_hornero1 := preload("res://Sprites/Pajaros/hornero1.png")
 var _tex_hornero2 := preload("res://Sprites/Pajaros/hornero2.png")
+var _tex_frame1: Texture2D
+var _tex_frame2: Texture2D
 var _feather_particles: GPUParticles2D
 
 func _ready() -> void:
 	position = start_position
+	_load_bird_textures()
 	var mods := DataManager.get_bird_modifiers()
 	flap_mult = mods["flap_mult"]
 	lives = 1 + mods["extra_lives"]
@@ -74,8 +79,18 @@ func _setup_feather_particles() -> void:
 
 	add_child(_feather_particles)
 
+func _load_bird_textures() -> void:
+	match DataManager.active_bird:
+		"carpintero":
+			_tex_frame1 = _tex_carpintero1
+			_tex_frame2 = _tex_carpintero2
+		_:
+			_tex_frame1 = _tex_hornero1
+			_tex_frame2 = _tex_hornero2
+	$Sprite2D.texture = _tex_frame1
+
 func _flap_anim_tick() -> void:
-	$Sprite2D.texture = _tex_hornero2 if $Sprite2D.texture == _tex_hornero1 else _tex_hornero1
+	$Sprite2D.texture = _tex_frame2 if $Sprite2D.texture == _tex_frame1 else _tex_frame1
 
 func _physics_process(delta: float) -> void:
 	if not alive:
@@ -85,7 +100,7 @@ func _physics_process(delta: float) -> void:
 	if is_pressed:
 		if not _was_pressed:
 			AudioManager.play_sfx("flap")
-			$Sprite2D.texture = _tex_hornero2
+			$Sprite2D.texture = _tex_frame2
 			flap_timer.start()
 			if not DataManager.reduce_motion:
 				_feather_particles.restart()
@@ -101,7 +116,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		if _was_pressed:
 			flap_timer.stop()
-			$Sprite2D.texture = _tex_hornero1
+			$Sprite2D.texture = _tex_frame1
 		velocity.y += GRAVITY * delta
 	
 	_was_pressed = is_pressed
@@ -198,7 +213,7 @@ func reset() -> void:
 	flap_timer.stop()
 	$Sprite2D.modulate.a = 1.0
 	$Sprite2D.scale = _original_scale
-	$Sprite2D.texture = _tex_hornero1
+	_load_bird_textures()
 	_was_pressed = false
 	storm_flap_override = 0
 	if not DataManager.reduce_motion:
