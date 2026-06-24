@@ -13,10 +13,16 @@ extends CanvasLayer
 @onready var tutorial_overlay := $TutorialOverlay
 @onready var tap_arrow := $TutorialOverlay/Panel/TapArrow
 @onready var milestone_flash := $MilestoneFlash
+@onready var event_label := $EventLabel
+@onready var rear_warning := $RearWarningLabel
 
 var _storm_warning_active := false
 var _storm_warning_time := 0.0
 const STORM_WARNING_DURATION := 2.0
+
+var _rear_warning_active := false
+var _rear_warning_time := 0.0
+const REAR_WARNING_DURATION := 2.0
 
 var _tutorial_timer := 0.0
 var _tutorial_arrow_time := 0.0
@@ -44,6 +50,15 @@ func _process(delta: float) -> void:
 		var t := sin(_storm_warning_time * 12.0)
 		var s := 1.0 + 0.4 * t
 		storm_warning.scale = Vector2(s, s)
+
+	if _rear_warning_active:
+		_rear_warning_time += delta
+		if _rear_warning_time >= REAR_WARNING_DURATION:
+			show_rear_warning(false)
+			return
+		var t := sin(_rear_warning_time * 14.0)
+		var s := 1.0 + 0.3 * t
+		rear_warning.scale = Vector2(s, s)
 
 	var dist := int(distance_label.text.trim_suffix("m"))
 	_idle_time += delta
@@ -137,16 +152,18 @@ func _pulse_label(label: Label) -> void:
 	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.1)
 	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.3)
 
-func update_powerups(shield_remaining: float, turbo_remaining: float, x2: bool, x2p: float = 0.0) -> void:
+func update_powerups(shield_remaining: float, turbo_remaining: float, x4_barro: bool, x3p: float = 0.0, mini: float = 0.0) -> void:
 	var parts := []
 	if shield_remaining > 0:
 		parts.append("Escudo: %.1fs" % shield_remaining)
 	if turbo_remaining > 0:
 		parts.append("Turbo: %.1fs" % turbo_remaining)
-	if x2:
-		parts.append("x2 Barro")
-	if x2p > 0:
-		parts.append("x2 Palitos: %.1fs" % x2p)
+	if x4_barro:
+		parts.append("x4 Barro")
+	if x3p > 0:
+		parts.append("x3 Palitos: %.1fs" % x3p)
+	if mini > 0:
+		parts.append("Miniatura: %.1fs" % mini)
 	powerup_label.text = "  ".join(parts)
 
 func flash_milestone() -> void:
@@ -162,6 +179,14 @@ func flash_milestone() -> void:
 	tween.tween_property(flash, "color:a", 0.0, 1.0)
 	tween.tween_callback(flash.queue_free)
 
+func show_event_text(text: String, is_positive: bool) -> void:
+	event_label.text = text
+	event_label.modulate = Color(0.3, 0.9, 0.3) if is_positive else Color(0.95, 0.15, 0.1)
+	event_label.visible = true
+
+func hide_event_text() -> void:
+	event_label.visible = false
+
 func show_storm(active: bool) -> void:
 	storm_label.visible = active
 
@@ -175,6 +200,21 @@ func show_storm_warning(active: bool) -> void:
 	else:
 		storm_warning.visible = true
 		_storm_warning_time = 0.0
+
+func show_rear_warning(active: bool, y_pos: float = 540.0) -> void:
+	_rear_warning_active = active
+	if not active:
+		rear_warning.visible = false
+		rear_warning.modulate.a = 1.0
+		rear_warning.scale = Vector2(1.0, 1.0)
+		_rear_warning_time = 0.0
+	else:
+		rear_warning.visible = true
+		rear_warning.offset_left = 40
+		rear_warning.offset_top = y_pos - 30
+		rear_warning.offset_right = 120
+		rear_warning.offset_bottom = y_pos + 30
+		_rear_warning_time = 0.0
 
 func show_transition_message(text: String) -> void:
 	$TransitionLabel.text = text

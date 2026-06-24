@@ -14,7 +14,7 @@ offset_right = 227.0
 offset_bottom = 81.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0.53224236, 0.53224236, 0.53224236, 1)
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 36
 text = "0m"
 
 [node name="MaxDistLabel" type="Label" parent="." unique_id=320463290]
@@ -23,15 +23,13 @@ offset_top = 82.0
 offset_right = 227.0
 offset_bottom = 113.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 16
 text = "Récord: 0m"
 
 [node name="Minimap" type="Control" parent="." unique_id=1311487202]
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 0.0
-offset_right = 0.0
 offset_bottom = 34.0
 grow_horizontal = 2
 mouse_filter = 2
@@ -47,7 +45,7 @@ offset_right = -1715.0
 offset_bottom = -44.0
 grow_horizontal = 0
 theme_override_colors/font_color = Color(0.6, 0.35, 0.15, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 26
 horizontal_alignment = 2
 
 [node name="PalitosEmoji" type="Label" parent="." unique_id=1892457837]
@@ -56,7 +54,7 @@ offset_top = 139.0
 offset_right = -408.0
 offset_bottom = 200.0
 theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 36
 text = "🪵"
 
 [node name="PalitosLabel" type="Label" parent="." unique_id=1892457836]
@@ -65,14 +63,14 @@ offset_top = 125.0
 offset_right = 98.0
 offset_bottom = 186.0
 theme_override_colors/font_color = Color(0.9, 0.7, 0.2, 1)
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 36
 
 [node name="PowerUpLabel" type="Label" parent="." unique_id=988080970]
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 80.0
 offset_bottom = 115.0
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 
 [node name="StormLabel" type="Label" parent="." unique_id=286242357]
@@ -83,7 +81,7 @@ offset_top = 130.0
 offset_bottom = 185.0
 theme_override_colors/font_color = Color(1, 0.3, 0.1, 1)
 theme_override_colors/font_shadow_color = Color(0.96640044, 0, 0.14082664, 1)
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 40
 text = "¡TORMENTA!"
 horizontal_alignment = 1
 
@@ -96,8 +94,32 @@ offset_bottom = 620.0
 theme_override_colors/font_color = Color(0.9111997, 0.27477574, 0, 1)
 theme_override_colors/font_shadow_color = Color(0.96045476, 0.09887571, 3.080368e-06, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 140
+theme_override_font_sizes/font_size = 120
 text = "!"
+horizontal_alignment = 1
+
+[node name="RearWarningLabel" type="Label" parent="."]
+visible = false
+offset_left = 1.0
+offset_top = 517.0
+offset_right = 101.0
+offset_bottom = 572.0
+theme_override_colors/font_color = Color(0.95, 0.15, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constant/outline_size = 10
+theme_override_font_sizes/font_size = 60
+text = "!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EventLabel" type="Label" parent="."]
+visible = false
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 130.0
+offset_bottom = 185.0
+theme_override_font_sizes/font_size = 40
+text = ""
 horizontal_alignment = 1
 
 [node name="MilestoneFlash" type="Control" parent="." unique_id=63912113]
@@ -146,7 +168,7 @@ offset_top = 480.0
 offset_bottom = 580.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 44
 horizontal_alignment = 1
 
 [node name="TutorialOverlay" type="Control" parent="." unique_id=1862089278]
@@ -184,7 +206,7 @@ offset_top = 16.0
 offset_right = 780.0
 offset_bottom = 74.0
 theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 30
 text = "¡Bienvenido a El Norte!"
 horizontal_alignment = 1
 
@@ -195,7 +217,7 @@ offset_top = 90.0
 offset_right = 760.0
 offset_bottom = 146.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22
 text = "Mantené presionado para volar"
 horizontal_alignment = 1
 
@@ -206,7 +228,7 @@ offset_top = 130.0
 offset_right = 760.0
 offset_bottom = 186.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22
 text = "Soltá para caer"
 horizontal_alignment = 1
 
@@ -217,7 +239,7 @@ offset_top = 186.0
 offset_right = 440.0
 offset_bottom = 246.0
 theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 30
 text = "👆"
 horizontal_alignment = 1
 
@@ -230,7 +252,7 @@ offset_top = 16.0
 offset_right = -30.0
 offset_bottom = 80.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 40
 text = "☰"
 
 [node name="PauseOverlay" type="ColorRect" parent="." unique_id=859131915]
@@ -251,7 +273,7 @@ offset_left = -200.0
 offset_top = -120.0
 offset_right = 200.0
 offset_bottom = -40.0
-theme_override_font_sizes/font_size = 80
+theme_override_font_sizes/font_size = 68
 text = "PAUSA"
 horizontal_alignment = 1
 
@@ -265,7 +287,7 @@ offset_left = -140.0
 offset_top = 20.0
 offset_right = 140.0
 offset_bottom = 100.0
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 40
 text = "Seguir"
 
 [node name="QuitBtn" type="Button" parent="PauseOverlay" unique_id=424113099]
@@ -278,5 +300,5 @@ offset_left = -140.0
 offset_top = 140.0
 offset_right = 140.0
 offset_bottom = 220.0
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 40
 text = "Salir al menú"

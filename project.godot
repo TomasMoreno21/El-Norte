@@ -15,6 +15,9 @@ run/main_scene="res://scenes/menu/menu.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
+[gui]
+theme/custom_font="res://Fuentes/Pixel Sans Serif.ttf"
+
 [autoload]
 
 DataManager="*res://scenes/data_manager/data_manager.gd"

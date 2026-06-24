@@ -19,7 +19,12 @@ var in_storm := false
 var _rafaga_progress := 0.0
 var storm_time := 0.0
 var turbo_effect: CanvasLayer
-var next_storm_distance := 500.0
+enum EventType { REAR_WAVE, FRONT_WAVE, STORM }
+const EVENT_INTERVAL_MIN := 250.0
+const EVENT_INTERVAL_MAX := 500.0
+var _next_event_type := -1
+var _next_event_distance := 0.0
+var _last_event_type := -1
 var bird_speed_mult := 1.0
 var bird_kiwi_bonus := 0.0
 var rafaga_active := false
@@ -44,10 +49,22 @@ var x2_palitos_start_time := 0.0
 var x2_bolas_active := false
 var miniatura_active := false
 var miniatura_start_time := 0.0
+var miniatura_speed_mult := 1.0
 var _revive_available := true
 var _death_old_max := 0
 var _contra_viento_active := false
 var _contra_viento_time := 0.0
+var _rear_wave_active := false
+var _rear_wave_phase := 0
+var _rear_wave_timer := 0.0
+var _rear_y := 540.0
+var _wave_active := false
+var _wave_phase := 0
+enum WaveState { WARN, POST }
+var _wave_timer := 0.0
+var _wave_state := WaveState.WARN
+var _wave_lane_ys: Array[float] = []
+const WAVE_POST_DELAY := 1.5
 const CONTRA_VIENTO_DURATION := 4.0
 const CONTRA_VIENTO_COOLDOWN := 2000.0
 var _last_contra_viento_distance := 0.0
@@ -79,6 +96,11 @@ const RAFAGA_COOLDOWN := 1200.0
 const RAFAGA_CHANCE := 0.4
 const RAFAGA_DURATION := 5.0
 const RAFAGA_BOOST := 1.5
+const REAR_INTERVAL := 600.0
+const REAR_SPEED := 900.0
+const WAVE_INTERVAL := 600.0
+const WAVE_COUNT := 4
+const WAVE_WARN_TIME := 2.5
 const CALMA_COOLDOWN := 800.0
 const CALMA_CHANCE := 0.25
 const CALMA_DURATION := 5.0
@@ -116,7 +138,7 @@ func get_speed(dist: float) -> float:
 	return s
 
 func get_double_chance(dist: float) -> float:
-	return min(0.08 + dist * 0.002, 0.40)
+	return min(0.04 + dist * 0.001, 0.25)
 
 func get_spawn_interval(dist: float) -> float:
 	var i: float = INTERVAL_MIN + INTERVAL_AMP * exp(-dist / INTERVAL_TAU)
@@ -155,6 +177,7 @@ func _ready() -> void:
 	if not DataManager.tutorial_done:
 		hud.start_tutorial()
 	_setup_biome_effects()
+	_schedule_next_event()
 
 func start_storm() -> void:
 	in_storm = true
@@ -169,7 +192,7 @@ func end_storm() -> void:
 	in_storm = false
 	storm_time = 0.0
 	player.end_storm_gradual()
-	next_storm_distance += STORM_INTERVAL
+	_schedule_next_event()
 	DataManager.storms_survived += 1
 	storms_in_run += 1
 	AudioManager.play_sfx("storm_end")
@@ -181,33 +204,45 @@ func end_storm() -> void:
 		hud.update_bolas(DataManager.bolas_balance)
 	_update_encounter_mode()
 
+func _schedule_next_event() -> void:
+	var types := [EventType.REAR_WAVE, EventType.FRONT_WAVE, EventType.STORM]
+	if _last_event_type >= 0:
+		types.erase(_last_event_type)
+	_next_event_type = types[randi() % types.size()]
+	_last_event_type = _next_event_type
+	_next_event_distance = distance + randf_range(EVENT_INTERVAL_MIN, EVENT_INTERVAL_MAX)
+
 func start_rafaga() -> void:
 	rafaga_active = true
 	rafaga_time = 0.0
 	_rafaga_progress = 0.0
 	last_rafaga_distance = distance
+	hud.show_event_text("¡RÁFAGA!", true)
 	_update_encounter_mode()
 
 func end_rafaga() -> void:
 	rafaga_active = false
+	hud.hide_event_text()
 	_update_encounter_mode()
 
 func start_calma() -> void:
 	calma_active = true
 	calma_time = 0.0
 	last_calma_distance = distance
+	hud.show_event_text("¡CALMA!", true)
 	_update_encounter_mode()
 
 func end_calma() -> void:
 	calma_active = false
 	DataManager.calmas_survived += 1
+	hud.hide_event_text()
 	_update_encounter_mode()
 
 func start_lluvia() -> void:
 	lluvia_active = true
 	lluvia_time = 0.0
 	_lluvia_spawn_timer = 0.0
-	hud.show_transition_message("¡LLUVIA DE BARRO!")
+	hud.show_event_text("¡LLUVIA DE BARRO!", true)
 	_update_encounter_mode()
 
 func _spawn_lluvia_bola() -> void:
@@ -274,45 +309,47 @@ func _process(delta: float) -> void:
 	if not player.alive:
 		return
 
-	if not in_storm and not $Background.in_transition and distance >= next_storm_distance:
-		start_storm()
-		hud.show_storm_warning(false)
-	elif in_storm:
+	if in_storm:
 		storm_time += delta
 		if storm_time >= STORM_DURATION:
 			end_storm()
-	else:
-		var storm_dist := next_storm_distance
-		var warning := distance >= storm_dist - STORM_WARNING_DIST and distance < storm_dist
+	elif _next_event_type == EventType.STORM:
+		var warning := distance >= _next_event_distance - STORM_WARNING_DIST
 		hud.show_storm_warning(warning)
+		if distance >= _next_event_distance and not $Background.in_transition and not rafaga_active and not calma_active and not _contra_viento_active and not lluvia_active:
+			start_storm()
+			hud.show_storm_warning(false)
+			_next_event_type = -1
+	else:
+		hud.show_storm_warning(false)
 
-	if not rafaga_active and not calma_active and not in_storm and not _contra_viento_active and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
+	if not rafaga_active and not calma_active and not in_storm and not _contra_viento_active and not _wave_active and not _rear_wave_active and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
 		last_rafaga_distance = distance
 		if randf() < RAFAGA_CHANCE:
 			start_rafaga()
 
-	if not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and distance >= 500 and distance - last_calma_distance >= CALMA_COOLDOWN:
+	if not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and not _wave_active and not _rear_wave_active and distance >= 500 and distance - last_calma_distance >= CALMA_COOLDOWN:
 		last_calma_distance = distance
 		if randf() < CALMA_CHANCE:
 			start_calma()
 
-	if not lluvia_active and not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and distance >= 500 and distance - last_lluvia_distance >= LLUVIA_INTERVAL:
+	if not lluvia_active and not calma_active and not rafaga_active and not in_storm and not _contra_viento_active and not _wave_active and not _rear_wave_active and distance >= 500 and distance - last_lluvia_distance >= LLUVIA_INTERVAL:
 		last_lluvia_distance = distance
 		if randf() < LLUVIA_CHANCE:
 			start_lluvia()
 
-	if not _contra_viento_active and not calma_active and not in_storm and distance >= 1000 and distance - _last_contra_viento_distance >= CONTRA_VIENTO_COOLDOWN:
+	if not _contra_viento_active and not calma_active and not in_storm and not _wave_active and not _rear_wave_active and distance >= 1000 and distance - _last_contra_viento_distance >= CONTRA_VIENTO_COOLDOWN:
 		_last_contra_viento_distance = distance
 		if randf() < 0.35:
 			_contra_viento_active = true
 			_contra_viento_time = 0.0
-			hud.show_transition_message("¡VIENTO EN CONTRA!")
+			hud.show_event_text("¡VIENTO EN CONTRA!", false)
 
 	if _contra_viento_active:
 		_contra_viento_time += delta
 		if _contra_viento_time >= CONTRA_VIENTO_DURATION:
 			_contra_viento_active = false
-			hud.hide_transition_message()
+			hud.hide_event_text()
 
 	kiwi_cooldown_timer += delta
 
@@ -369,31 +406,86 @@ func _process(delta: float) -> void:
 			_update_encounter_mode()
 			_update_existing_obstacle_speeds()
 		else:
-			turbo_mult = 2.0
+			turbo_mult = 3.0
 
 	if x2_palitos_active:
-		x2p_remaining = 4.0 - (now - x2_palitos_start_time) / 1000.0
+		x2p_remaining = 6.0 - (now - x2_palitos_start_time) / 1000.0
 		if x2p_remaining <= 0:
 			x2_palitos_active = false
 			x2p_remaining = 0.0
 		else:
-			palitos_dist_mult = 2.0
+			palitos_dist_mult = 3.0
 
 	if miniatura_active:
-		mini_remaining = 3.0 - (now - miniatura_start_time) / 1000.0
+		mini_remaining = 6.0 - (now - miniatura_start_time) / 1000.0
 		if mini_remaining <= 0:
 			miniatura_active = false
 			mini_remaining = 0.0
 			player.set_miniatura(false)
+			miniatura_speed_mult = 1.0
+		else:
+			miniatura_speed_mult = 1.35
 
 	var raw_delta := current_speed * delta / PIXEL_TO_METER
 	difficulty_dist += raw_delta
 	var contra_mult := 0.5 if _contra_viento_active else 1.0
-	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult * contra_mult
+	distance += raw_delta * speed_bonus * bird_speed_mult * turbo_mult * rafaga_mult * palitos_dist_mult * contra_mult * miniatura_speed_mult
 	hud.update_distance(int(distance))
 	while _last_milestone_idx < MILESTONES.size() and int(distance) >= MILESTONES[_last_milestone_idx]:
 		hud.flash_milestone()
 		_last_milestone_idx += 1
+
+	if _rear_wave_active:
+		_rear_wave_timer += delta
+		var phase_delay := 2.0
+		if _rear_wave_timer >= phase_delay:
+			_rear_wave_timer = 0.0
+			hud.show_rear_warning(false)
+			_spawn_rear_obstacle()
+			_rear_wave_phase += 1
+			if _rear_wave_phase >= 3:
+				_rear_wave_active = false
+				_rear_wave_phase = 0
+				_schedule_next_event()
+			else:
+				_rear_y = randf_range(200, 880)
+				hud.show_rear_warning(true, _rear_y)
+	else:
+		if not _wave_active and _next_event_type == EventType.REAR_WAVE and distance >= _next_event_distance and not rafaga_active and not calma_active and not _contra_viento_active and not lluvia_active:
+			_rear_wave_active = true
+			_rear_wave_timer = 0.0
+			_rear_wave_phase = 0
+			_rear_y = randf_range(200, 880)
+			hud.show_rear_warning(true, _rear_y)
+			_next_event_type = -1
+
+	if _wave_active:
+		_wave_timer += delta
+		match _wave_state:
+			WaveState.WARN:
+				if _wave_timer >= WAVE_WARN_TIME:
+					_wave_timer = 0.0
+					_spawn_wave_row()
+					_wave_phase += 1
+					if _wave_phase >= WAVE_COUNT:
+						_wave_active = false
+						_wave_phase = 0
+						_schedule_next_event()
+					else:
+						_wave_state = WaveState.POST
+			WaveState.POST:
+				if _wave_timer >= WAVE_POST_DELAY:
+					_wave_timer = 0.0
+					_spawn_wave_warnings()
+					_wave_state = WaveState.WARN
+	elif not _rear_wave_active and _next_event_type == EventType.FRONT_WAVE and distance >= _next_event_distance and not rafaga_active and not calma_active and not _contra_viento_active and not lluvia_active:
+		_wave_active = true
+		_wave_timer = 0.0
+		_wave_phase = 0
+		_wave_state = WaveState.WARN
+		_spawn_wave_warnings()
+		_next_event_type = -1
+
 	var palitos_rate := 1 + DataManager.get_upgrade_level("palitos_base")
 	var bird_palitos_mult: float = DataManager.get_bird_modifiers()["palitos_mult"]
 	var run_palitos := int(distance / 10) * palitos_rate * bird_palitos_mult
@@ -403,11 +495,12 @@ func _process(delta: float) -> void:
 		last_check_dist = curr_dist
 		var nuevos := DataManager.check_achievements({ "distance": curr_dist })
 		_show_popups(nuevos)
-	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, 0.0)
+	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining, mini_remaining)
 	hud.show_storm(in_storm)
-	$Background.set_run_distance(distance, 1.0)
+	$Background.set_run_distance(distance, 3.5)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
-	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult
+	var rear_spawn_mult := 1.5 if _rear_wave_active else 1.0
+	spawn_timer.wait_time = get_spawn_interval(difficulty_dist) * turbo_spawn_mult * rear_spawn_mult
 
 	var target_shake := 0.0
 	if DataManager.reduce_motion:
@@ -473,8 +566,51 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float, base_speed: flo
 	obs.add_to_group("obstacle")
 	add_child(obs)
 
+func _spawn_rear_obstacle() -> void:
+	var obs := obstacle_scene.instantiate()
+	obs.speed = REAR_SPEED
+	obs.moving_right = true
+	obs.shape_type = randi() % 3
+	obs.position = Vector2(-100, _rear_y)
+	obs.add_to_group("obstacle")
+	add_child(obs)
+
+func _generate_wave_lane_ys() -> void:
+	_wave_lane_ys.clear()
+	var gap := randf_range(120, 170)
+	var center := clampf(player.position.y, 250, 830)
+	_wave_lane_ys.append(clampf(center - gap, 200, 880))
+	_wave_lane_ys.append(center)
+	_wave_lane_ys.append(clampf(center + gap, 200, 880))
+
+func _spawn_wave_warnings() -> void:
+	_generate_wave_lane_ys()
+	for i in 3:
+		var warn := ColorRect.new()
+		warn.name = "WaveWarning%d" % i
+		warn.color = Color(0.95, 0.15, 0.1, 0.6)
+		warn.size = Vector2(2200, 8)
+		warn.position = Vector2(-50, _wave_lane_ys[i])
+		warn.mouse_filter = Control.MOUSE_FILTER_PASS
+		add_child(warn)
+
+func _spawn_wave_row() -> void:
+	var to_free: Array[ColorRect] = []
+	for c in get_children():
+		if c is ColorRect and c.name.begins_with("WaveWarning"):
+			to_free.append(c)
+	for c in to_free:
+		c.free()
+	for i in 3:
+		var obs := obstacle_scene.instantiate()
+		obs.speed = REAR_SPEED * 3.0
+		obs.shape_type = randi() % 3
+		obs.position = Vector2(2020, _wave_lane_ys[i])
+		obs.add_to_group("obstacle")
+		add_child(obs)
+
 func _on_spawn_timer_timeout() -> void:
-	if not obstacle_scene or not player.alive or calma_active or $Background.in_transition:
+	if not obstacle_scene or not player.alive or calma_active or _wave_active or $Background.in_transition:
 		return
 
 	if kiwi_scene and kiwi_cooldown_timer >= KIWI_COOLDOWN:
@@ -521,7 +657,7 @@ func _on_power_up_selected(type: String) -> void:
 		"shield":
 			shield_active = true
 			shield_start_time = Time.get_ticks_msec()
-			shield_duration_max = 4.0 + DataManager.get_upgrade_level("shield_duration") * 0.2
+			shield_duration_max = 8.0 + DataManager.get_upgrade_level("shield_duration") * 0.2
 			player.set_shield(true)
 		"turbo":
 			turbo_active = true
@@ -554,13 +690,13 @@ func _on_bola_timer_timeout() -> void:
 	var bola := bola_scene.instantiate()
 	bola.speed = get_speed(difficulty_dist)
 	bola.position = Vector2(2100, randf_range(220, 860))
-	bola.amount = 2 if x2_bolas_active else 1
+	bola.amount = 4 if x2_bolas_active else 1
 	bola.collected.connect(_on_bola_collected)
 	bola.add_to_group("bola")
 	add_child(bola)
 
 func _on_bola_collected() -> void:
-	var amount := 2 if x2_bolas_active else 1
+	var amount := 4 if x2_bolas_active else 1
 	DataManager.add_bolas(amount)
 	run_bolas += amount
 	AudioManager.play_sfx("collect")
@@ -576,7 +712,7 @@ func _show_popups(nuevos: Array) -> void:
 	for a in nuevos:
 		AudioManager.play_sfx("achievement")
 		DataManager.show_achievement_popup(a)
-		await get_tree().create_timer(2.8).timeout
+		await get_tree().create_timer(2.8, false, true).timeout
 
 func _on_revive() -> void:
 	AudioManager.play_sfx("revive")
@@ -587,7 +723,7 @@ func _on_revive() -> void:
 	_show_popups(nuevos_revive)
 	distance = max(distance - REVIVE_REWIND, 0.0)
 	difficulty_dist = max(difficulty_dist - REVIVE_REWIND, 0.0)
-	next_storm_distance = floor(distance / STORM_INTERVAL) * STORM_INTERVAL + STORM_INTERVAL
+	_schedule_next_event()
 	last_rafaga_distance = distance
 	last_calma_distance = distance
 	last_lluvia_distance = distance
@@ -598,6 +734,9 @@ func _on_revive() -> void:
 		k.queue_free()
 	for b in get_tree().get_nodes_in_group("bola"):
 		b.queue_free()
+	for c in get_children():
+		if c is ColorRect and c.name.begins_with("WaveWarning"):
+			c.queue_free()
 
 	if in_storm:
 		in_storm = false
@@ -631,6 +770,12 @@ func _on_revive() -> void:
 	x2_palitos_active = false
 	x2_bolas_active = false
 	miniatura_active = false
+	miniatura_speed_mult = 1.0
+	_rear_wave_active = false
+	_rear_wave_phase = 0
+	_wave_active = false
+	_wave_phase = 0
+	_wave_state = WaveState.WARN
 	kiwi_cooldown_timer = 0.0
 
 	player.reset()

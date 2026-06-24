@@ -39,19 +39,19 @@ theme_override_constants/separation = 20
 [node name="Title" type="Label" parent="Panel/VBox"]
 layout_mode = 2
 text = "¡HORNERO CAÍDO!"
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
 
 [node name="PalitosLabel" type="Label" parent="Panel/VBox"]
 layout_mode = 2
 text = "Palitos: 0"
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
 [node name="CostLabel" type="RichTextLabel" parent="Panel/VBox"]
 layout_mode = 2
 text = "Revivir por 0 palitos?"
-theme_override_font_sizes/normal_font_size = 44
+theme_override_font_sizes/normal_font_size = 36
 fit_content = true
 scroll_active = false
 bbcode_enabled = true
@@ -69,11 +69,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "REVIVIR"
 custom_minimum_size = Vector2(0, 80)
-theme_override_font_sizes/font_size = 56
+theme_override_font_sizes/font_size = 48
 
 [node name="RejectBtn" type="Button" parent="Panel/VBox/ButtonRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "RENDIRSE"
 custom_minimum_size = Vector2(0, 80)
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 40

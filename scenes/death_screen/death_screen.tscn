@@ -24,45 +24,45 @@ theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="ColorRect/VBoxContainer" unique_id=1174477123]
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 54
 text = "EL VIENTO PARÓ"
 horizontal_alignment = 1
 
 [node name="DistanceLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=596636937]
 layout_mode = 2
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 36
 text = "0m"
 horizontal_alignment = 1
 
 [node name="PalitosLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=100933802]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 30
 text = "Palitos: +0"
 horizontal_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=1733749348]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
 [node name="BonusLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=485973396]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.4, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
 [node name="RecordDiffLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=1410288723]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
 [node name="TipLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=919238852]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
 [node name="ButtonRow" type="HBoxContainer" parent="ColorRect/VBoxContainer" unique_id=838787196]
@@ -73,7 +73,7 @@ theme_override_constants/separation = 16
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 70
+theme_override_font_sizes/font_size = 58
 text = "Volver a volar"
 script = ExtResource("2")
 
@@ -81,6 +81,6 @@ script = ExtResource("2")
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 70
+theme_override_font_sizes/font_size = 58
 text = "Volver al menú"
 script = ExtResource("2")

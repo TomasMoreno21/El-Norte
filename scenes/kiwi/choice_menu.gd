@@ -5,18 +5,18 @@ signal power_up_selected(type: String)
 const POOL := [
 	{ "text": "Escudo", "type": "shield", "cost": 35 },
 	{ "text": "Turbo", "type": "turbo", "cost": 40 },
-	{ "text": "x2 Bolas", "type": "x2_bolas", "cost": 25 },
+	{ "text": "x4 Barro", "type": "x2_bolas", "cost": 25 },
 	{ "text": "Miniatura", "type": "miniatura", "cost": 20 },
-	{ "text": "x2 Palitos", "type": "x2_palitos", "cost": 60 },
+	{ "text": "x3 Palitos", "type": "x2_palitos", "cost": 60 },
 	{ "text": "Barro extra", "type": "bola_extra", "cost": 35 },
 ]
 
 const DESCRIPTIONS := {
-	"shield": "Protege de obstáculos por 4s",
-	"turbo": "Duplica la distancia por 6s",
-	"x2_bolas": "Duplica barros por 4s",
-	"miniatura": "Reduce el pájaro 3s",
-	"x2_palitos": "Duplica palitos por 4s",
+	"shield": "Protege de obstáculos por 8s",
+	"turbo": "Triplica la distancia por 6s",
+	"x2_bolas": "Da x4 de barro",
+	"miniatura": "Reduce el pájaro 6s + turbo extra",
+	"x2_palitos": "Triplica palitos por 6s",
 	"bola_extra": "Da 1 barro extra",
 }
 
@@ -31,7 +31,7 @@ func _ready() -> void:
 
 	var palitos_label := Label.new()
 	palitos_label.text = "$" + str(DataManager.palitos_balance) + " palitos"
-	palitos_label.add_theme_font_size_override("font_size", 28)
+	palitos_label.add_theme_font_size_override("font_size", 22)
 	palitos_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	palitos_label.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2))
 	$RightPanel/VBoxContainer.add_child(palitos_label)
@@ -59,7 +59,7 @@ func _add_choice(text: String, type: String, cost: int) -> void:
 	btn.text = text
 	btn.tooltip_text = DESCRIPTIONS.get(type, "")
 	btn.custom_minimum_size = Vector2(0, 64)
-	btn.add_theme_font_size_override("font_size", 36)
+	btn.add_theme_font_size_override("font_size", 30)
 	btn.size_flags_horizontal = 4
 	btn.pressed.connect(_on_choice.bind(type, cost))
 	$RightPanel/VBoxContainer.add_child(btn)
@@ -68,7 +68,7 @@ func _add_reject() -> void:
 	var btn := Button.new()
 	btn.text = "Rechazar"
 	btn.custom_minimum_size = Vector2(0, 64)
-	btn.add_theme_font_size_override("font_size", 36)
+	btn.add_theme_font_size_override("font_size", 30)
 	btn.size_flags_horizontal = 4
 	btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	btn.pressed.connect(_on_reject)

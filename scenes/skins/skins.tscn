@@ -33,12 +33,12 @@ theme_override_constants/separation = 20
 layout_mode = 2
 text = "SKINS"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 72
+theme_override_font_sizes/font_size = 60
 
 [node name="BolasLabel" type="Label" parent="Bg/VBoxContainer"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 34
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer"]
 layout_mode = 2
@@ -54,4 +54,4 @@ theme_override_constants/separation = 30
 layout_mode = 2
 text = "Volver"
 custom_minimum_size = Vector2(800, 96)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22

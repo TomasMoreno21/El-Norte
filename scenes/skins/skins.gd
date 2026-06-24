@@ -77,7 +77,7 @@ func _populate_birds() -> void:
 			name_label.text = "???"
 		else:
 			name_label.text = bird.get("name", "?")
-		name_label.add_theme_font_size_override("font_size", 30)
+		name_label.add_theme_font_size_override("font_size", 24)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		var bonus_label := Label.new()
@@ -85,7 +85,7 @@ func _populate_birds() -> void:
 			bonus_label.text = "??? "
 		else:
 			bonus_label.text = "Bonus: %s" % bird.get("Bonus", "—")
-		bonus_label.add_theme_font_size_override("font_size", 18)
+		bonus_label.add_theme_font_size_override("font_size", 14)
 		bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		bonus_label.modulate = Color(0.7, 0.7, 0.7)
 
@@ -94,7 +94,7 @@ func _populate_birds() -> void:
 			penalty_label.text = ""
 		else:
 			penalty_label.text = "Penalidad: %s" % bird.get("Penalidad", "—")
-		penalty_label.add_theme_font_size_override("font_size", 18)
+		penalty_label.add_theme_font_size_override("font_size", 14)
 		penalty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		penalty_label.modulate = Color(0.7, 0.7, 0.7)
 
@@ -106,7 +106,7 @@ func _populate_birds() -> void:
 		var action_btn := Button.new()
 		action_btn.size_flags_horizontal = 3
 		action_btn.custom_minimum_size = Vector2(0, 48)
-		action_btn.add_theme_font_size_override("font_size", 24)
+		action_btn.add_theme_font_size_override("font_size", 18)
 
 		if active:
 			action_btn.text = "Seleccionado"

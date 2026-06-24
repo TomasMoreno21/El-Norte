@@ -451,7 +451,7 @@ func show_achievement_popup(info: Dictionary) -> void:
 
 	var name_lbl := Label.new()
 	name_lbl.text = info["name"]
-	name_lbl.add_theme_font_size_override("font_size", 28)
+	name_lbl.add_theme_font_size_override("font_size", 22)
 	name_lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
 	name_lbl.position = Vector2(0, 6)
 	name_lbl.size = Vector2(350, 34)
@@ -459,7 +459,7 @@ func show_achievement_popup(info: Dictionary) -> void:
 
 	var desc_lbl := Label.new()
 	desc_lbl.text = info["desc"]
-	desc_lbl.add_theme_font_size_override("font_size", 20)
+	desc_lbl.add_theme_font_size_override("font_size", 14)
 	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	desc_lbl.position = Vector2(0, 46)
 	desc_lbl.size = Vector2(350, 32)
@@ -469,20 +469,12 @@ func show_achievement_popup(info: Dictionary) -> void:
 	bg.add_child(desc_lbl)
 	overlay.add_child(bg)
 
+	var tween := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	bg.modulate = Color(1, 1, 1, 0)
-	var tween := create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
+	tween.tween_interval(4.0)
+	tween.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
 	tween.tween_callback(func():
-		if not is_instance_valid(overlay):
-			return
-		var t := get_tree().create_timer(4.0, false, true)
-		await t.timeout
-		if not is_instance_valid(overlay):
-			return
-		var out := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-		out.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
-		await out.finished
 		if is_instance_valid(overlay):
 			overlay.queue_free()
 	)

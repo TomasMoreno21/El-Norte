@@ -21,7 +21,7 @@ func _build() -> void:
 
 	var title := Label.new()
 	title.text = "CONFIGURACIÓN"
-	title.add_theme_font_size_override("font_size", 22)
+	title.add_theme_font_size_override("font_size", 16)
 	title.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
@@ -36,13 +36,13 @@ func _add_toggle(parent: Container, label: String, which: int) -> void:
 
 	var lbl := Label.new()
 	lbl.text = label
-	lbl.add_theme_font_size_override("font_size", 30)
+	lbl.add_theme_font_size_override("font_size", 24)
 	lbl.custom_minimum_size = Vector2(300, 0)
 	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(80, 54)
-	btn.add_theme_font_size_override("font_size", 28)
+	btn.add_theme_font_size_override("font_size", 22)
 	btn.pressed.connect(func(): _toggle(which))
 	_refresh_btn(btn, _get_value(which))
 
