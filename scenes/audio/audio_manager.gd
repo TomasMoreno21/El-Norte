@@ -65,6 +65,21 @@ func play_sfx(sound_name: String) -> void:
 	else:
 		push_error("AudioManager: Failed to load stream for '%s' at %s" % [sound_name, SOUNDS[sound_name]])
 
+## Reproduce un SFX incluso cuando el árbol está pausado
+func play_sfx_unpaused(sound_name: String) -> void:
+	if not SOUNDS.has(sound_name):
+		return
+	var p := AudioStreamPlayer.new()
+	p.process_mode = PROCESS_MODE_WHEN_PAUSED
+	p.bus = "SFX"
+	add_child(p)
+	var stream = load(SOUNDS[sound_name])
+	if stream is AudioStream:
+		p.stream = stream
+		p.play()
+		await p.finished
+	p.queue_free()
+
 ## Reproduce música de fondo con crossfade simple
 func play_music(track_name: String, fade_time: float = 1.0) -> void:
 	if not DataManager.sound_enabled:

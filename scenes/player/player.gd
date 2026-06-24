@@ -149,7 +149,7 @@ func die() -> void:
 		$Sprite2D.modulate.a = 1.0
 		return
 	
-	AudioManager.play_sfx("hit")
+	AudioManager.play_sfx_unpaused("hit")
 	alive = false
 	velocity = Vector2.ZERO
 	rotation = 0.0
