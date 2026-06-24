@@ -29,13 +29,13 @@ theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="Bg/VBoxContainer" unique_id=2009993907]
 layout_mode = 2
-theme_override_font_sizes/font_size = 72
+theme_override_font_sizes/font_size = 60
 text = "LOGROS"
 horizontal_alignment = 1
 
 [node name="Estadisticas" type="Label" parent="Bg/VBoxContainer" unique_id=224773533]
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 34
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer" unique_id=1925309425]
@@ -55,5 +55,5 @@ theme_override_constants/separation = 20
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22
 text = "Volver"

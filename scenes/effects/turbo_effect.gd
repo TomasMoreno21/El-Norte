@@ -4,7 +4,6 @@ extends CanvasLayer
 @onready var bottom_emitter: GPUParticles2D = $BottomEmitter
 @onready var rafaga_top: GPUParticles2D = $RafagaTop
 @onready var rafaga_bottom: GPUParticles2D = $RafagaBottom
-@onready var calma_label: Label = $CalmaLabel
 
 func _ready() -> void:
 	_setup_emitter(top_emitter, Vector2(960, 25), Vector3(-1, 0, 0))
@@ -64,7 +63,6 @@ func _reduce_motion_check() -> bool:
 		bottom_emitter.emitting = false
 		rafaga_top.emitting = false
 		rafaga_bottom.emitting = false
-		calma_label.visible = false
 		return true
 	return false
 
@@ -87,7 +85,6 @@ func set_normal_mode() -> void:
 	bottom_emitter.emitting = true
 	rafaga_top.emitting = false
 	rafaga_bottom.emitting = false
-	calma_label.visible = false
 
 func set_turbo_mode() -> void:
 	if _reduce_motion_check():
@@ -108,7 +105,6 @@ func set_turbo_mode() -> void:
 	bottom_emitter.emitting = true
 	rafaga_top.emitting = false
 	rafaga_bottom.emitting = false
-	calma_label.visible = false
 
 func set_storm_mode() -> void:
 	if _reduce_motion_check():
@@ -129,7 +125,6 @@ func set_storm_mode() -> void:
 	bottom_emitter.emitting = true
 	rafaga_top.emitting = false
 	rafaga_bottom.emitting = false
-	calma_label.visible = false
 
 func set_rafaga_mode(progress: float) -> void:
 	if _reduce_motion_check():
@@ -151,7 +146,6 @@ func set_rafaga_mode(progress: float) -> void:
 	rafaga_bottom.modulate = Color(1, 1, 1, p)
 	rafaga_top.emitting = p > 0.0
 	rafaga_bottom.emitting = p > 0.0
-	calma_label.visible = false
 
 func set_calma_mode() -> void:
 	if _reduce_motion_check():
@@ -160,4 +154,3 @@ func set_calma_mode() -> void:
 	bottom_emitter.emitting = false
 	rafaga_top.emitting = false
 	rafaga_bottom.emitting = false
-	calma_label.visible = true

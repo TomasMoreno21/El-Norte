@@ -31,13 +31,13 @@ theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="Bg/VBoxContainer" unique_id=374780561]
 layout_mode = 2
-theme_override_font_sizes/font_size = 72
+theme_override_font_sizes/font_size = 60
 text = "TIENDA"
 horizontal_alignment = 1
 
 [node name="PalitosLabel" type="Label" parent="Bg/VBoxContainer" unique_id=1765975771]
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 34
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer" unique_id=1519815721]
@@ -53,5 +53,5 @@ theme_override_constants/separation = 14
 [node name="Volver" type="Button" parent="Bg/VBoxContainer" unique_id=1160943467]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 40
 text = "Volver"

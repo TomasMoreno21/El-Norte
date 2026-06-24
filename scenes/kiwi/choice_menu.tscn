@@ -41,12 +41,12 @@ theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="RightPanel/VBoxContainer" unique_id=1333865919]
 layout_mode = 2
-theme_override_font_sizes/font_size = 60
+theme_override_font_sizes/font_size = 50
 text = "Kiwi!"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="RightPanel/VBoxContainer" unique_id=972570374]
 layout_mode = 2
-theme_override_font_sizes/font_size = 50
+theme_override_font_sizes/font_size = 42
 text = "Elegí un poder:"
 horizontal_alignment = 1

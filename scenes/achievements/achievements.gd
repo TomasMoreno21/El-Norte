@@ -64,13 +64,13 @@ func _populate_achievements() -> void:
 			var header := HBoxContainer.new()
 			var name_lbl := Label.new()
 			name_lbl.text = a["name"]
-			name_lbl.add_theme_font_size_override("font_size", 36)
+			name_lbl.add_theme_font_size_override("font_size", 30)
 			header.add_child(name_lbl)
 			info.add_child(header)
 
 			var done_lbl := Label.new()
 			done_lbl.text = "COMPLETADO"
-			done_lbl.add_theme_font_size_override("font_size", 22)
+			done_lbl.add_theme_font_size_override("font_size", 16)
 			done_lbl.modulate = Color(0, 1, 0)
 			info.add_child(done_lbl)
 
@@ -83,7 +83,7 @@ func _populate_achievements() -> void:
 			var lv = a["levels"][cur_level]
 			var rtype: String = "Ba" if lv["reward_type"] == "bolas" else "P"
 			reward.text = "%s +%d" % [rtype, lv["reward_amount"]]
-			reward.add_theme_font_size_override("font_size", 30)
+			reward.add_theme_font_size_override("font_size", 24)
 			reward.modulate = Color(1, 1, 0)
 			reward.size_flags_horizontal = 3
 			reward.size_flags_vertical = 3
@@ -98,11 +98,11 @@ func _populate_achievements() -> void:
 			var header := HBoxContainer.new()
 			var name_lbl := Label.new()
 			name_lbl.text = a["name"]
-			name_lbl.add_theme_font_size_override("font_size", 36)
+			name_lbl.add_theme_font_size_override("font_size", 30)
 			header.add_child(name_lbl)
 
 			var level_lbl := Label.new()
-			level_lbl.add_theme_font_size_override("font_size", 24)
+			level_lbl.add_theme_font_size_override("font_size", 18)
 			level_lbl.modulate = Color(0.7, 0.7, 0.7)
 			level_lbl.text = "Nivel %d/%d" % [cur_level + 2, total_levels]
 			header.add_child(level_lbl)
@@ -114,7 +114,7 @@ func _populate_achievements() -> void:
 				var lv = a["levels"][next_idx]
 				var desc_lbl := Label.new()
 				desc_lbl.text = lv["desc"]
-				desc_lbl.add_theme_font_size_override("font_size", 22)
+				desc_lbl.add_theme_font_size_override("font_size", 16)
 				desc_lbl.modulate = Color(0.7, 0.7, 0.7)
 				info.add_child(desc_lbl)
 
@@ -129,7 +129,7 @@ func _populate_achievements() -> void:
 
 					var progress_lbl := Label.new()
 					progress_lbl.text = "%d / %d" % [min(cur_val, lv["target"]), lv["target"]]
-					progress_lbl.add_theme_font_size_override("font_size", 20)
+					progress_lbl.add_theme_font_size_override("font_size", 14)
 					progress_lbl.modulate = Color(0.6, 0.6, 0.6)
 
 					info.add_child(bar)
@@ -144,7 +144,7 @@ func _populate_achievements() -> void:
 				reward.text = "%s +%d" % [rtype, lv["reward_amount"]]
 			else:
 				reward.text = "---"
-			reward.add_theme_font_size_override("font_size", 30)
+			reward.add_theme_font_size_override("font_size", 24)
 			reward.modulate = Color(0.5, 0.5, 0.5)
 			reward.size_flags_vertical = 3
 			row.add_child(reward)

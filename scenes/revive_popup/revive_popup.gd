@@ -25,7 +25,7 @@ func _ready() -> void:
 
 	var countdown_lbl := Label.new()
 	countdown_lbl.name = "CountdownLabel"
-	countdown_lbl.add_theme_font_size_override("font_size", 28)
+	countdown_lbl.add_theme_font_size_override("font_size", 22)
 	countdown_lbl.add_theme_color_override("font_color", Color(0.86, 0.27, 0.16))
 	countdown_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var idx := cost_label.get_index() + 1
@@ -34,8 +34,8 @@ func _ready() -> void:
 
 	_style_button(revive_btn, Color(0.15, 0.5, 0.15))
 	_style_button(reject_btn, Color(0.86, 0.27, 0.16))
-	revive_btn.add_theme_font_size_override("font_size", 44)
-	reject_btn.add_theme_font_size_override("font_size", 36)
+	revive_btn.add_theme_font_size_override("font_size", 36)
+	reject_btn.add_theme_font_size_override("font_size", 30)
 	revive_btn.custom_minimum_size = Vector2(0, 64)
 	reject_btn.custom_minimum_size = Vector2(0, 56)
 

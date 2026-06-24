@@ -49,7 +49,7 @@ func _ready() -> void:
 	tip_bg.corner_radius_bottom_left = 4
 	tip_bg.corner_radius_bottom_right = 4
 	$ColorRect/VBoxContainer/TipLabel.add_theme_stylebox_override("normal", tip_bg)
-	$ColorRect/VBoxContainer/TipLabel.add_theme_font_size_override("font_size", 26)
+	$ColorRect/VBoxContainer/TipLabel.add_theme_font_size_override("font_size", 20)
 
 	var spacer := Control.new()
 	spacer.size_flags_vertical = 3
@@ -58,8 +58,8 @@ func _ready() -> void:
 
 	_style_button($ColorRect/VBoxContainer/ButtonRow/RestartButton, Color(0.15, 0.5, 0.15))
 	_style_button($ColorRect/VBoxContainer/ButtonRow/MenuButton, Color(0.86, 0.27, 0.16))
-	$ColorRect/VBoxContainer/ButtonRow/RestartButton.add_theme_font_size_override("font_size", 40)
-	$ColorRect/VBoxContainer/ButtonRow/MenuButton.add_theme_font_size_override("font_size", 36)
+	$ColorRect/VBoxContainer/ButtonRow/RestartButton.add_theme_font_size_override("font_size", 34)
+	$ColorRect/VBoxContainer/ButtonRow/MenuButton.add_theme_font_size_override("font_size", 30)
 
 func _style_button(btn: Button, color: Color) -> void:
 	var normal := StyleBoxFlat.new()

@@ -20,7 +20,7 @@ func _ready() -> void:
 	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
 	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
 	$Bg/VBoxContainer/Volver.custom_minimum_size = Vector2(800, 96)
-	$Bg/VBoxContainer/Volver.add_theme_font_size_override("font_size", 28)
+	$Bg/VBoxContainer/Volver.add_theme_font_size_override("font_size", 22)
 	_update_balance()
 	_populate_upgrades()
 	SceneTransition.fade_in()
@@ -79,12 +79,12 @@ func _populate_upgrades() -> void:
 
 		var name_label := Label.new()
 		name_label.text = u.name
-		name_label.add_theme_font_size_override("font_size", 30)
+		name_label.add_theme_font_size_override("font_size", 24)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		var desc_label := Label.new()
 		desc_label.text = u.desc
-		desc_label.add_theme_font_size_override("font_size", 18)
+		desc_label.add_theme_font_size_override("font_size", 14)
 		desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		desc_label.modulate = Color(0.7, 0.7, 0.7)
 
@@ -96,14 +96,14 @@ func _populate_upgrades() -> void:
 		level_label.text = "Nivel %d/%d" % [level, max_lv]
 		level_label.size_flags_horizontal = 3
 		level_label.size_flags_vertical = 3
-		level_label.add_theme_font_size_override("font_size", 24)
+		level_label.add_theme_font_size_override("font_size", 18)
 		level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		level_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 		var buy_btn := Button.new()
 		buy_btn.size_flags_horizontal = 3
 		buy_btn.custom_minimum_size = Vector2(0, 48)
-		buy_btn.add_theme_font_size_override("font_size", 24)
+		buy_btn.add_theme_font_size_override("font_size", 18)
 		var cost := DataManager.get_upgrade_cost(u.key)
 		if cost == -1:
 			buy_btn.text = "COMPLETO"
@@ -119,7 +119,7 @@ func _populate_upgrades() -> void:
 			else:
 				_style_button(buy_btn, Color(0.3, 0.3, 0.3), Color(0.3, 0.3, 0.3))
 			var key: String = u.key
-			buy_btn.pressed.connect(func(): _buy(key, buy_btn.global_position))
+			buy_btn.pressed.connect(func(): _buy(key, buy_btn.global_position + buy_btn.size * 0.5))
 
 		row.add_child(level_label)
 		row.add_child(buy_btn)
@@ -140,25 +140,25 @@ func _show_stars(pos: Vector2) -> void:
 	var stars := GPUParticles2D.new()
 	stars.one_shot = true
 	stars.emitting = false
-	stars.amount = 30
-	stars.lifetime = 0.8
-	stars.explosiveness = 0.9
-	stars.position = pos + Vector2(130, 48)
+	stars.amount = 80
+	stars.lifetime = 0.4
+	stars.explosiveness = 1.0
+	stars.position = pos
 	var mat := ParticleProcessMaterial.new()
 	mat.direction = Vector3(0, -1, 0)
-	mat.spread = 200.0
-	mat.gravity = Vector3(0, -50, 0)
-	mat.initial_velocity_min = 150.0
-	mat.initial_velocity_max = 350.0
-	mat.scale_min = 0.8
-	mat.scale_max = 1.6
-	mat.color = Color(1, 0.95, 0.4)
+	mat.spread = 300.0
+	mat.gravity = Vector3(0, -20, 0)
+	mat.initial_velocity_min = 250.0
+	mat.initial_velocity_max = 600.0
+	mat.scale_min = 2.0
+	mat.scale_max = 4.0
+	mat.color = Color(0.2, 1, 0.3)
 	mat.angle_min = 0.0
 	mat.angle_max = 360.0
 	stars.process_material = mat
 	add_child(stars)
 	stars.emitting = true
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(0.7).timeout
 	if is_instance_valid(stars):
 		stars.queue_free()
 
