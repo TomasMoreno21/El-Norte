@@ -99,12 +99,12 @@ func stop_music(fade_time: float = 1.0) -> void:
 func start_ambient_wind() -> void:
 	if not DataManager.sound_enabled:
 		return
-	var stream = load(SOUNDS["wind_ambient"]) as AudioStreamWAV
-	if stream:
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		stream.loop_begin = 0
-		stream.loop_end = -1
+	var stream = load(SOUNDS["wind_ambient"])
+	if stream is AudioStream:
+		if stream is AudioStreamWAV:
+			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 		_ambient_player.stream = stream
+		_ambient_player.volume_db = -6.0
 		_ambient_player.play()
 
 func stop_ambient_wind() -> void:
