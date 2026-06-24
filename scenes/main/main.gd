@@ -171,6 +171,7 @@ func _ready() -> void:
 		turbo_effect = turbo_effect_scene.instantiate()
 		add_child(turbo_effect)
 	SceneTransition.fade_in()
+	AudioManager.start_ambient_wind()
 	$Background.transition_started.connect(_on_transition_started)
 	$Background.transition_ended.connect(_on_transition_ended)
 	parallax_editor.set_background($Background)
@@ -291,6 +292,7 @@ func _on_player_flapped() -> void:
 	shake_strength = 8.0
 
 func _on_player_died() -> void:
+	AudioManager.stop_ambient_wind()
 	DataManager.deaths += 1
 	_death_old_max = DataManager.max_distance
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
@@ -716,6 +718,7 @@ func _show_popups(nuevos: Array) -> void:
 
 func _on_revive() -> void:
 	AudioManager.play_sfx("revive")
+	AudioManager.start_ambient_wind()
 	Engine.time_scale = 1.0
 	DataManager.palitos_balance -= REVIVE_COST
 	DataManager.revives_used += 1

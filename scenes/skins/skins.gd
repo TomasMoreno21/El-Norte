@@ -45,12 +45,12 @@ func _style_button(btn: Button, color: Color, disabled_color := Color()) -> void
 		btn.add_theme_stylebox_override("disabled", disabled)
 
 func _make_bird_display(bird_id: String, owned: bool) -> Control:
-	var tex := BIRD_SPRITES.get(bird_id)
+	var tex: Texture2D = BIRD_SPRITES.get(bird_id) as Texture2D
 	if tex != null and (owned or DataManager.BIRDS[bird_id].get("cost", 0) == 0):
 		var tr := TextureRect.new()
 		tr.texture = tex
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		tr.custom_minimum_size = Vector2(100, 0)
+		tr.custom_minimum_size = Vector2(180, 0)
 		tr.size_flags_vertical = 3
 		tr.mouse_filter = 2
 		return tr
@@ -60,7 +60,7 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 			cr.color = Color(0.15, 0.15, 0.15)
 		else:
 			cr.color = BIRD_COLORS.get(bird_id, Color.WHITE)
-		cr.custom_minimum_size = Vector2(100, 0)
+		cr.custom_minimum_size = Vector2(180, 0)
 		cr.size_flags_vertical = 3
 		cr.mouse_filter = 2
 		return cr
@@ -79,7 +79,7 @@ func _populate_birds() -> void:
 		var active = DataManager.active_bird == id
 
 		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 130)
+		row.custom_minimum_size = Vector2(0, 190)
 		row.size_flags_horizontal = 3
 		row.add_theme_constant_override("separation", 20)
 

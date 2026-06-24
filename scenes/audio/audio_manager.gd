@@ -15,6 +15,7 @@ const SOUNDS := {
 	"kiwi_appear": "res://audio/sfx/kiwi_appear.wav",
 	"revive": "res://audio/sfx/revive.wav",
 	"achievement": "res://audio/sfx/achievement.wav",
+	"wind_ambient": "res://audio/sfx/wind_ambient.wav",
 }
 
 const MUSIC := {
@@ -24,6 +25,7 @@ const MUSIC := {
 }
 
 var _music_player: AudioStreamPlayer
+var _ambient_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 const SFX_POOL_SIZE := 8
 
@@ -32,6 +34,11 @@ func _ready() -> void:
 	_music_player = AudioStreamPlayer.new()
 	_music_player.bus = "Music"
 	add_child(_music_player)
+
+	# Configurar reproductor de ambiente (loop)
+	_ambient_player = AudioStreamPlayer.new()
+	_ambient_player.bus = "SFX"
+	add_child(_ambient_player)
 	
 	# Configurar pool de SFX para permitir sonidos solapados
 	for i in range(SFX_POOL_SIZE):
@@ -88,6 +95,20 @@ func stop_music(fade_time: float = 1.0) -> void:
 	var tween := create_tween()
 	tween.tween_property(_music_player, "volume_db", -80.0, fade_time)
 	tween.tween_callback(func(): _music_player.stop())
+
+func start_ambient_wind() -> void:
+	if not DataManager.sound_enabled:
+		return
+	var stream = load(SOUNDS["wind_ambient"]) as AudioStreamWAV
+	if stream:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		stream.loop_begin = 0
+		stream.loop_end = -1
+		_ambient_player.stream = stream
+		_ambient_player.play()
+
+func stop_ambient_wind() -> void:
+	_ambient_player.stop()
 
 func _get_available_sfx_player() -> AudioStreamPlayer:
 	for p in _sfx_pool:
