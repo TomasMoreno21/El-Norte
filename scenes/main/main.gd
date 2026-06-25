@@ -571,6 +571,7 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float, base_speed: flo
 func _spawn_rear_obstacle() -> void:
 	var obs := obstacle_scene.instantiate()
 	obs.speed = REAR_SPEED
+	obs.base_speed = REAR_SPEED
 	obs.moving_right = true
 	obs.shape_type = randi() % 3
 	obs.position = Vector2(-100, _rear_y)
@@ -605,7 +606,9 @@ func _spawn_wave_row() -> void:
 		c.free()
 	for i in 3:
 		var obs := obstacle_scene.instantiate()
-		obs.speed = REAR_SPEED * 3.0
+		var ws := REAR_SPEED * 3.0
+		obs.speed = ws
+		obs.base_speed = ws
 		obs.shape_type = randi() % 3
 		obs.position = Vector2(2020, _wave_lane_ys[i])
 		obs.add_to_group("obstacle")
