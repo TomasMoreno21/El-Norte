@@ -10,8 +10,6 @@ const SOUNDS := {
 	"flap": "res://audio/sfx/flap.wav",
 	"collect": "res://audio/sfx/collect.wav",
 	"hit": "res://audio/sfx/hit.wav",
-	"storm_start": "res://audio/sfx/storm_start.wav",
-	"storm_end": "res://audio/sfx/storm_end.wav",
 	"kiwi_appear": "res://audio/sfx/kiwi_appear.wav",
 	"revive": "res://audio/sfx/revive.wav",
 	"achievement": "res://audio/sfx/achievement.wav",
@@ -133,6 +131,10 @@ func start_ambient_wind() -> void:
 
 func stop_ambient_wind() -> void:
 	_ambient_player.stop()
+
+func stop_all_ambient() -> void:
+	_ambient_player.stop()
+	_storm_player.stop()
 
 func _enable_loop(stream: AudioStream) -> void:
 	if stream is AudioStreamWAV:

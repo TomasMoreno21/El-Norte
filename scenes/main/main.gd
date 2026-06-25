@@ -185,7 +185,6 @@ func start_storm() -> void:
 	storm_time = 0.0
 	shake_strength = 16.0
 	player.storm_flap_override = -340
-	AudioManager.play_sfx("storm_start")
 	AudioManager.start_storm_wind()
 	_update_encounter_mode()
 	_update_existing_obstacle_speeds()
@@ -197,7 +196,6 @@ func end_storm() -> void:
 	_schedule_next_event()
 	DataManager.storms_survived += 1
 	storms_in_run += 1
-	AudioManager.play_sfx("storm_end")
 	AudioManager.stop_storm_wind()
 	_update_existing_obstacle_speeds()
 	var nuevos := DataManager.check_achievements({ "storms_in_run": storms_in_run })
@@ -869,3 +867,6 @@ func _on_transition_ended(biome_name: String) -> void:
 			hud.show_transition_message("+%d palitos por explorar!" % bonus)
 			await get_tree().create_timer(1.5).timeout
 			hud.hide_transition_message()
+
+func _exit_tree() -> void:
+	AudioManager.stop_all_ambient()
