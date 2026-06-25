@@ -18,6 +18,7 @@ const SOUNDS := {
 	"popup": "res://audio/sfx/sonido de popup logro.mp3",
 	"storm_wind": "res://audio/sfx/sonido de viento de tormenta.mp3",
 	"ui_click": "res://audio/sfx/ui_click.wav",
+	"rechazar_kiwi": "res://audio/sfx/opcion rechazar kiwi.wav",
 }
 
 const MUSIC := {

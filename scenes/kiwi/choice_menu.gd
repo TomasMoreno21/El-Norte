@@ -72,6 +72,7 @@ func _add_reject() -> void:
 	btn.size_flags_horizontal = 4
 	btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	btn.pressed.connect(_on_reject)
+	btn.pressed.connect(func(): AudioManager.play_sfx("rechazar_kiwi"))
 	$RightPanel/VBoxContainer.add_child(btn)
 
 func _on_choice(type: String, cost: int) -> void:

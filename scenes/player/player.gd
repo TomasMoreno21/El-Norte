@@ -99,7 +99,7 @@ func _physics_process(delta: float) -> void:
 	var is_pressed := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE)
 	if is_pressed:
 		if not _was_pressed:
-			AudioManager.play_sfx("flap", -8.0)
+			AudioManager.play_sfx("flap", -16.0)
 			$Sprite2D.texture = _tex_frame2
 			flap_timer.start()
 			if not DataManager.reduce_motion:
