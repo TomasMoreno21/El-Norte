@@ -479,16 +479,12 @@ func show_achievement_popup(info: Dictionary) -> void:
 	bg.modulate = Color(1, 1, 1, 0)
 	var tw := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
-
-	await get_tree().create_timer(3.5, false).timeout
-	if not is_instance_valid(overlay):
-		return
-
-	var tw2 := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tw2.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
-	await tw2.finished
-	if is_instance_valid(overlay):
-		overlay.queue_free()
+	tw.tween_interval(3.5)
+	tw.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
+	tw.tween_callback(func():
+		if is_instance_valid(overlay):
+			overlay.queue_free()
+	)
 
 func save_data() -> void:
 	var data := {
