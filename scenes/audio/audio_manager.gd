@@ -17,6 +17,7 @@ const SOUNDS := {
 	"buy": "res://audio/sfx/sonido de compra.mp3",
 	"popup": "res://audio/sfx/sonido de popup logro.mp3",
 	"storm_wind": "res://audio/sfx/sonido de viento de tormenta.mp3",
+	"ui_click": "res://audio/sfx/ui_click.wav",
 }
 
 const MUSIC := {
@@ -168,5 +169,7 @@ func _get_available_sfx_player() -> AudioStreamPlayer:
 	for p in _sfx_pool:
 		if not p.playing:
 			return p
-	# Si todos están ocupados, reutilizar el primero (el más antiguo)
 	return _sfx_pool[0]
+
+func add_click(btn: Button) -> void:
+	btn.pressed.connect(func(): play_sfx("ui_click"))

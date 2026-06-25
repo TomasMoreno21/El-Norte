@@ -31,6 +31,8 @@ func _ready() -> void:
 	$Skins.pressed.connect(_on_skins)
 	$ResetButton.pressed.connect(_on_reset)
 	$SettingsBtn.pressed.connect(_toggle_settings)
+	for btn in [$Salir, $Tienda, $Logros, $Skins, $ResetButton, $SettingsBtn]:
+		AudioManager.add_click(btn)
 
 	_style_texture_button($Jugar, JUGAR_TEX)
 	_style_texture_button($Salir, SALIR_TEX)

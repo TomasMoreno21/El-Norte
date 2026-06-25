@@ -18,6 +18,7 @@ const STRIPE_COLORS := {
 
 func _ready() -> void:
 	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
+	AudioManager.add_click($Bg/VBoxContainer/Volver)
 	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
 	$Bg/VBoxContainer/Volver.custom_minimum_size = Vector2(800, 96)
 	$Bg/VBoxContainer/Volver.add_theme_font_size_override("font_size", 22)
@@ -120,6 +121,7 @@ func _populate_upgrades() -> void:
 				_style_button(buy_btn, Color(0.3, 0.3, 0.3), Color(0.3, 0.3, 0.3))
 			var key: String = u.key
 			buy_btn.pressed.connect(func(): _buy(key, buy_btn.global_position + buy_btn.size * 0.5))
+			AudioManager.add_click(buy_btn)
 
 		row.add_child(level_label)
 		row.add_child(buy_btn)

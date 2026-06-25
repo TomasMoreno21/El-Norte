@@ -19,6 +19,8 @@ const TIPS := [
 func _ready() -> void:
 	$ColorRect/VBoxContainer/ButtonRow/RestartButton.pressed.connect(_on_restart)
 	$ColorRect/VBoxContainer/ButtonRow/MenuButton.pressed.connect(_on_menu)
+	AudioManager.add_click($ColorRect/VBoxContainer/ButtonRow/RestartButton)
+	AudioManager.add_click($ColorRect/VBoxContainer/ButtonRow/MenuButton)
 
 	var border := ColorRect.new()
 	border.name = "TopBorder"

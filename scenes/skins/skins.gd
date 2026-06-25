@@ -15,6 +15,7 @@ const BIRD_SPRITES := {
 
 func _ready() -> void:
 	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
+	AudioManager.add_click($Bg/VBoxContainer/Volver)
 	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
 	_update_balance()
 	_populate_birds()
@@ -135,6 +136,7 @@ func _populate_birds() -> void:
 			action_btn.text = "Seleccionar"
 			_style_button(action_btn, Color(0.15, 0.5, 0.15))
 			action_btn.pressed.connect(_select.bind(id))
+			AudioManager.add_click(action_btn)
 		elif bird.get("cost", 0) < 0:
 			action_btn.text = "---"
 			action_btn.disabled = true
@@ -148,6 +150,7 @@ func _populate_birds() -> void:
 			else:
 				_style_button(action_btn, Color(0.3, 0.3, 0.3), Color(0.3, 0.3, 0.3))
 			action_btn.pressed.connect(_buy.bind(id))
+			AudioManager.add_click(action_btn)
 
 		row.add_child(action_btn)
 		list.add_child(row)
