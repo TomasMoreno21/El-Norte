@@ -118,7 +118,6 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 func _on_restart() -> void:
 	Engine.time_scale = 1.0
 	get_tree().paused = false
-	DataManager.clear_achievement_popups()
 	get_tree().reload_current_scene()
 
 func _on_menu() -> void:

@@ -433,15 +433,21 @@ func get_current_value(cond: String) -> int:
 			return -1
 
 func clear_achievement_popups() -> void:
-	for c in get_children():
+	var scene := get_tree().current_scene
+	if not scene:
+		return
+	for c in scene.get_children():
 		if c is CanvasLayer:
 			c.queue_free()
 
 func show_achievement_popup(info: Dictionary) -> void:
+	var scene := get_tree().current_scene
+	if not scene:
+		return
 	var overlay := CanvasLayer.new()
 	overlay.layer = 100
 	overlay.process_mode = PROCESS_MODE_WHEN_PAUSED
-	add_child(overlay)
+	scene.add_child(overlay)
 
 	var vp := get_viewport().get_visible_rect().size
 	var bg := ColorRect.new()
