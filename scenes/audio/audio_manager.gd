@@ -30,7 +30,6 @@ const MUSIC := {
 var _music_player: AudioStreamPlayer
 var _ambient_player: AudioStreamPlayer
 var _storm_player: AudioStreamPlayer
-var _achievement_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 const SFX_POOL_SIZE := 8
 
@@ -50,11 +49,6 @@ func _ready() -> void:
 	_storm_player.bus = "SFX"
 	_storm_player.volume_db = -80.0
 	add_child(_storm_player)
-
-	# Reproductor dedicado para logros (evita que el pool de SFX lo corte)
-	_achievement_player = AudioStreamPlayer.new()
-	_achievement_player.bus = "SFX"
-	add_child(_achievement_player)
 	
 	# Configurar pool de SFX para permitir sonidos solapados
 	for i in range(SFX_POOL_SIZE):
@@ -179,14 +173,6 @@ func _get_available_sfx_player() -> AudioStreamPlayer:
 		if not p.playing:
 			return p
 	return _sfx_pool[0]
-
-func play_achievement() -> void:
-	if not DataManager.sound_enabled:
-		return
-	var stream = load(SOUNDS["achievement"])
-	if stream is AudioStream:
-		_achievement_player.stream = stream
-		_achievement_player.play()
 
 func add_click(btn: Button) -> void:
 	btn.pressed.connect(func(): play_sfx("ui_click"))

@@ -179,7 +179,16 @@ func _populate_achievements() -> void:
 func _claim_reward(id: String, level: int, rtype: String, ramount: int) -> void:
 	var info := { "id": id, "level": level, "reward_type": rtype, "reward_amount": ramount }
 	DataManager.claim_achievement_reward(info)
-	AudioManager.play_achievement()
+	var p := AudioStreamPlayer.new()
+	p.bus = "SFX"
+	add_child(p)
+	var s := load("res://audio/sfx/achievement.wav")
+	if s:
+		p.stream = s
+		p.play()
+		p.finished.connect(p.queue_free)
+	else:
+		p.queue_free()
 	var txt := DataManager.format_reward(rtype, ramount)
 	if not txt.is_empty():
 		_show_floating_text(txt)
