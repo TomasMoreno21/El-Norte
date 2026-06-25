@@ -712,7 +712,7 @@ func _show_popups(nuevos: Array) -> void:
 	if nuevos.is_empty():
 		return
 	for a in nuevos:
-		AudioManager.play_sfx_unpaused("achievement")
+		AudioManager.play_sfx("achievement")
 		DataManager.show_achievement_popup(a)
 		await get_tree().create_timer(2.8, false, true).timeout
 
