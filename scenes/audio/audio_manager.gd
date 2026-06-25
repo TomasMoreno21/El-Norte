@@ -7,7 +7,7 @@ enum SoundType { SFX, MUSIC }
 
 # Definición de rutas de audio (Placeholders - El usuario los llenará)
 const SOUNDS := {
-	"flap": "res://audio/sfx/flap.wav",
+	"flap": "res://audio/sfx/sonido de flap.mp3",
 	"collect": "res://audio/sfx/collect.wav",
 	"hit": "res://audio/sfx/hit.wav",
 	"kiwi_appear": "res://audio/sfx/kiwi_appear.wav",
@@ -56,7 +56,7 @@ func _ready() -> void:
 		_sfx_pool.append(asp)
 
 ## Reproduce un efecto de sonido breve
-func play_sfx(sound_name: String) -> void:
+func play_sfx(sound_name: String, vol_db: float = 0.0) -> void:
 	if not DataManager.sound_enabled:
 		return
 	if not SOUNDS.has(sound_name):
@@ -69,6 +69,7 @@ func play_sfx(sound_name: String) -> void:
 	var stream = load(SOUNDS[sound_name])
 	if stream is AudioStream:
 		player.stream = stream
+		player.volume_db = vol_db
 		player.play()
 	else:
 		push_error("AudioManager: Failed to load stream for '%s' at %s" % [sound_name, SOUNDS[sound_name]])
