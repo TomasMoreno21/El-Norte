@@ -141,6 +141,7 @@ var deaths := 0
 var storms_survived := 0
 var max_distance := 0
 var completed_achievements := {}
+var pending_rewards := {}
 var kiwi_accepts := 0
 var total_upgrades_bought := 0
 var calmas_survived := 0
@@ -390,16 +391,39 @@ func check_achievements(conditions: Dictionary) -> Array:
 			completed_achievements[id] = next_idx
 			var rtype: String = level_data["reward_type"]
 			var ramount: int = level_data["reward_amount"]
-			if rtype == "bolas":
-				bolas_balance += ramount
-			elif rtype == "palitos":
-				palitos_balance += ramount
-			elif rtype == "unlock_bird":
-				if not "premio_pajarero" in unlocked_birds:
-					unlocked_birds.append("premio_pajarero")
-			unlocked.append({ "id": id, "level": next_idx, "name": a["name"], "desc": level_data["desc"] })
+			pending_rewards[id + "_" + str(next_idx)] = { "rtype": rtype, "ramount": ramount }
+			unlocked.append({ "id": id, "level": next_idx, "name": a["name"], "desc": level_data["desc"], "reward_type": rtype, "reward_amount": ramount })
 	save_data()
 	return unlocked
+
+func claim_achievement_reward(info: Dictionary) -> void:
+	var key := info["id"] + "_" + str(info["level"])
+	if key not in pending_rewards:
+		return
+	var rdata = pending_rewards[key]
+	var rtype := rdata["rtype"]
+	var ramount := rdata["ramount"]
+	pending_rewards.erase(key)
+	match rtype:
+		"bolas":
+			bolas_balance += ramount
+		"palitos":
+			palitos_balance += ramount
+		"unlock_bird":
+			if not "premio_pajarero" in unlocked_birds:
+				unlocked_birds.append("premio_pajarero")
+	save_data()
+
+func _format_reward(rtype: String, ramount: int) -> String:
+	match rtype:
+		"bolas":
+			return "+%d barro" % ramount
+		"palitos":
+			return "+%d palitos" % ramount
+		"unlock_bird":
+			return "¡Nuevo pájaro!"
+		_:
+			return ""
 
 func get_current_value(cond: String) -> int:
 	match cond:
@@ -449,11 +473,12 @@ func show_achievement_popup(info: Dictionary) -> void:
 	overlay.process_mode = PROCESS_MODE_WHEN_PAUSED
 	scene.add_child(overlay)
 
+	var POPUP_H := 140
 	var vp := get_viewport().get_visible_rect().size
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.05, 0.85)
-	bg.size = Vector2(350, 88)
-	bg.position = Vector2(16, vp.y - 88 - 16)
+	bg.size = Vector2(350, POPUP_H)
+	bg.position = Vector2(16, vp.y - POPUP_H - 16)
 	bg.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	var name_lbl := Label.new()
@@ -468,7 +493,7 @@ func show_achievement_popup(info: Dictionary) -> void:
 	desc_lbl.text = info["desc"]
 	desc_lbl.add_theme_font_size_override("font_size", 14)
 	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	desc_lbl.position = Vector2(0, 46)
+	desc_lbl.position = Vector2(0, 42)
 	desc_lbl.size = Vector2(350, 32)
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
@@ -476,19 +501,65 @@ func show_achievement_popup(info: Dictionary) -> void:
 	bg.add_child(desc_lbl)
 	overlay.add_child(bg)
 
+	var btn := Button.new()
+	btn.text = "Recoger"
+	btn.size = Vector2(120, 36)
+	btn.position = Vector2((350 - 120) / 2, 76)
+	var theme := Theme.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.55, 0.45, 0.15)
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
+	theme.set_stylebox("normal", "Button", style)
+	theme.set_stylebox("hover", "Button", style)
+	theme.set_stylebox("pressed", "Button", style)
+	var style_hover := style.duplicate()
+	style_hover.bg_color = Color(0.7, 0.55, 0.2)
+	theme.set_stylebox("hover", "Button", style_hover)
+	theme.set_color("font_color", "Button", Color.WHITE)
+	theme.set_font_size("font_size", "Button", 18)
+	btn.theme = theme
+	bg.add_child(btn)
+
 	bg.modulate = Color(1, 1, 1, 0)
 	var tw := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
 
-	await get_tree().create_timer(3.5, false).timeout
-	if not is_instance_valid(overlay):
-		return
+	var claimed := false
+	btn.pressed.connect(func():
+		if claimed:
+			return
+		claimed = true
+		claim_achievement_reward(info)
+		AudioManager.play_sfx("achievement")
+		var txt := _format_reward(info.get("reward_type", ""), info.get("reward_amount", 0))
+		if not txt.is_empty():
+			_show_floating_reward_text(overlay, txt)
+		await get_tree().create_timer(0.8, false).timeout
+		if is_instance_valid(overlay):
+			overlay.queue_free()
+	)
 
-	var tw2 := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tw2.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
-	await tw2.finished
-	if is_instance_valid(overlay):
-		overlay.queue_free()
+	while not claimed:
+		await get_tree().process_frame
+		if not is_instance_valid(overlay):
+			break
+
+func _show_floating_reward_text(overlay: CanvasLayer, text: String) -> void:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.75, 0.06))
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.size = Vector2(350, 40)
+	lbl.position = Vector2(0, 10)
+	overlay.add_child(lbl)
+	var tw := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(lbl, "position", lbl.position + Vector2(0, -40), 0.8)
+	tw.parallel().tween_property(lbl, "modulate", Color(1, 1, 1, 0), 0.8)
+	tw.tween_callback(lbl.queue_free)
 
 func save_data() -> void:
 	var data := {
@@ -502,6 +573,7 @@ func save_data() -> void:
 		"storms_survived": storms_survived,
 		"max_distance": max_distance,
 		"completed_achievements": completed_achievements,
+		"pending_rewards": pending_rewards,
 		"kiwi_accepts": kiwi_accepts,
 		"total_upgrades_bought": total_upgrades_bought,
 		"calmas_survived": calmas_survived,
@@ -554,7 +626,7 @@ func load_data() -> void:
 					u["kiwi"] = u["calandria"]
 					u.erase("calandria")
 				upgrades = u
-				var ca = data.get("completed_achievements", {})
+				var 				ca = data.get("completed_achievements", {})
 				if ca is Array:
 					var old : Array = ca
 					completed_achievements = {}
@@ -562,6 +634,7 @@ func load_data() -> void:
 						completed_achievements[aid] = 0
 				else:
 					completed_achievements = ca
+				pending_rewards = data.get("pending_rewards", {})
 			elif data is int:
 				palitos_balance = data
 				bolas_balance = 0
