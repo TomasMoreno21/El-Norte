@@ -477,25 +477,18 @@ func show_achievement_popup(info: Dictionary) -> void:
 	overlay.add_child(bg)
 
 	bg.modulate = Color(1, 1, 1, 0)
-	var fade_in := create_tween().bind_node(bg).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	fade_in.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
+	var tw := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
 
-	var timer := Timer.new()
-	timer.one_shot = true
-	timer.wait_time = 3.5
-	timer.process_mode = PROCESS_MODE_WHEN_PAUSED
-	timer.timeout.connect(func():
-		if not is_instance_valid(overlay):
-			return
-		var fade_out := create_tween().bind_node(bg).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-		fade_out.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
-		fade_out.tween_callback(func():
-			if is_instance_valid(overlay):
-				overlay.queue_free()
-		)
-	)
-	overlay.add_child(timer)
-	timer.start()
+	await get_tree().create_timer(3.5, false).timeout
+	if not is_instance_valid(overlay):
+		return
+
+	var tw2 := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw2.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
+	await tw2.finished
+	if is_instance_valid(overlay):
+		overlay.queue_free()
 
 func save_data() -> void:
 	var data := {
