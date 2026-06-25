@@ -606,7 +606,7 @@ func _spawn_wave_row() -> void:
 		c.free()
 	for i in 3:
 		var obs := obstacle_scene.instantiate()
-		var ws := (REAR_SPEED + distance * 0.04) * max(3.0, 3.0 + distance * 0.00008)
+		var ws: float = (REAR_SPEED + distance * 0.04) * max(3.0, 3.0 + distance * 0.00008)
 		obs.speed = ws
 		obs.base_speed = ws
 		obs.shape_type = randi() % 3
