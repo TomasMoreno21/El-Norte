@@ -90,8 +90,9 @@ func play_sfx_unpaused(sound_name: String) -> void:
 	if stream is AudioStream:
 		p.stream = stream
 		p.play()
-		await p.finished
-	p.queue_free()
+		p.finished.connect(p.queue_free)
+	else:
+		p.queue_free()
 
 ## Reproduce música de fondo con crossfade simple
 func play_music(track_name: String, fade_time: float = 1.0) -> void:
