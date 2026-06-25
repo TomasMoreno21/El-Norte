@@ -126,14 +126,19 @@ func start_ambient_wind() -> void:
 		return
 	var stream = load(SOUNDS["wind_ambient"])
 	if stream is AudioStream:
-		if stream is AudioStreamWAV:
-			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		_enable_loop(stream)
 		_ambient_player.stream = stream
-		_ambient_player.volume_db = -18.0
+		_ambient_player.volume_db = -24.0
 		_ambient_player.play()
 
 func stop_ambient_wind() -> void:
 	_ambient_player.stop()
+
+func _enable_loop(stream: AudioStream) -> void:
+	if stream is AudioStreamWAV:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	elif stream.has_method("set_loop"):
+		stream.set_loop(true)
 
 func start_storm_wind(fade_time: float = 0.3) -> void:
 	if not DataManager.sound_enabled:
@@ -141,8 +146,7 @@ func start_storm_wind(fade_time: float = 0.3) -> void:
 	stop_ambient_wind()
 	var stream = load(SOUNDS["storm_wind"])
 	if stream is AudioStream:
-		if stream is AudioStreamWAV:
-			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		_enable_loop(stream)
 		_storm_player.stream = stream
 		_storm_player.volume_db = -80.0
 		_storm_player.play()
