@@ -713,7 +713,9 @@ func _show_popups(nuevos: Array) -> void:
 		return
 	for a in nuevos:
 		AudioManager.play_sfx("popup")
-		await DataManager.show_achievement_popup(a)
+		AudioManager.play_sfx("achievement")
+		DataManager.show_achievement_popup(a)
+		await get_tree().create_timer(2.8, false, true).timeout
 
 func _on_revive() -> void:
 	AudioManager.play_sfx("revive")

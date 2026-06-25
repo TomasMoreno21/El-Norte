@@ -416,7 +416,7 @@ func claim_achievement_reward(info: Dictionary) -> void:
 				unlocked_birds.append("premio_pajarero")
 	save_data()
 
-func _format_reward(rtype: String, ramount: int) -> String:
+func format_reward(rtype: String, ramount: int) -> String:
 	match rtype:
 		"bolas":
 			return "+%d barro" % ramount
@@ -475,7 +475,7 @@ func show_achievement_popup(info: Dictionary) -> void:
 	overlay.process_mode = PROCESS_MODE_WHEN_PAUSED
 	scene.add_child(overlay)
 
-	var POPUP_H := 140
+	var POPUP_H := 88
 	var vp := get_viewport().get_visible_rect().size
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.05, 0.85)
@@ -495,7 +495,7 @@ func show_achievement_popup(info: Dictionary) -> void:
 	desc_lbl.text = info["desc"]
 	desc_lbl.add_theme_font_size_override("font_size", 14)
 	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	desc_lbl.position = Vector2(0, 42)
+	desc_lbl.position = Vector2(0, 46)
 	desc_lbl.size = Vector2(350, 32)
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
@@ -503,51 +503,19 @@ func show_achievement_popup(info: Dictionary) -> void:
 	bg.add_child(desc_lbl)
 	overlay.add_child(bg)
 
-	var btn := Button.new()
-	btn.text = "Recoger"
-	btn.size = Vector2(120, 36)
-	btn.position = Vector2((350 - 120) / 2, 76)
-	var theme := Theme.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.55, 0.45, 0.15)
-	style.corner_radius_top_left = 6
-	style.corner_radius_top_right = 6
-	style.corner_radius_bottom_left = 6
-	style.corner_radius_bottom_right = 6
-	theme.set_stylebox("normal", "Button", style)
-	theme.set_stylebox("hover", "Button", style)
-	theme.set_stylebox("pressed", "Button", style)
-	var style_hover := style.duplicate()
-	style_hover.bg_color = Color(0.7, 0.55, 0.2)
-	theme.set_stylebox("hover", "Button", style_hover)
-	theme.set_color("font_color", "Button", Color.WHITE)
-	theme.set_font_size("font_size", "Button", 18)
-	btn.theme = theme
-	bg.add_child(btn)
-
 	bg.modulate = Color(1, 1, 1, 0)
 	var tw := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
 
-	var claimed := false
-	btn.pressed.connect(func():
-		if claimed:
-			return
-		claimed = true
-		claim_achievement_reward(info)
-		AudioManager.play_sfx("achievement")
-		var txt := _format_reward(info.get("reward_type", ""), info.get("reward_amount", 0))
-		if not txt.is_empty():
-			_show_floating_reward_text(overlay, txt)
-		await get_tree().create_timer(0.8, false).timeout
-		if is_instance_valid(overlay):
-			overlay.queue_free()
-	)
+	await get_tree().create_timer(3.5, false).timeout
+	if not is_instance_valid(overlay):
+		return
 
-	while not claimed:
-		await get_tree().process_frame
-		if not is_instance_valid(overlay):
-			break
+	var tw2 := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw2.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
+	await tw2.finished
+	if is_instance_valid(overlay):
+		overlay.queue_free()
 
 func _show_floating_reward_text(overlay: CanvasLayer, text: String) -> void:
 	var lbl := Label.new()
