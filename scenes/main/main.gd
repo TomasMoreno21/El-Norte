@@ -150,6 +150,7 @@ func get_turbo_obs_speed(dist: float) -> float:
 	return min(TURBO_OBSTACLE_SPEED_BASE + dist * TURBO_OBSTACLE_SPEED_PER_M, TURBO_OBSTACLE_SPEED_MAX)
 
 func _ready() -> void:
+	DataManager.clear_achievement_popups()
 	spawn_timer.wait_time = get_spawn_interval(0.0)
 	spawn_timer.start()
 	bola_timer.wait_time = BOLA_SPAWN_INTERVAL
