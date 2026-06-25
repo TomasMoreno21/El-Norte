@@ -179,7 +179,7 @@ func _populate_achievements() -> void:
 func _claim_reward(id: String, level: int, rtype: String, ramount: int) -> void:
 	var info := { "id": id, "level": level, "reward_type": rtype, "reward_amount": ramount }
 	DataManager.claim_achievement_reward(info)
-	AudioManager.play_sfx("achievement")
+	AudioManager.play_achievement()
 	var txt := DataManager.format_reward(rtype, ramount)
 	if not txt.is_empty():
 		_show_floating_text(txt)
