@@ -64,7 +64,6 @@ enum WaveState { WARN, POST }
 var _wave_timer := 0.0
 var _wave_state := WaveState.WARN
 var _wave_lane_ys: Array[float] = []
-const WAVE_POST_DELAY := 1.5
 const CONTRA_VIENTO_DURATION := 10.0
 const CONTRA_VIENTO_COOLDOWN := 2000.0
 var _last_contra_viento_distance := 0.0
@@ -100,7 +99,6 @@ const REAR_INTERVAL := 600.0
 const REAR_SPEED := 900.0
 const WAVE_INTERVAL := 600.0
 const WAVE_COUNT := 4
-	const WAVE_WARN_TIME := 1.5
 const CALMA_COOLDOWN := 800.0
 const CALMA_CHANCE := 0.25
 	const CALMA_DURATION := 6.0
@@ -439,7 +437,7 @@ func _process(delta: float) -> void:
 
 	if _rear_wave_active:
 		_rear_wave_timer += delta
-		var phase_delay := 2.0
+		var phase_delay := max(1.2, 2.0 - distance * 0.00005)
 		if _rear_wave_timer >= phase_delay:
 			_rear_wave_timer = 0.0
 			hud.show_rear_warning(false)
@@ -465,7 +463,7 @@ func _process(delta: float) -> void:
 		_wave_timer += delta
 		match _wave_state:
 			WaveState.WARN:
-				if _wave_timer >= WAVE_WARN_TIME:
+				if _wave_timer >= max(0.9, 1.5 - distance * 0.00006):
 					_wave_timer = 0.0
 					_spawn_wave_row()
 					_wave_phase += 1
@@ -476,7 +474,7 @@ func _process(delta: float) -> void:
 					else:
 						_wave_state = WaveState.POST
 			WaveState.POST:
-				if _wave_timer >= WAVE_POST_DELAY:
+				if _wave_timer >= max(0.9, 1.5 - distance * 0.00006):
 					_wave_timer = 0.0
 					_spawn_wave_warnings()
 					_wave_state = WaveState.WARN
@@ -570,8 +568,9 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float, base_speed: flo
 
 func _spawn_rear_obstacle() -> void:
 	var obs := obstacle_scene.instantiate()
-	obs.speed = REAR_SPEED
-	obs.base_speed = REAR_SPEED
+	var rs := REAR_SPEED + distance * 0.04
+	obs.speed = rs
+	obs.base_speed = rs
 	obs.moving_right = true
 	obs.shape_type = randi() % 3
 	obs.position = Vector2(-100, _rear_y)
@@ -580,7 +579,8 @@ func _spawn_rear_obstacle() -> void:
 
 func _generate_wave_lane_ys() -> void:
 	_wave_lane_ys.clear()
-	var gap := randf_range(120, 170)
+	var factor := min(1.0, distance / 10000.0)
+	var gap := randf_range(lerpf(120, 85, factor), lerpf(170, 130, factor))
 	var center := clampf(player.position.y, 250, 830)
 	_wave_lane_ys.append(clampf(center - gap, 200, 880))
 	_wave_lane_ys.append(center)
@@ -606,7 +606,7 @@ func _spawn_wave_row() -> void:
 		c.free()
 	for i in 3:
 		var obs := obstacle_scene.instantiate()
-		var ws := REAR_SPEED * 3.0
+		var ws := (REAR_SPEED + distance * 0.04) * max(3.0, 3.0 + distance * 0.00008)
 		obs.speed = ws
 		obs.base_speed = ws
 		obs.shape_type = randi() % 3
