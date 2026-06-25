@@ -397,12 +397,14 @@ func check_achievements(conditions: Dictionary) -> Array:
 	return unlocked
 
 func claim_achievement_reward(info: Dictionary) -> void:
-	var key := info["id"] + "_" + str(info["level"])
+	var key: String = str(info["id"]) + "_" + str(info["level"])
 	if key not in pending_rewards:
 		return
-	var rdata = pending_rewards[key]
-	var rtype := rdata["rtype"]
-	var ramount := rdata["ramount"]
+	var rdata: Dictionary = pending_rewards.get(key, {})
+	if rdata.is_empty():
+		return
+	var rtype: String = rdata.get("rtype", "")
+	var ramount: int = rdata.get("ramount", 0)
 	pending_rewards.erase(key)
 	match rtype:
 		"bolas":
