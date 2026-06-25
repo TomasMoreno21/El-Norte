@@ -437,7 +437,7 @@ func _process(delta: float) -> void:
 
 	if _rear_wave_active:
 		_rear_wave_timer += delta
-		var phase_delay := max(1.2, 2.0 - distance * 0.00005)
+		var phase_delay: float = max(1.2, 2.0 - distance * 0.00005)
 		if _rear_wave_timer >= phase_delay:
 			_rear_wave_timer = 0.0
 			hud.show_rear_warning(false)
@@ -568,7 +568,7 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float, base_speed: flo
 
 func _spawn_rear_obstacle() -> void:
 	var obs := obstacle_scene.instantiate()
-	var rs := REAR_SPEED + distance * 0.04
+	var rs: float = REAR_SPEED + distance * 0.04
 	obs.speed = rs
 	obs.base_speed = rs
 	obs.moving_right = true
@@ -579,7 +579,7 @@ func _spawn_rear_obstacle() -> void:
 
 func _generate_wave_lane_ys() -> void:
 	_wave_lane_ys.clear()
-	var factor := min(1.0, distance / 10000.0)
+	var factor: float = min(1.0, distance / 10000.0)
 	var gap := randf_range(lerpf(120, 85, factor), lerpf(170, 130, factor))
 	var center := clampf(player.position.y, 250, 830)
 	_wave_lane_ys.append(clampf(center - gap, 200, 880))
