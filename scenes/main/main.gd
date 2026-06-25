@@ -265,7 +265,7 @@ func _spawn_lluvia_bola() -> void:
 
 func end_lluvia() -> void:
 	lluvia_active = false
-	hud.hide_transition_message()
+	hud.hide_event_text()
 	_update_encounter_mode()
 
 func _update_encounter_mode() -> void:
@@ -756,11 +756,11 @@ func _on_revive() -> void:
 		_update_encounter_mode()
 	if lluvia_active:
 		lluvia_active = false
-		hud.hide_transition_message()
+		hud.hide_event_text()
 		_update_encounter_mode()
 	if _contra_viento_active:
 		_contra_viento_active = false
-		hud.hide_transition_message()
+		hud.hide_event_text()
 	if turbo_active:
 		turbo_active = false
 		turbo_effect.set_normal_mode()
