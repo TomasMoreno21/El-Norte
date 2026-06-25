@@ -76,7 +76,7 @@ func _populate_achievements() -> void:
 			done_lbl.modulate = Color(0, 1, 0)
 			row2.add_child(done_lbl)
 
-			var pending_key := id + "_" + str(cur_level)
+			var pending_key: String = id + "_" + str(cur_level)
 			if pending_key in DataManager.pending_rewards:
 				var recoger_btn := Button.new()
 				recoger_btn.text = "Recoger"
