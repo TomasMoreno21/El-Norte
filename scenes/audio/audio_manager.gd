@@ -78,6 +78,8 @@ func play_sfx(sound_name: String, vol_db: float = 0.0) -> void:
 
 ## Reproduce un SFX incluso cuando el árbol está pausado
 func play_sfx_unpaused(sound_name: String) -> void:
+	if not DataManager.sound_enabled:
+		return
 	if not SOUNDS.has(sound_name):
 		return
 	var p := AudioStreamPlayer.new()
