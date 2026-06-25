@@ -440,6 +440,7 @@ func clear_achievement_popups() -> void:
 func show_achievement_popup(info: Dictionary) -> void:
 	var overlay := CanvasLayer.new()
 	overlay.layer = 100
+	overlay.process_mode = PROCESS_MODE_WHEN_PAUSED
 	add_child(overlay)
 
 	var vp := get_viewport().get_visible_rect().size
@@ -469,8 +470,8 @@ func show_achievement_popup(info: Dictionary) -> void:
 	bg.add_child(desc_lbl)
 	overlay.add_child(bg)
 
-	var tween := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	bg.modulate = Color(1, 1, 1, 0)
+	var tween := create_tween().bind_node(overlay).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
 	tween.tween_interval(4.0)
 	tween.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
