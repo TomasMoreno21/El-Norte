@@ -20,8 +20,8 @@ var _rafaga_progress := 0.0
 var storm_time := 0.0
 var turbo_effect: CanvasLayer
 enum EventType { REAR_WAVE, FRONT_WAVE, STORM }
-const EVENT_INTERVAL_MIN := 250.0
-const EVENT_INTERVAL_MAX := 500.0
+const EVENT_INTERVAL_MIN := 200.0
+const EVENT_INTERVAL_MAX := 400.0
 var _next_event_type := -1
 var _next_event_distance := 0.0
 var _last_event_type := -1
