@@ -80,11 +80,23 @@ func _populate_achievements() -> void:
 			info.anchor_bottom = 1.0
 			row.add_child(panel)
 
+			var right_box := HBoxContainer.new()
+			right_box.size_flags_vertical = 3
+			right_box.add_theme_constant_override("separation", 8)
+
+			var reward := Label.new()
+			var rtype: String = "Ba" if lv["reward_type"] == "bolas" else "P"
+			reward.text = "%s +%d" % [rtype, lv["reward_amount"]]
+			reward.add_theme_font_size_override("font_size", 24)
+			reward.modulate = Color(1, 1, 0)
+			reward.size_flags_vertical = 3
+			right_box.add_child(reward)
+
 			var pending_key: String = id + "_" + str(cur_level)
 			if pending_key in DataManager.pending_rewards:
 				var recoger_btn := Button.new()
 				recoger_btn.text = "Recoger"
-				recoger_btn.custom_minimum_size = Vector2(120, 60)
+				recoger_btn.custom_minimum_size = Vector2(100, 40)
 				var s := StyleBoxFlat.new()
 				s.bg_color = Color(0.55, 0.45, 0.15)
 				s.corner_radius_top_left = 6
@@ -99,17 +111,9 @@ func _populate_achievements() -> void:
 				recoger_btn.add_theme_font_size_override("font_size", 18)
 				recoger_btn.size_flags_vertical = 3
 				recoger_btn.pressed.connect(_claim_reward.bind(id, cur_level, lv["reward_type"], lv["reward_amount"]))
-				row.add_child(recoger_btn)
+				right_box.add_child(recoger_btn)
 
-			var reward := Label.new()
-			var rtype: String = "Ba" if lv["reward_type"] == "bolas" else "P"
-			reward.text = "%s +%d" % [rtype, lv["reward_amount"]]
-			reward.add_theme_font_size_override("font_size", 24)
-			reward.modulate = Color(1, 1, 0)
-			reward.size_flags_horizontal = 3
-			reward.size_flags_vertical = 3
-			reward.size_flags_stretch_ratio = 1.0
-			row.add_child(reward)
+			row.add_child(right_box)
 		else:
 			var info := VBoxContainer.new()
 			info.size_flags_horizontal = 3
