@@ -93,7 +93,7 @@ const TURBO_OBSTACLE_SPEED_MAX := 1.7
 const TURBO_SPAWN_MULT := 1.5
 const RAFAGA_COOLDOWN := 1200.0
 const RAFAGA_CHANCE := 0.4
-	const RAFAGA_DURATION := 8.0
+const RAFAGA_DURATION := 8.0
 const RAFAGA_BOOST := 1.5
 const REAR_INTERVAL := 600.0
 const REAR_SPEED := 900.0
@@ -101,10 +101,10 @@ const WAVE_INTERVAL := 600.0
 const WAVE_COUNT := 4
 const CALMA_COOLDOWN := 800.0
 const CALMA_CHANCE := 0.25
-	const CALMA_DURATION := 6.0
+const CALMA_DURATION := 6.0
 const LLUVIA_INTERVAL := 2500.0
 const LLUVIA_CHANCE := 0.15
-	const LLUVIA_DURATION := 8.0
+const LLUVIA_DURATION := 8.0
 const REVIVE_COST := 200
 const REVIVE_REWIND := 150.0
 
@@ -869,6 +869,13 @@ func _on_transition_ended(biome_name: String) -> void:
 			hud.show_transition_message("+%d palitos por explorar!" % bonus)
 			await get_tree().create_timer(1.5).timeout
 			hud.hide_transition_message()
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.keycode == KEY_F1 and event.pressed and not event.echo:
+		DataManager.palitos_balance += 100000
+		DataManager.bolas_balance += 1000
+		DataManager.save_data()
+		print("DEBUG: +100000 palitos, +1000 barro")
 
 func _exit_tree() -> void:
 	AudioManager.stop_all_ambient()
