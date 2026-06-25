@@ -712,16 +712,7 @@ func _show_popups(nuevos: Array) -> void:
 	if nuevos.is_empty():
 		return
 	for a in nuevos:
-		var p := AudioStreamPlayer.new()
-		p.bus = "SFX"
-		add_child(p)
-		var s := load("res://audio/sfx/achievement.wav")
-		if s:
-			p.stream = s
-			p.play()
-			p.finished.connect(p.queue_free)
-		else:
-			p.queue_free()
+		AudioManager.play_sfx("collect")
 		DataManager.show_achievement_popup(a)
 		await get_tree().create_timer(2.8, false, true).timeout
 
