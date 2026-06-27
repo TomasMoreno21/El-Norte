@@ -59,7 +59,7 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		tr.mouse_filter = 2
 		tr.position = Vector2(15, 10)
-		tr.custom_minimum_size = Vector2(270, 280)
+		tr.custom_minimum_size = Vector2(310, 267)
 		container.add_child(tr)
 		if not owned:
 			tr.modulate = Color(0.15, 0.15, 0.15, 1.0)
