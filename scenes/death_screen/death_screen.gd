@@ -13,6 +13,7 @@ const TIPS := [
 	"No te olvides de mejorar a tus pájaros!",
 	"Revisa los logros... pueden haber recompensas",
 	"El minimapa te muestra cuanto falta para el próximo bioma",
+	"Mirá las configuraciones, adapta el juego a tu gusto!",
 ]
 
 func _ready() -> void:
