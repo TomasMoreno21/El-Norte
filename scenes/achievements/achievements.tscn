@@ -45,7 +45,7 @@ size_flags_vertical = 3
 [node name="AchievementList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer" unique_id=1333243488]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 14
 
 [node name="ButtonRow" type="HBoxContainer" parent="Bg/VBoxContainer" unique_id=809832081]
 layout_mode = 2

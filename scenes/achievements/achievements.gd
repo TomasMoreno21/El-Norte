@@ -44,9 +44,9 @@ func _populate_achievements() -> void:
 		var cur_val: int = DataManager.get_current_value(a["cond"])
 
 		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 120)
+		row.custom_minimum_size = Vector2(0, 140)
 		row.size_flags_horizontal = 3
-		row.add_theme_constant_override("separation", 12)
+		row.add_theme_constant_override("separation", 16)
 
 		if all_done:
 			var lv = a["levels"][cur_level]
@@ -60,9 +60,10 @@ func _populate_achievements() -> void:
 			var info := VBoxContainer.new()
 			info.size_flags_horizontal = 3
 			info.size_flags_vertical = 3
-			info.add_theme_constant_override("separation", 2)
+			info.add_theme_constant_override("separation", 6)
 
 			var header := HBoxContainer.new()
+			header.add_theme_constant_override("separation", 10)
 			var name_lbl := Label.new()
 			name_lbl.text = a["name"]
 			name_lbl.add_theme_font_size_override("font_size", 30)
@@ -118,9 +119,10 @@ func _populate_achievements() -> void:
 			var info := VBoxContainer.new()
 			info.size_flags_horizontal = 3
 			info.size_flags_vertical = 3
-			info.add_theme_constant_override("separation", 2)
+			info.add_theme_constant_override("separation", 6)
 
 			var header := HBoxContainer.new()
+			header.add_theme_constant_override("separation", 10)
 			var name_lbl := Label.new()
 			name_lbl.text = a["name"]
 			name_lbl.add_theme_font_size_override("font_size", 30)
