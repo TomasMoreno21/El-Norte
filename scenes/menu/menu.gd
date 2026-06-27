@@ -30,8 +30,9 @@ func _ready() -> void:
 	$Logros.pressed.connect(_on_logros)
 	$Skins.pressed.connect(_on_skins)
 	$ResetButton.pressed.connect(_on_reset)
+	$DebugBtn.pressed.connect(_on_debug)
 	$SettingsBtn.pressed.connect(_toggle_settings)
-	for btn in [$Salir, $Tienda, $Logros, $Skins, $ResetButton, $SettingsBtn]:
+	for btn in [$Salir, $Tienda, $Logros, $Skins, $ResetButton, $DebugBtn, $SettingsBtn]:
 		AudioManager.add_click(btn)
 
 	_style_texture_button($Jugar, JUGAR_TEX)
@@ -98,6 +99,7 @@ func _animate_menu() -> void:
 	$Tienda.modulate.a = 0.0
 	$Logros.modulate.a = 0.0
 	$Skins.modulate.a = 0.0
+	$DebugBtn.modulate.a = 0.0
 
 	var tween := create_tween().set_parallel(true)
 	tween.tween_property($Label, "modulate:a", 1.0, 0.5)
@@ -106,6 +108,7 @@ func _animate_menu() -> void:
 	tween.tween_property($Tienda, "modulate:a", 1.0, 0.5).set_delay(0.25)
 	tween.tween_property($Logros, "modulate:a", 1.0, 0.5).set_delay(0.3)
 	tween.tween_property($Skins, "modulate:a", 1.0, 0.5).set_delay(0.35)
+	tween.tween_property($DebugBtn, "modulate:a", 1.0, 0.5).set_delay(0.4)
 
 func _on_tienda() -> void:
 	SceneTransition.fade_to_scene("res://scenes/shop/shop.tscn")
@@ -121,6 +124,12 @@ func _on_salir() -> void:
 
 func _on_reset() -> void:
 	DataManager.reset_data()
+
+func _on_debug() -> void:
+	DataManager.palitos_balance += 100000
+	DataManager.bolas_balance += 1000
+	DataManager.save_data()
+	$DebugBtn.text = "¡Listo!"
 
 func _toggle_settings() -> void:
 	$SettingsPanel.visible = not $SettingsPanel.visible
