@@ -284,7 +284,7 @@ func _update_encounter_mode() -> void:
 func _on_player_flapped() -> void:
 	if in_storm or turbo_active:
 		return
-	shake_strength = 12.0
+	shake_strength = 10.0
 
 func _on_player_died() -> void:
 	AudioManager.stop_ambient_wind()
