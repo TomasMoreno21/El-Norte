@@ -51,14 +51,15 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 	var tex: Texture2D = BIRD_SPRITES.get(bird_id) as Texture2D
 	if tex != null:
 		var container := Control.new()
-		container.custom_minimum_size = Vector2(240, 0)
+		container.custom_minimum_size = Vector2(300, 0)
 		container.size_flags_vertical = 3
 		container.mouse_filter = 2
 		var tr := TextureRect.new()
 		tr.texture = tex
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		tr.mouse_filter = 2
-		tr.anchors_preset = Control.PRESET_FULL_RECT
+		tr.position = Vector2(15, 10)
+		tr.custom_minimum_size = Vector2(270, 280)
 		container.add_child(tr)
 		if not owned:
 			tr.modulate = Color(0.15, 0.15, 0.15, 1.0)
@@ -69,7 +70,8 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 			qmark.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			qmark.modulate = Color(0.5, 0.5, 0.5)
 			qmark.mouse_filter = 2
-			qmark.anchors_preset = Control.PRESET_FULL_RECT
+			qmark.position = Vector2(15, 10)
+			qmark.custom_minimum_size = Vector2(270, 280)
 			container.add_child(qmark)
 		return container
 	else:
@@ -78,7 +80,7 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 			cr.color = Color(0.15, 0.15, 0.15)
 		else:
 			cr.color = BIRD_COLORS.get(bird_id, Color.WHITE)
-		cr.custom_minimum_size = Vector2(240, 0)
+		cr.custom_minimum_size = Vector2(300, 0)
 		cr.size_flags_vertical = 3
 		cr.mouse_filter = 2
 		return cr
@@ -97,7 +99,7 @@ func _populate_birds() -> void:
 		var active = DataManager.active_bird == id
 
 		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 240)
+		row.custom_minimum_size = Vector2(0, 300)
 		row.size_flags_horizontal = 3
 		row.add_theme_constant_override("separation", 20)
 
