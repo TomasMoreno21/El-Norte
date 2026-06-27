@@ -33,7 +33,7 @@ const BIRDS := {
 	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
 	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
 	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
-	"premio_pajarero": { "name": "Carancho", "cost": -1, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
+	"premio_pajarero": { "name": "Carancho", "cost": 15000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
 }
 
 const DISTANCE_MILESTONES := [
@@ -213,9 +213,14 @@ func unlock_bird(bird: String) -> Array:
 	if is_bird_unlocked(bird):
 		return []
 	var cost = BIRDS[bird]["cost"]
-	if bolas_balance < cost:
-		return []
-	bolas_balance -= cost
+	if bird == "premio_pajarero":
+		if palitos_balance < cost:
+			return []
+		palitos_balance -= cost
+	else:
+		if bolas_balance < cost:
+			return []
+		bolas_balance -= cost
 	unlocked_birds.append(bird)
 	var nuevos := check_achievements({})
 	save_data()

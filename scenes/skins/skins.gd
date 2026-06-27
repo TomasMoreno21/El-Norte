@@ -86,7 +86,7 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 		return cr
 
 func _update_balance() -> void:
-	$Bg/VBoxContainer/BolasLabel.text = "Barro: %d" % DataManager.bolas_balance
+	$Bg/VBoxContainer/BolasLabel.text = "Barro: %d  |  Palitos: %d" % [DataManager.bolas_balance, DataManager.palitos_balance]
 
 func _populate_birds() -> void:
 	var list := $Bg/VBoxContainer/ScrollContainer/BirdList
@@ -156,12 +156,13 @@ func _populate_birds() -> void:
 			_style_button(action_btn, Color(0.15, 0.5, 0.15))
 			action_btn.pressed.connect(_select.bind(id))
 			AudioManager.add_click(action_btn)
-		elif bird.get("cost", 0) < 0:
-			action_btn.text = "---"
-			action_btn.disabled = true
 		else:
-			action_btn.text = "Comprar (%d)" % bird.get("cost", 0)
-			var can_buy: bool = DataManager.bolas_balance >= bird.get("cost", 0)
+			var cost: int = bird.get("cost", 0)
+			var use_palitos: bool = id == "premio_pajarero"
+			var currency := "Palitos" if use_palitos else "Barro"
+			var balance: int = DataManager.palitos_balance if use_palitos else DataManager.bolas_balance
+			action_btn.text = "Comprar (%d %s)" % [cost, currency]
+			var can_buy: bool = balance >= cost
 			action_btn.disabled = not can_buy
 			if can_buy:
 				_style_button(action_btn, Color(0.55, 0.45, 0.15))
