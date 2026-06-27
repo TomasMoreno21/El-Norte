@@ -33,7 +33,7 @@ const BIRDS := {
 	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
 	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
 	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
-	"premio_pajarero": { "name": "Carancho", "cost": 15000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
+	"premio_pajarero": { "name": "Carancho", "cost": 20000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
 }
 
 const DISTANCE_MILESTONES := [
