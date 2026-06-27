@@ -171,7 +171,7 @@ func _populate_birds() -> void:
 				action_btn.add_theme_color_override("font_color", Color.WHITE)
 			else:
 				_style_button(action_btn, Color(0.3, 0.3, 0.3), Color(0.3, 0.3, 0.3))
-			action_btn.pressed.connect(_buy.bind(id))
+			action_btn.pressed.connect(func(): _buy(id, action_btn.global_position + action_btn.size * 0.5))
 			AudioManager.add_click(action_btn)
 
 		row.add_child(action_btn)
@@ -179,17 +179,45 @@ func _populate_birds() -> void:
 
 	_update_balance()
 
-func _buy(bird_id: String) -> void:
+func _buy(bird_id: String, btn_pos: Vector2) -> void:
 	AudioManager.play_sfx("buy")
 	var nuevos := DataManager.unlock_bird(bird_id)
 	if not nuevos.is_empty():
 		for a in nuevos:
 			DataManager.show_achievement_popup(a)
+	if not DataManager.reduce_motion:
+		_show_big_stars(btn_pos)
 	_populate_birds()
 
 func _select(bird_id: String) -> void:
 	DataManager.select_bird(bird_id)
 	_populate_birds()
+
+func _show_big_stars(pos: Vector2) -> void:
+	var stars := GPUParticles2D.new()
+	stars.one_shot = true
+	stars.emitting = false
+	stars.amount = 200
+	stars.lifetime = 0.6
+	stars.explosiveness = 1.0
+	stars.position = pos
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(0, -1, 0)
+	mat.spread = 360.0
+	mat.gravity = Vector3(0, -30, 0)
+	mat.initial_velocity_min = 300.0
+	mat.initial_velocity_max = 800.0
+	mat.scale_min = 3.0
+	mat.scale_max = 6.0
+	mat.color = Color(0.2, 1, 0.3)
+	mat.angle_min = 0.0
+	mat.angle_max = 360.0
+	stars.process_material = mat
+	add_child(stars)
+	stars.emitting = true
+	await get_tree().create_timer(0.8).timeout
+	if is_instance_valid(stars):
+		stars.queue_free()
 
 func _on_volver() -> void:
 	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")
