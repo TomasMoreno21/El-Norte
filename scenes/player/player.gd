@@ -147,7 +147,7 @@ func die() -> void:
 	if invulnerable:
 		return
 	if lives > 1:
-		AudioManager.play_sfx("collect", -6.0)
+		AudioManager.play_sfx("collect", -11.0)
 		lives -= 1
 		invulnerable = true
 		collision_mask = 0

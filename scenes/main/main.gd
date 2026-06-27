@@ -709,7 +709,7 @@ func _on_bola_collected() -> void:
 	var amount := 4 if x2_bolas_active else 1
 	DataManager.add_bolas(amount)
 	run_bolas += amount
-	AudioManager.play_sfx("collect", -6.0)
+	AudioManager.play_sfx("collect", -11.0)
 	var nuevos := DataManager.check_achievements({})
 	_show_popups(nuevos)
 	hud.update_bolas(DataManager.bolas_balance)
