@@ -209,7 +209,7 @@ func _show_big_stars(pos: Vector2) -> void:
 	mat.initial_velocity_max = 800.0
 	mat.scale_min = 3.0
 	mat.scale_max = 6.0
-	mat.color = Color(0.2, 1, 0.3)
+	mat.color = Color(1.0, 0.75, 0.06)
 	mat.angle_min = 0.0
 	mat.angle_max = 360.0
 	stars.process_material = mat
