@@ -120,7 +120,7 @@ func _physics_process(delta: float) -> void:
 				kill_all_tweens()
 				var base := _original_scale * (0.5 if _miniatura_active else 1.0)
 				var sq := create_tween().set_ease(Tween.EASE_OUT)
-				sq.tween_property(s, "scale", base * Vector2(1.2, 0.8), 0.05)
+				sq.tween_property(s, "scale", base * Vector2(1.5, 0.6), 0.05)
 				sq.tween_property(s, "scale", base, 0.1)
 		velocity.y = storm_flap_override if storm_flap_override != 0.0 else FLAP_VELOCITY * flap_mult
 	else:
