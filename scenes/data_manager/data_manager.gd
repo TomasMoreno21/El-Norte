@@ -483,7 +483,7 @@ func show_achievement_popup(info: Dictionary) -> void:
 
 	var vp := get_viewport().get_visible_rect().size
 	var PAD := 10.0
-	var W := 380.0
+	var W := 400.0
 	var GAP := 6.0
 
 	var name_lbl := Label.new()
@@ -507,7 +507,7 @@ func show_achievement_popup(info: Dictionary) -> void:
 	desc_lbl.position = Vector2(PAD, desc_y)
 	var desc_h: float = desc_lbl.get_minimum_size().y
 
-	var popup_h: float = desc_y + desc_h + PAD
+	var popup_h: float = desc_y + desc_h + PAD + 8
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.05, 0.85)
 	bg.size = Vector2(W, popup_h)
