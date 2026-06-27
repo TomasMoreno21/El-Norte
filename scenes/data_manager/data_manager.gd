@@ -88,7 +88,7 @@ const ACHIEVEMENTS := {
 		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 100 },
 	]},
 	"birder": { "name": "Pajarero", "cond": "all_birds", "idx": 9, "levels": [
-		{ "target": 1, "desc": "Desbloquear todos los pájaros", "reward_type": "unlock_carancho", "reward_amount": 0 },
+		{ "target": 1, "desc": "Desbloquea todas las skins", "reward_type": "unlock_carancho", "reward_amount": 0 },
 	]},
 	"pampeano": { "name": "Pampeano", "cond": "all_birds_5000", "idx": 20, "levels": [
 		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 4 },
