@@ -176,4 +176,4 @@ func _get_available_sfx_player() -> AudioStreamPlayer:
 	return _sfx_pool[0]
 
 func add_click(btn: Button) -> void:
-	btn.pressed.connect(func(): play_sfx("ui_click", 3.0))
+	btn.pressed.connect(func(): play_sfx("ui_click", 5.0))
