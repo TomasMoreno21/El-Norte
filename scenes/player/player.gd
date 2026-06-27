@@ -147,7 +147,7 @@ func die() -> void:
 	if invulnerable:
 		return
 	if lives > 1:
-		AudioManager.play_sfx("collect")
+		AudioManager.play_sfx("collect", -6.0)
 		lives -= 1
 		invulnerable = true
 		collision_mask = 0
@@ -159,7 +159,7 @@ func die() -> void:
 		$Sprite2D.modulate.a = 1.0
 		return
 	
-	AudioManager.play_sfx_unpaused("hit")
+	AudioManager.play_sfx_unpaused("hit", -6.0)
 	alive = false
 	velocity = Vector2.ZERO
 	rotation = 0.0

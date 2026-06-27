@@ -77,7 +77,7 @@ func play_sfx(sound_name: String, vol_db: float = 0.0) -> void:
 		push_error("AudioManager: Failed to load stream for '%s' at %s" % [sound_name, SOUNDS[sound_name]])
 
 ## Reproduce un SFX incluso cuando el árbol está pausado
-func play_sfx_unpaused(sound_name: String) -> void:
+func play_sfx_unpaused(sound_name: String, vol_db: float = 0.0) -> void:
 	if not DataManager.sound_enabled:
 		return
 	if not SOUNDS.has(sound_name):
@@ -89,6 +89,7 @@ func play_sfx_unpaused(sound_name: String) -> void:
 	var stream = load(SOUNDS[sound_name])
 	if stream is AudioStream:
 		p.stream = stream
+		p.volume_db = vol_db
 		p.play()
 		await p.finished
 	p.queue_free()
@@ -131,7 +132,7 @@ func start_ambient_wind() -> void:
 	if stream is AudioStream:
 		_enable_loop(stream)
 		_ambient_player.stream = stream
-		_ambient_player.volume_db = -24.0
+		_ambient_player.volume_db = -16.0
 		_ambient_player.play()
 
 func stop_ambient_wind() -> void:
@@ -158,7 +159,7 @@ func start_storm_wind(fade_time: float = 0.3) -> void:
 		_storm_player.volume_db = -80.0
 		_storm_player.play()
 		var tw := create_tween()
-		tw.tween_property(_storm_player, "volume_db", -6.0, fade_time)
+		tw.tween_property(_storm_player, "volume_db", -3.0, fade_time)
 
 func stop_storm_wind(fade_time: float = 0.3) -> void:
 	var tw := create_tween()
@@ -175,4 +176,4 @@ func _get_available_sfx_player() -> AudioStreamPlayer:
 	return _sfx_pool[0]
 
 func add_click(btn: Button) -> void:
-	btn.pressed.connect(func(): play_sfx("ui_click"))
+	btn.pressed.connect(func(): play_sfx("ui_click", 3.0))
