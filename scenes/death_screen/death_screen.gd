@@ -10,6 +10,9 @@ const TIPS := [
 	"Usá el escudo en zonas de obstáculos densos.",
 	"El turbo duplica tu distancia recorrida.",
 	"Cada pájaro tiene stats únicos. ¡Probalos todos!",
+	"No te olvides de mejorar a tus pájaros!",
+	"Revisa los logros... pueden haber recompensas",
+	"El minimapa te muestra cuanto falta para el próximo bioma",
 ]
 
 func _ready() -> void:
