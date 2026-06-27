@@ -98,10 +98,10 @@ const ACHIEVEMENTS := {
 		{ "target": 5, "desc": "Usar 5 revives", "reward_type": "palitos", "reward_amount": 60 },
 		{ "target": 10, "desc": "Usar 10 revives", "reward_type": "palitos", "reward_amount": 100 },
 	]},
-	"storm_survivor": { "name": "Tormentero", "cond": "storms", "idx": 5, "levels": [
-		{ "target": 3, "desc": "3 tormentas", "reward_type": "bolas", "reward_amount": 1 },
-		{ "target": 10, "desc": "10 tormentas", "reward_type": "bolas", "reward_amount": 3 },
-		{ "target": 25, "desc": "25 tormentas", "reward_type": "bolas", "reward_amount": 5 },
+	"major_survivor": { "name": "Sobreviviente", "cond": "major_events", "idx": 5, "levels": [
+		{ "target": 5, "desc": "5 eventos mayores", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 15, "desc": "15 eventos mayores", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 40, "desc": "40 eventos mayores", "reward_type": "bolas", "reward_amount": 5 },
 	]},
 	"calma_survivor": { "name": "Sereno", "cond": "calmas_survived", "idx": 7, "levels": [
 		{ "target": 3, "desc": "3 calmas", "reward_type": "bolas", "reward_amount": 1 },
@@ -126,8 +126,8 @@ const ACHIEVEMENTS := {
 	"trato_hecho": { "name": "Trato Hecho", "cond": "kiwi_accepts", "idx": 10, "levels": [
 		{ "target": 20, "desc": "Aceptar 20 ofertas del kiwi", "reward_type": "none", "reward_amount": 0 },
 	]},
-	"rey_tormentas": { "name": "Rey de Tormentas", "cond": "storms_in_run", "idx": 11, "levels": [
-		{ "target": 6, "desc": "6 tormentas en una partida", "reward_type": "none", "reward_amount": 0 },
+	"major_run": { "name": "Imparable", "cond": "major_events_in_run", "idx": 11, "levels": [
+		{ "target": 10, "desc": "10 eventos mayores en una partida", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 }
 
@@ -138,7 +138,7 @@ var unlocked_birds := ["hornero"]
 var active_bird := "hornero"
 var bolas_total := 0
 var deaths := 0
-var storms_survived := 0
+var major_events_total := 0
 var max_distance := 0
 var completed_achievements := {}
 var pending_rewards := {}
@@ -302,7 +302,7 @@ func reset_data() -> void:
 	active_bird = "hornero"
 	bolas_total = 0
 	deaths = 0
-	storms_survived = 0
+	major_events_total = 0
 	max_distance = 0
 	completed_achievements = {}
 	kiwi_accepts = 0
@@ -352,8 +352,8 @@ func check_achievements(conditions: Dictionary) -> Array:
 				achieved = bolas_total >= level_data["target"]
 			"deaths":
 				achieved = deaths >= level_data["target"]
-			"storms":
-				achieved = storms_survived >= level_data["target"]
+			"major_events":
+				achieved = major_events_total >= level_data["target"]
 			"all_maxed":
 				achieved = true
 				for key in UPGRADE_COST:
@@ -369,8 +369,8 @@ func check_achievements(conditions: Dictionary) -> Array:
 						break
 			"kiwi_accepts":
 				achieved = kiwi_accepts >= level_data["target"]
-			"storms_in_run":
-				achieved = conditions.get("storms_in_run", 0) >= level_data["target"]
+			"major_events_in_run":
+				achieved = conditions.get("major_events_in_run", 0) >= level_data["target"]
 			"total_upgrades_bought":
 				achieved = total_upgrades_bought >= level_data["target"]
 			"calmas_survived":
@@ -435,8 +435,8 @@ func get_current_value(cond: String) -> int:
 			return bolas_total
 		"deaths":
 			return deaths
-		"storms":
-			return storms_survived
+		"major_events":
+			return major_events_total
 		"kiwi_accepts":
 			return kiwi_accepts
 		"total_upgrades_bought":
@@ -532,7 +532,7 @@ func save_data() -> void:
 		"active_bird": active_bird,
 		"bolas_total": bolas_total,
 		"deaths": deaths,
-		"storms_survived": storms_survived,
+		"major_events_total": major_events_total,
 		"max_distance": max_distance,
 		"completed_achievements": completed_achievements,
 		"pending_rewards": pending_rewards,
@@ -567,7 +567,7 @@ func load_data() -> void:
 				active_bird = data.get("active_bird", "hornero")
 				bolas_total = data.get("bolas_total", 0)
 				deaths = data.get("deaths", 0)
-				storms_survived = data.get("storms_survived", 0)
+				major_events_total = data.get("major_events_total", data.get("storms_survived", 0))
 				max_distance = data.get("max_distance", 0)
 				kiwi_accepts = data.get("kiwi_accepts", data.get("calandria_accepts", 0))
 				total_upgrades_bought = data.get("total_upgrades_bought", 0)

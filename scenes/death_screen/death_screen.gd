@@ -90,7 +90,7 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 
 	$ColorRect/VBoxContainer/DistanceLabel.text = "%dm" % distance
 	$ColorRect/VBoxContainer/PalitosLabel.text = "Palitos: +%d  (Total: %d)" % [total_palitos, DataManager.palitos_balance]
-	$ColorRect/VBoxContainer/StatsLabel.text = "Tormentas: %d  |  Barro: %d  |  Kiwis: %d" % [storms, bolas, kiwis]
+	$ColorRect/VBoxContainer/StatsLabel.text = "Eventos: %d  |  Barro: %d  |  Kiwis: %d" % [storms, bolas, kiwis]
 
 	$ColorRect/VBoxContainer/BonusLabel.visible = false
 	var bonus_text := ""

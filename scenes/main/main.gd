@@ -39,7 +39,7 @@ var last_rafaga_distance := 0.0
 var last_calma_distance := 0.0
 var last_lluvia_distance := 0.0
 var last_check_dist := 0
-var storms_in_run := 0
+var major_events_in_run := 0
 var run_bolas := 0
 var run_kiwis := 0
 var x2_palitos_active := false
@@ -160,7 +160,7 @@ func _ready() -> void:
 	var mods := DataManager.get_bird_modifiers()
 	bird_speed_mult = mods["speed_mult"]
 	bird_kiwi_bonus = mods["kiwi_bonus"]
-	storms_in_run = 0
+	major_events_in_run = 0
 	run_bolas = 0
 	run_kiwis = 0
 	_last_milestone_idx = 0
@@ -192,15 +192,12 @@ func end_storm() -> void:
 	storm_time = 0.0
 	player.end_storm_gradual()
 	_schedule_next_event()
-	DataManager.storms_survived += 1
-	storms_in_run += 1
+	DataManager.major_events_total += 1
+	major_events_in_run += 1
 	AudioManager.stop_storm_wind()
 	_update_existing_obstacle_speeds()
-	var nuevos := DataManager.check_achievements({ "storms_in_run": storms_in_run })
+	var nuevos := DataManager.check_achievements({ "major_events_in_run": major_events_in_run })
 	_show_popups(nuevos)
-	if "rey_tormentas" in DataManager.completed_achievements:
-		DataManager.add_bolas(1)
-		hud.update_bolas(DataManager.bolas_balance)
 	_update_encounter_mode()
 
 func _schedule_next_event() -> void:
@@ -296,13 +293,13 @@ func _on_player_died() -> void:
 	DataManager.max_distance = max(DataManager.max_distance, int(distance))
 	DataManager.mark_bird_used(DataManager.active_bird)
 	DataManager.mark_bird_distance(DataManager.active_bird, int(distance))
-	var nuevos := DataManager.check_achievements({ "distance": int(distance), "storms_in_run": storms_in_run })
+	var nuevos := DataManager.check_achievements({ "distance": int(distance), "major_events_in_run": major_events_in_run })
 	if DataManager.palitos_balance >= REVIVE_COST and _revive_available:
 		_revive_available = false
 		revive_popup.show_revive(REVIVE_COST)
 		get_tree().paused = true
 	else:
-		death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis, _death_old_max)
+		death_screen.show_screen(int(distance), major_events_in_run, run_bolas, run_kiwis, _death_old_max)
 	_show_popups(nuevos)
 
 func _process(delta: float) -> void:
@@ -446,6 +443,10 @@ func _process(delta: float) -> void:
 			if _rear_wave_phase >= 3:
 				_rear_wave_active = false
 				_rear_wave_phase = 0
+				DataManager.major_events_total += 1
+				major_events_in_run += 1
+				var nuevos := DataManager.check_achievements({ "major_events_in_run": major_events_in_run })
+				_show_popups(nuevos)
 				_schedule_next_event()
 			else:
 				_rear_y = randf_range(200, 880)
@@ -470,6 +471,10 @@ func _process(delta: float) -> void:
 					if _wave_phase >= WAVE_COUNT:
 						_wave_active = false
 						_wave_phase = 0
+						DataManager.major_events_total += 1
+						major_events_in_run += 1
+						var nuevos := DataManager.check_achievements({ "major_events_in_run": major_events_in_run })
+						_show_popups(nuevos)
 						_schedule_next_event()
 					else:
 						_wave_state = WaveState.POST
@@ -849,7 +854,7 @@ func _set_biome_effects() -> void:
 func _on_revive_reject() -> void:
 	Engine.time_scale = 1.0
 	revive_popup.visible = false
-	death_screen.show_screen(int(distance), storms_in_run, run_bolas, run_kiwis, _death_old_max)
+	death_screen.show_screen(int(distance), major_events_in_run, run_bolas, run_kiwis, _death_old_max)
 
 func _on_transition_started(msg: String) -> void:
 	hud.show_transition_message(msg)

@@ -27,8 +27,8 @@ func _style_button(btn: Button, color: Color) -> void:
 func _update_stats() -> void:
 	var s := DataManager
 	$Bg/VBoxContainer/Estadisticas.text = (
-		"Max dist: %dm  |  Barro: %d  |  Muertes: %d  |  Tormentas: %d"
-		% [s.max_distance, s.bolas_total, s.deaths, s.storms_survived]
+		"Max dist: %dm  |  Barro: %d  |  Muertes: %d  |  Eventos: %d"
+		% [s.max_distance, s.bolas_total, s.deaths, s.major_events_total]
 	)
 
 func _populate_achievements() -> void:
