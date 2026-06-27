@@ -51,26 +51,24 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 	var tex: Texture2D = BIRD_SPRITES.get(bird_id) as Texture2D
 	if tex != null:
 		var container := CenterContainer.new()
-		container.custom_minimum_size = Vector2(180, 0)
+		container.custom_minimum_size = Vector2(240, 0)
 		container.size_flags_vertical = 3
 		container.mouse_filter = 2
 		var tr := TextureRect.new()
 		tr.texture = tex
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		tr.mouse_filter = 2
+		container.add_child(tr)
 		if not owned:
 			tr.modulate = Color(0.15, 0.15, 0.15, 1.0)
 			var qmark := Label.new()
 			qmark.text = "???"
-			qmark.add_theme_font_size_override("font_size", 36)
+			qmark.add_theme_font_size_override("font_size", 48)
 			qmark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			qmark.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			qmark.modulate = Color(0.5, 0.5, 0.5)
 			qmark.mouse_filter = 2
-			container.add_child(tr)
 			container.add_child(qmark)
-		else:
-			container.add_child(tr)
 		return container
 	else:
 		var cr := ColorRect.new()
@@ -78,7 +76,7 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 			cr.color = Color(0.15, 0.15, 0.15)
 		else:
 			cr.color = BIRD_COLORS.get(bird_id, Color.WHITE)
-		cr.custom_minimum_size = Vector2(180, 0)
+		cr.custom_minimum_size = Vector2(240, 0)
 		cr.size_flags_vertical = 3
 		cr.mouse_filter = 2
 		return cr
@@ -97,7 +95,7 @@ func _populate_birds() -> void:
 		var active = DataManager.active_bird == id
 
 		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 190)
+		row.custom_minimum_size = Vector2(0, 240)
 		row.size_flags_horizontal = 3
 		row.add_theme_constant_override("separation", 20)
 
@@ -110,7 +108,7 @@ func _populate_birds() -> void:
 		info_col.add_theme_constant_override("separation", 2)
 
 		var name_label := Label.new()
-		if not owned:
+		if not owned and bird.get("cost", 0) < 0:
 			name_label.text = "???"
 		else:
 			name_label.text = bird.get("name", "?")
@@ -118,7 +116,7 @@ func _populate_birds() -> void:
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		var bonus_label := Label.new()
-		if not owned:
+		if not owned and bird.get("cost", 0) < 0:
 			bonus_label.text = "???"
 		else:
 			bonus_label.text = "Bonus: %s" % bird.get("Bonus", "—")
@@ -127,7 +125,7 @@ func _populate_birds() -> void:
 		bonus_label.modulate = Color(0.7, 0.7, 0.7)
 
 		var penalty_label := Label.new()
-		if not owned:
+		if not owned and bird.get("cost", 0) < 0:
 			penalty_label.text = ""
 		else:
 			penalty_label.text = "Penalidad: %s" % bird.get("Penalidad", "—")
