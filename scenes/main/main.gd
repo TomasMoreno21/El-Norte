@@ -243,7 +243,7 @@ func start_lluvia() -> void:
 
 func _spawn_lluvia_bola() -> void:
 	_lluvia_spawn_timer += get_process_delta_time()
-	if _lluvia_spawn_timer < 1.5:
+	if _lluvia_spawn_timer < 1.0:
 		return
 	_lluvia_spawn_timer = 0.0
 	if not bola_scene:
