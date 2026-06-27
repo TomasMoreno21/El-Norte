@@ -86,7 +86,7 @@ const STORM_SPEED_BOOST := 1.3
 const STORM_INTERVAL_FACTOR := 0.7
 const STORM_WARNING_DIST := 50.0
 const BOLA_SPAWN_INTERVAL := 6.0
-const BOLA_SPAWN_CHANCE := 0.15
+const BOLA_SPAWN_CHANCE := 0.07
 const TURBO_OBSTACLE_SPEED_BASE := 1.5
 const TURBO_OBSTACLE_SPEED_PER_M := 0.00002
 const TURBO_OBSTACLE_SPEED_MAX := 1.7
@@ -243,7 +243,7 @@ func start_lluvia() -> void:
 
 func _spawn_lluvia_bola() -> void:
 	_lluvia_spawn_timer += get_process_delta_time()
-	if _lluvia_spawn_timer < 1.0:
+	if _lluvia_spawn_timer < 1.5:
 		return
 	_lluvia_spawn_timer = 0.0
 	if not bola_scene:
