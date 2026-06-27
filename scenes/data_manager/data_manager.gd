@@ -481,11 +481,11 @@ func show_achievement_popup(info: Dictionary) -> void:
 	overlay.process_mode = PROCESS_MODE_WHEN_PAUSED
 	scene.add_child(overlay)
 
-	var POPUP_H := 88
+	var POPUP_H := 110
 	var vp := get_viewport().get_visible_rect().size
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.05, 0.85)
-	bg.size = Vector2(350, POPUP_H)
+	bg.size = Vector2(380, POPUP_H)
 	bg.position = Vector2(16, vp.y - POPUP_H - 16)
 	bg.mouse_filter = Control.MOUSE_FILTER_PASS
 
@@ -493,8 +493,8 @@ func show_achievement_popup(info: Dictionary) -> void:
 	name_lbl.text = info["name"]
 	name_lbl.add_theme_font_size_override("font_size", 22)
 	name_lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
-	name_lbl.position = Vector2(8, 6)
-	name_lbl.size = Vector2(334, 34)
+	name_lbl.position = Vector2(10, 8)
+	name_lbl.size = Vector2(360, 40)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
@@ -502,8 +502,8 @@ func show_achievement_popup(info: Dictionary) -> void:
 	desc_lbl.text = info["desc"]
 	desc_lbl.add_theme_font_size_override("font_size", 14)
 	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	desc_lbl.position = Vector2(8, 46)
-	desc_lbl.size = Vector2(334, 32)
+	desc_lbl.position = Vector2(10, 56)
+	desc_lbl.size = Vector2(360, 44)
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
