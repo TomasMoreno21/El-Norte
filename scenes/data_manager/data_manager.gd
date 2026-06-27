@@ -88,7 +88,7 @@ const ACHIEVEMENTS := {
 		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 100 },
 	]},
 	"birder": { "name": "Pajarero", "cond": "all_birds", "idx": 9, "levels": [
-		{ "target": 1, "desc": "Desbloquear todos los pájaros", "reward_type": "unlock_bird", "reward_amount": 0 },
+		{ "target": 1, "desc": "Desbloquear todos los pájaros", "reward_type": "unlock_carancho", "reward_amount": 0 },
 	]},
 	"pampeano": { "name": "Pampeano", "cond": "all_birds_5000", "idx": 20, "levels": [
 		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 4 },
@@ -156,6 +156,7 @@ var bird_max_distances := {}
 var reduce_motion := false
 var sound_enabled := true
 var minimap_visible := false
+var carancho_available := false
 
 func _ready() -> void:
 	load_data()
@@ -320,6 +321,7 @@ func reset_data() -> void:
 	tutorial_done = false
 	welcome_bonus_given = false
 	explored_biomes = []
+	carancho_available = false
 	save_data()
 
 func mark_bird_used(bird: String) -> void:
@@ -416,9 +418,8 @@ func claim_achievement_reward(info: Dictionary) -> void:
 			bolas_balance += ramount
 		"palitos":
 			palitos_balance += ramount
-		"unlock_bird":
-			if not "premio_pajarero" in unlocked_birds:
-				unlocked_birds.append("premio_pajarero")
+		"unlock_carancho":
+			carancho_available = true
 	save_data()
 
 func format_reward(rtype: String, ramount: int) -> String:
@@ -427,8 +428,8 @@ func format_reward(rtype: String, ramount: int) -> String:
 			return "+%d barro" % ramount
 		"palitos":
 			return "+%d palitos" % ramount
-		"unlock_bird":
-			return "¡Nuevo pájaro!"
+		"unlock_carancho":
+			return "¡Carancho disponible!"
 		_:
 			return ""
 
@@ -555,6 +556,7 @@ func save_data() -> void:
 		"reduce_motion": reduce_motion,
 		"sound_enabled": sound_enabled,
 		"minimap_visible": minimap_visible,
+		"carancho_available": carancho_available,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -588,6 +590,7 @@ func load_data() -> void:
 				reduce_motion = data.get("reduce_motion", false)
 				sound_enabled = data.get("sound_enabled", true)
 				minimap_visible = data.get("minimap_visible", false)
+				carancho_available = data.get("carancho_available", false)
 				var u = data.get("upgrades", {})
 				if u.has("calandria") and not u.has("kiwi"):
 					u["kiwi"] = u["calandria"]

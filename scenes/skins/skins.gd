@@ -97,6 +97,8 @@ func _populate_birds() -> void:
 		var bird = DataManager.BIRDS[id]
 		var owned = DataManager.is_bird_unlocked(id)
 		var active = DataManager.active_bird == id
+		if id == "premio_pajarero" and not owned and not DataManager.carancho_available:
+			continue
 
 		var row := HBoxContainer.new()
 		row.custom_minimum_size = Vector2(0, 300)
