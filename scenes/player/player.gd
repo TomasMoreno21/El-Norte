@@ -24,6 +24,10 @@ var _tex_carpintero1 := preload("res://Sprites/Pajaros/carpintero1.png")
 var _tex_carpintero2 := preload("res://Sprites/Pajaros/carpintero2.png")
 var _tex_hornero1 := preload("res://Sprites/Pajaros/hornero1.png")
 var _tex_hornero2 := preload("res://Sprites/Pajaros/hornero2.png")
+var _tex_golondrina1 := preload("res://Sprites/Pajaros/golondrina1.png")
+var _tex_golondrina2 := preload("res://Sprites/Pajaros/golondrina2.png")
+var _tex_tero1 := preload("res://Sprites/Pajaros/tero1.png")
+var _tex_tero2 := preload("res://Sprites/Pajaros/tero2.png")
 var _tex_frame1: Texture2D
 var _tex_frame2: Texture2D
 var _feather_particles: GPUParticles2D
@@ -84,6 +88,12 @@ func _load_bird_textures() -> void:
 		"carpintero":
 			_tex_frame1 = _tex_carpintero1
 			_tex_frame2 = _tex_carpintero2
+		"golondrina":
+			_tex_frame1 = _tex_golondrina1
+			_tex_frame2 = _tex_golondrina2
+		"tero":
+			_tex_frame1 = _tex_tero1
+			_tex_frame2 = _tex_tero2
 		_:
 			_tex_frame1 = _tex_hornero1
 			_tex_frame2 = _tex_hornero2

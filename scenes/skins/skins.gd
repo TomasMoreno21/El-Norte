@@ -11,6 +11,8 @@ const BIRD_COLORS := {
 const BIRD_SPRITES := {
 	"hornero": preload("res://Sprites/Pajaros/hornero1.png"),
 	"carpintero": preload("res://Sprites/Pajaros/carpintero1.png"),
+	"golondrina": preload("res://Sprites/Pajaros/golondrina1.png"),
+	"tero": preload("res://Sprites/Pajaros/tero1.png"),
 }
 
 func _ready() -> void:
