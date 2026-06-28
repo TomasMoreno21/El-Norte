@@ -30,10 +30,10 @@ const MAX_LEVEL := 8
 
 const BIRDS := {
 	"hornero": { "name": "Hornero", "cost": 0, "Bonus": "—", "Penalidad": "—" },
-	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
-	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
-	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
-	"premio_pajarero": { "name": "Carancho", "cost": -1, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
+	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "Flap más lento" },
+	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi, reaparece cada 15s", "Penalidad": "- duracion de escudo y turbo" },
+	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-15% velocidad" },
+	"premio_pajarero": { "name": "Carancho", "cost": 20000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
 }
 
 const DISTANCE_MILESTONES := [
@@ -52,19 +52,19 @@ const RECORD_BOLAS := [
 
 const ACHIEVEMENTS := {
 	"first_flight": { "name": "Primer Vuelo", "cond": "distance", "idx": 0, "levels": [
-		{ "target": 100, "desc": "Llegar a 100m", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 100, "desc": "Llegar a 100m", "reward_type": "palitos", "reward_amount": 50 },
 	]},
 	"explorer": { "name": "Explorador", "cond": "distance", "idx": 1, "levels": [
-		{ "target": 500, "desc": "Llegar a 500m", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 500, "desc": "Llegar a 500m", "reward_type": "palitos", "reward_amount": 50 },
 	]},
 	"fearless": { "name": "Sin Miedo", "cond": "distance", "idx": 2, "levels": [
-		{ "target": 2000, "desc": "Llegar a 2000m", "reward_type": "palitos", "reward_amount": 80 },
+		{ "target": 2000, "desc": "Llegar a 2000m", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"llanura": { "name": "Llanuras", "cond": "distance", "idx": 12, "levels": [
 		{ "target": 2200, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
 	]},
 	"norte": { "name": "Norte", "cond": "distance", "idx": 13, "levels": [
-		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 10 },
 	]},
 	"maraton": { "name": "Maratón", "cond": "distance", "idx": 17, "levels": [
 		{ "target": 10000, "desc": "Llegar a 10000m", "reward_type": "bolas", "reward_amount": 5 },
@@ -83,51 +83,51 @@ const ACHIEVEMENTS := {
 		{ "target": 8000, "desc": "Tener 8000 palitos", "reward_type": "bolas", "reward_amount": 6 },
 	]},
 	"buyer": { "name": "Comprador", "cond": "total_upgrades_bought", "idx": 6, "levels": [
-		{ "target": 3, "desc": "Comprar 3 mejoras", "reward_type": "palitos", "reward_amount": 20 },
-		{ "target": 7, "desc": "Comprar 7 mejoras", "reward_type": "palitos", "reward_amount": 50 },
-		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 100 },
+		{ "target": 3, "desc": "Comprar 3 mejoras", "reward_type": "palitos", "reward_amount": 50 },
+		{ "target": 7, "desc": "Comprar 7 mejoras", "reward_type": "palitos", "reward_amount": 200 },
+		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 500 },
 	]},
 	"birder": { "name": "Pajarero", "cond": "all_birds", "idx": 9, "levels": [
-		{ "target": 1, "desc": "Desbloquear todos los pájaros", "reward_type": "unlock_bird", "reward_amount": 0 },
+		{ "target": 1, "desc": "Desbloquea todas las skins", "reward_type": "unlock_carancho", "reward_amount": 0 },
 	]},
 	"pampeano": { "name": "Pampeano", "cond": "all_birds_5000", "idx": 20, "levels": [
-		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 4 },
+		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 10 },
 	]},
 	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
 		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },
 		{ "target": 5, "desc": "Usar 5 revives", "reward_type": "palitos", "reward_amount": 60 },
 		{ "target": 10, "desc": "Usar 10 revives", "reward_type": "palitos", "reward_amount": 100 },
 	]},
-	"storm_survivor": { "name": "Tormentero", "cond": "storms", "idx": 5, "levels": [
-		{ "target": 3, "desc": "3 tormentas", "reward_type": "bolas", "reward_amount": 1 },
-		{ "target": 10, "desc": "10 tormentas", "reward_type": "bolas", "reward_amount": 3 },
-		{ "target": 25, "desc": "25 tormentas", "reward_type": "bolas", "reward_amount": 5 },
+	"major_survivor": { "name": "Sobreviviente", "cond": "major_events", "idx": 5, "levels": [
+		{ "target": 5, "desc": "5 eventos mayores", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 15, "desc": "15 eventos mayores", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 40, "desc": "40 eventos mayores", "reward_type": "bolas", "reward_amount": 5 },
 	]},
 	"calma_survivor": { "name": "Sereno", "cond": "calmas_survived", "idx": 7, "levels": [
 		{ "target": 3, "desc": "3 calmas", "reward_type": "bolas", "reward_amount": 1 },
 		{ "target": 10, "desc": "10 calmas", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"persistent": { "name": "Persistente", "cond": "deaths", "idx": 4, "levels": [
-		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 30 },
-		{ "target": 35, "desc": "Morir 35 veces", "reward_type": "palitos", "reward_amount": 50 },
-		{ "target": 50, "desc": "Morir 50 veces", "reward_type": "palitos", "reward_amount": 80 },
+		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 100 },
+		{ "target": 35, "desc": "Morir 35 veces", "reward_type": "palitos", "reward_amount": 150 },
+		{ "target": 50, "desc": "Morir 50 veces", "reward_type": "palitos", "reward_amount": 500 },
 	]},
 	"veterano": { "name": "Veterano", "cond": "deaths", "idx": 19, "levels": [
 		{ "target": 100, "desc": "Morir 100 veces", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"maxed_out": { "name": "Al Máximo", "cond": "all_maxed", "idx": 8, "levels": [
-		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 5 },
+		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 10 },
 	]},
 	"multiuso": { "name": "Multiuso", "cond": "bird_uses", "idx": 16, "levels": [
-		{ "target": 2, "desc": "Usar 2 pájaros distintos", "reward_type": "palitos", "reward_amount": 40 },
-		{ "target": 3, "desc": "Usar 3 pájaros distintos", "reward_type": "palitos", "reward_amount": 80 },
-		{ "target": 4, "desc": "Usar los 4 pájaros", "reward_type": "bolas", "reward_amount": 5 },
+		{ "target": 2, "desc": "Usar 2 pájaros distintos", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 3, "desc": "Usar 3 pájaros distintos", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 4, "desc": "Usar los 4 pájaros", "reward_type": "palitos", "reward_amount": 1000 },
 	]},
 	"trato_hecho": { "name": "Trato Hecho", "cond": "kiwi_accepts", "idx": 10, "levels": [
 		{ "target": 20, "desc": "Aceptar 20 ofertas del kiwi", "reward_type": "none", "reward_amount": 0 },
 	]},
-	"rey_tormentas": { "name": "Rey de Tormentas", "cond": "storms_in_run", "idx": 11, "levels": [
-		{ "target": 6, "desc": "6 tormentas en una partida", "reward_type": "none", "reward_amount": 0 },
+	"major_run": { "name": "Imparable", "cond": "major_events_in_run", "idx": 11, "levels": [
+		{ "target": 10, "desc": "10 eventos mayores en una partida", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 }
 
@@ -138,9 +138,10 @@ var unlocked_birds := ["hornero"]
 var active_bird := "hornero"
 var bolas_total := 0
 var deaths := 0
-var storms_survived := 0
+var major_events_total := 0
 var max_distance := 0
 var completed_achievements := {}
+var pending_rewards := {}
 var kiwi_accepts := 0
 var total_upgrades_bought := 0
 var calmas_survived := 0
@@ -155,6 +156,7 @@ var bird_max_distances := {}
 var reduce_motion := false
 var sound_enabled := true
 var minimap_visible := false
+var carancho_available := false
 
 func _ready() -> void:
 	load_data()
@@ -212,9 +214,14 @@ func unlock_bird(bird: String) -> Array:
 	if is_bird_unlocked(bird):
 		return []
 	var cost = BIRDS[bird]["cost"]
-	if bolas_balance < cost:
-		return []
-	bolas_balance -= cost
+	if bird == "premio_pajarero":
+		if palitos_balance < cost:
+			return []
+		palitos_balance -= cost
+	else:
+		if bolas_balance < cost:
+			return []
+		bolas_balance -= cost
 	unlocked_birds.append(bird)
 	var nuevos := check_achievements({})
 	save_data()
@@ -223,15 +230,15 @@ func unlock_bird(bird: String) -> Array:
 func get_bird_modifiers() -> Dictionary:
 	match active_bird:
 		"tero":
-			return { "flap_mult": 0.72, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 0.85, "extra_lives": 0 }
+			return { "flap_mult": 0.72, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 		"golondrina":
-			return { "flap_mult": 1.1, "speed_mult": 1.0, "kiwi_bonus": 0.20, "palitos_mult": 0.85, "extra_lives": 0 }
+			return { "flap_mult": 1.1, "speed_mult": 1.0, "kiwi_bonus": 0.20, "palitos_mult": 1.0, "extra_lives": 0, "powerup_duration_mult": 0.5, "storm_flap_mult": 1.3, "kiwi_cooldown_mult": 0.75 }
 		"carpintero":
-			return { "flap_mult": 1.0, "speed_mult": 0.9, "kiwi_bonus": 0.0, "palitos_mult": 0.75, "extra_lives": 1 }
+			return { "flap_mult": 1.0, "speed_mult": 0.85, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 1, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 		"premio_pajarero":
-			return { "flap_mult": 1.0, "speed_mult": 1.6, "kiwi_bonus": 0.0, "palitos_mult": 1.1, "extra_lives": 1 }
+			return { "flap_mult": 1.0, "speed_mult": 1.6, "kiwi_bonus": 0.0, "palitos_mult": 1.1, "extra_lives": 1, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 		_:
-			return { "flap_mult": 1.0, "speed_mult": 1.0, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0 }
+			return { "flap_mult": 1.0, "speed_mult": 1.0, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 
 func select_bird(bird: String) -> void:
 	if is_bird_unlocked(bird):
@@ -301,7 +308,7 @@ func reset_data() -> void:
 	active_bird = "hornero"
 	bolas_total = 0
 	deaths = 0
-	storms_survived = 0
+	major_events_total = 0
 	max_distance = 0
 	completed_achievements = {}
 	kiwi_accepts = 0
@@ -314,6 +321,7 @@ func reset_data() -> void:
 	tutorial_done = false
 	welcome_bonus_given = false
 	explored_biomes = []
+	carancho_available = false
 	save_data()
 
 func mark_bird_used(bird: String) -> void:
@@ -351,8 +359,8 @@ func check_achievements(conditions: Dictionary) -> Array:
 				achieved = bolas_total >= level_data["target"]
 			"deaths":
 				achieved = deaths >= level_data["target"]
-			"storms":
-				achieved = storms_survived >= level_data["target"]
+			"major_events":
+				achieved = major_events_total >= level_data["target"]
 			"all_maxed":
 				achieved = true
 				for key in UPGRADE_COST:
@@ -368,8 +376,8 @@ func check_achievements(conditions: Dictionary) -> Array:
 						break
 			"kiwi_accepts":
 				achieved = kiwi_accepts >= level_data["target"]
-			"storms_in_run":
-				achieved = conditions.get("storms_in_run", 0) >= level_data["target"]
+			"major_events_in_run":
+				achieved = conditions.get("major_events_in_run", 0) >= level_data["target"]
 			"total_upgrades_bought":
 				achieved = total_upgrades_bought >= level_data["target"]
 			"calmas_survived":
@@ -390,16 +398,40 @@ func check_achievements(conditions: Dictionary) -> Array:
 			completed_achievements[id] = next_idx
 			var rtype: String = level_data["reward_type"]
 			var ramount: int = level_data["reward_amount"]
-			if rtype == "bolas":
-				bolas_balance += ramount
-			elif rtype == "palitos":
-				palitos_balance += ramount
-			elif rtype == "unlock_bird":
-				if not "premio_pajarero" in unlocked_birds:
-					unlocked_birds.append("premio_pajarero")
-			unlocked.append({ "id": id, "level": next_idx, "name": a["name"], "desc": level_data["desc"] })
+			pending_rewards[id + "_" + str(next_idx)] = { "rtype": rtype, "ramount": ramount }
+			unlocked.append({ "id": id, "level": next_idx, "name": a["name"], "desc": level_data["desc"], "reward_type": rtype, "reward_amount": ramount })
 	save_data()
 	return unlocked
+
+func claim_achievement_reward(info: Dictionary) -> void:
+	var key: String = str(info["id"]) + "_" + str(info["level"])
+	if key not in pending_rewards:
+		return
+	var rdata: Dictionary = pending_rewards.get(key, {})
+	if rdata.is_empty():
+		return
+	var rtype: String = rdata.get("rtype", "")
+	var ramount: int = rdata.get("ramount", 0)
+	pending_rewards.erase(key)
+	match rtype:
+		"bolas":
+			bolas_balance += ramount
+		"palitos":
+			palitos_balance += ramount
+		"unlock_carancho":
+			carancho_available = true
+	save_data()
+
+func format_reward(rtype: String, ramount: int) -> String:
+	match rtype:
+		"bolas":
+			return "+%d barro" % ramount
+		"palitos":
+			return "+%d palitos" % ramount
+		"unlock_carancho":
+			return "¡Carancho disponible!"
+		_:
+			return ""
 
 func get_current_value(cond: String) -> int:
 	match cond:
@@ -409,8 +441,8 @@ func get_current_value(cond: String) -> int:
 			return bolas_total
 		"deaths":
 			return deaths
-		"storms":
-			return storms_survived
+		"major_events":
+			return major_events_total
 		"kiwi_accepts":
 			return kiwi_accepts
 		"total_upgrades_bought":
@@ -433,51 +465,79 @@ func get_current_value(cond: String) -> int:
 			return -1
 
 func clear_achievement_popups() -> void:
-	for c in get_children():
+	var scene := get_tree().current_scene
+	if not scene:
+		return
+	for c in scene.get_children():
 		if c is CanvasLayer:
 			c.queue_free()
 
 func show_achievement_popup(info: Dictionary) -> void:
+	var scene := get_tree().current_scene
+	if not scene:
+		return
 	var overlay := CanvasLayer.new()
 	overlay.layer = 100
-	add_child(overlay)
+	overlay.process_mode = PROCESS_MODE_WHEN_PAUSED
+	scene.add_child(overlay)
 
 	var vp := get_viewport().get_visible_rect().size
-	var bg := ColorRect.new()
-	bg.color = Color(0.05, 0.05, 0.05, 0.85)
-	bg.size = Vector2(350, 88)
-	bg.position = Vector2(16, vp.y - 88 - 16)
-	bg.mouse_filter = Control.MOUSE_FILTER_PASS
+	var PAD := 10.0
+	var W := 400.0
+	var GAP := 6.0
 
 	var name_lbl := Label.new()
 	name_lbl.text = info["name"]
 	name_lbl.add_theme_font_size_override("font_size", 22)
 	name_lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
-	name_lbl.position = Vector2(0, 6)
-	name_lbl.size = Vector2(350, 34)
+	name_lbl.size = Vector2(W - PAD * 2, 0)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_lbl.position = Vector2(PAD, PAD)
+	var name_h: float = name_lbl.get_minimum_size().y
 
 	var desc_lbl := Label.new()
 	desc_lbl.text = info["desc"]
 	desc_lbl.add_theme_font_size_override("font_size", 14)
 	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	desc_lbl.position = Vector2(0, 46)
-	desc_lbl.size = Vector2(350, 32)
+	desc_lbl.size = Vector2(W - PAD * 2, 0)
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var desc_y: float = PAD + name_h + GAP
+	desc_lbl.position = Vector2(PAD, desc_y)
+	var desc_h: float = desc_lbl.get_minimum_size().y
+
+	var popup_h: float = desc_y + desc_h + PAD + 8
+	var bg := ColorRect.new()
+	bg.color = Color(0.05, 0.05, 0.05, 0.85)
+	bg.size = Vector2(W, popup_h)
+	bg.position = Vector2(16, vp.y - popup_h - 16)
+	bg.mouse_filter = Control.MOUSE_FILTER_PASS
+
+	name_lbl.size.y = name_h
+	desc_lbl.size.y = desc_h
 
 	bg.add_child(name_lbl)
 	bg.add_child(desc_lbl)
 	overlay.add_child(bg)
 
-	var tween := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	bg.modulate = Color(1, 1, 1, 0)
-	tween.tween_property(bg, "modulate", Color(1, 1, 1, 1), 0.3)
-	tween.tween_interval(4.0)
-	tween.tween_property(bg, "modulate", Color(1, 1, 1, 0), 0.5)
-	tween.tween_callback(func():
-		if is_instance_valid(overlay):
-			overlay.queue_free()
-	)
+	await get_tree().create_timer(3.5, false).timeout
+	if is_instance_valid(overlay):
+		overlay.queue_free()
+
+func _show_floating_reward_text(overlay: CanvasLayer, text: String) -> void:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.75, 0.06))
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.size = Vector2(350, 40)
+	lbl.position = Vector2(0, 10)
+	overlay.add_child(lbl)
+	var tw := get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(lbl, "position", lbl.position + Vector2(0, -40), 0.8)
+	tw.parallel().tween_property(lbl, "modulate", Color(1, 1, 1, 0), 0.8)
+	tw.tween_callback(lbl.queue_free)
 
 func save_data() -> void:
 	var data := {
@@ -488,9 +548,10 @@ func save_data() -> void:
 		"active_bird": active_bird,
 		"bolas_total": bolas_total,
 		"deaths": deaths,
-		"storms_survived": storms_survived,
+		"major_events_total": major_events_total,
 		"max_distance": max_distance,
 		"completed_achievements": completed_achievements,
+		"pending_rewards": pending_rewards,
 		"kiwi_accepts": kiwi_accepts,
 		"total_upgrades_bought": total_upgrades_bought,
 		"calmas_survived": calmas_survived,
@@ -505,6 +566,7 @@ func save_data() -> void:
 		"reduce_motion": reduce_motion,
 		"sound_enabled": sound_enabled,
 		"minimap_visible": minimap_visible,
+		"carancho_available": carancho_available,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -522,7 +584,7 @@ func load_data() -> void:
 				active_bird = data.get("active_bird", "hornero")
 				bolas_total = data.get("bolas_total", 0)
 				deaths = data.get("deaths", 0)
-				storms_survived = data.get("storms_survived", 0)
+				major_events_total = data.get("major_events_total", data.get("storms_survived", 0))
 				max_distance = data.get("max_distance", 0)
 				kiwi_accepts = data.get("kiwi_accepts", data.get("calandria_accepts", 0))
 				total_upgrades_bought = data.get("total_upgrades_bought", 0)
@@ -538,12 +600,13 @@ func load_data() -> void:
 				reduce_motion = data.get("reduce_motion", false)
 				sound_enabled = data.get("sound_enabled", true)
 				minimap_visible = data.get("minimap_visible", false)
+				carancho_available = data.get("carancho_available", false)
 				var u = data.get("upgrades", {})
 				if u.has("calandria") and not u.has("kiwi"):
 					u["kiwi"] = u["calandria"]
 					u.erase("calandria")
 				upgrades = u
-				var ca = data.get("completed_achievements", {})
+				var 				ca = data.get("completed_achievements", {})
 				if ca is Array:
 					var old : Array = ca
 					completed_achievements = {}
@@ -551,6 +614,7 @@ func load_data() -> void:
 						completed_achievements[aid] = 0
 				else:
 					completed_achievements = ca
+				pending_rewards = data.get("pending_rewards", {})
 			elif data is int:
 				palitos_balance = data
 				bolas_balance = 0

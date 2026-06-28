@@ -1,8 +1,6 @@
 extends CanvasLayer
 
 const TIPS := [
-	"Mantené el ritmo: aletear seguido cansa menos que aletear fuerte.",
-	"Los barros cerca del piso son más fáciles de agarrar.",
 	"Si ves el signo '!', prepárate para la tormenta.",
 	"El kiwi aparece cada 20 segundos... estate atento.",
 	"Llegar a las Llanuras da ×1.5 de palitos.",
@@ -11,14 +9,18 @@ const TIPS := [
 	"Las calmas son un respiro... pero no duran para siempre.",
 	"Usá el escudo en zonas de obstáculos densos.",
 	"El turbo duplica tu distancia recorrida.",
-	"Agarrar 3 barros seguido rápido da combo +1.",
-	"Doble toque rápido = mini turbo gratis.",
 	"Cada pájaro tiene stats únicos. ¡Probalos todos!",
+	"No te olvides de mejorar a tus pájaros!",
+	"Revisa los logros... pueden haber recompensas",
+	"El minimapa te muestra cuanto falta para el próximo bioma",
+	"Mirá las configuraciones, adapta el juego a tu gusto!",
 ]
 
 func _ready() -> void:
 	$ColorRect/VBoxContainer/ButtonRow/RestartButton.pressed.connect(_on_restart)
 	$ColorRect/VBoxContainer/ButtonRow/MenuButton.pressed.connect(_on_menu)
+	AudioManager.add_click($ColorRect/VBoxContainer/ButtonRow/RestartButton)
+	AudioManager.add_click($ColorRect/VBoxContainer/ButtonRow/MenuButton)
 
 	var border := ColorRect.new()
 	border.name = "TopBorder"
@@ -88,7 +90,7 @@ func show_screen(distance: int, storms: int = 0, bolas: int = 0, kiwis: int = 0,
 
 	$ColorRect/VBoxContainer/DistanceLabel.text = "%dm" % distance
 	$ColorRect/VBoxContainer/PalitosLabel.text = "Palitos: +%d  (Total: %d)" % [total_palitos, DataManager.palitos_balance]
-	$ColorRect/VBoxContainer/StatsLabel.text = "Tormentas: %d  |  Barro: %d  |  Kiwis: %d" % [storms, bolas, kiwis]
+	$ColorRect/VBoxContainer/StatsLabel.text = "Eventos: %d  |  Barro: %d  |  Kiwis: %d" % [storms, bolas, kiwis]
 
 	$ColorRect/VBoxContainer/BonusLabel.visible = false
 	var bonus_text := ""

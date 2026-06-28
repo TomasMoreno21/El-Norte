@@ -10,7 +10,7 @@ script = ExtResource("1")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.05, 0.05, 0.05, 0.95)
+color = Color(0.2, 0.2, 0.2, 0.95)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Bg" unique_id=1222739465]
 layout_mode = 1
@@ -45,7 +45,7 @@ size_flags_vertical = 3
 [node name="AchievementList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer" unique_id=1333243488]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 14
 
 [node name="ButtonRow" type="HBoxContainer" parent="Bg/VBoxContainer" unique_id=809832081]
 layout_mode = 2
