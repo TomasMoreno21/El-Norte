@@ -108,9 +108,9 @@ const REAR_SPEED := 900.0
 const WAVE_INTERVAL := 600.0
 const WAVE_COUNT := 4
 const WALL_GAP_SIZE := 190
-const WALL_SPEED_MULT := 1.3
+const WALL_SPEED_MULT := 2.1
 const WALL_WARN_DURATION := 1.5
-const WALL_CLEAR_DELAY := 3.0
+const WALL_CLEAR_DELAY := 1.5
 const CALMA_COOLDOWN := 800.0
 const CALMA_CHANCE := 0.25
 const CALMA_DURATION := 6.0
@@ -645,28 +645,27 @@ func _spawn_wave_warnings() -> void:
 	_generate_wave_lane_ys()
 	for i in 3:
 		var y := _wave_lane_ys[i]
-		var border := ColorRect.new()
-		border.name = "WaveWarningBorder%d" % i
-		border.color = Color(0, 0, 0)
-		border.size = Vector2(2200, 10)
-		border.position = Vector2(-50, y - 1)
-		border.mouse_filter = Control.MOUSE_FILTER_PASS
-		add_child(border)
-		var warn := ColorRect.new()
+		var warn := Label.new()
 		warn.name = "WaveWarning%d" % i
-		warn.color = Color(0.95, 0.15, 0.1, 0.6)
-		warn.size = Vector2(2200, 8)
-		warn.position = Vector2(-50, y)
+		warn.text = "!"
+		warn.add_theme_font_size_override("font_size", 56)
+		warn.add_theme_color_override("font_color", Color(0.95, 0.15, 0.1))
+		warn.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+		warn.add_theme_constant_override("shadow_offset_x", 2)
+		warn.add_theme_constant_override("shadow_offset_y", 2)
+		warn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		warn.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		warn.custom_minimum_size = Vector2(56, 56)
+		warn.position = Vector2(1630, y - 28)
 		warn.mouse_filter = Control.MOUSE_FILTER_PASS
 		add_child(warn)
+		var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tw.tween_property(warn, "position:x", 1630, 0.25).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 
 func _spawn_wave_row() -> void:
-	var to_free: Array[ColorRect] = []
 	for c in get_children():
-		if c is ColorRect and c.name.begins_with("WaveWarning"):
-			to_free.append(c)
-	for c in to_free:
-		c.free()
+		if c is Label and c.name.begins_with("WaveWarning"):
+			c.free()
 	for i in 3:
 		var obs := obstacle_scene.instantiate()
 		var ws: float = (REAR_SPEED + distance * 0.04) * max(3.0, 3.0 + distance * 0.00008)
@@ -856,7 +855,7 @@ func _on_revive() -> void:
 	for b in get_tree().get_nodes_in_group("bola"):
 		b.free()
 	for c in get_children():
-		if c is ColorRect and c.name.begins_with("WaveWarning"):
+		if c.name.begins_with("WaveWarning"):
 			c.free()
 
 	if in_storm:

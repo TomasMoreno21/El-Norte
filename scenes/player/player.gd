@@ -37,6 +37,7 @@ var _original_scale: Vector2
 var _was_pressed := false
 var _miniatura_active := false
 var _target_rotation := 0.0
+var _flap_sound_counter := 0
 var _tex_carpintero1 := preload("res://Sprites/Pajaros/carpintero1.png")
 var _tex_carpintero2 := preload("res://Sprites/Pajaros/carpintero2.png")
 var _tex_hornero1 := preload("res://Sprites/Pajaros/hornero1.png")
@@ -65,7 +66,7 @@ func _ready() -> void:
 	add_child(blink_timer)
 
 	flap_timer = Timer.new()
-	flap_timer.wait_time = 0.20
+	flap_timer.wait_time = 0.15
 	flap_timer.timeout.connect(_flap_anim_tick)
 	add_child(flap_timer)
 
@@ -125,6 +126,9 @@ func _load_bird_textures() -> void:
 
 func _flap_anim_tick() -> void:
 	$Sprite2D.texture = _tex_frame2 if $Sprite2D.texture == _tex_frame1 else _tex_frame1
+	_flap_sound_counter += 1
+	if _flap_sound_counter % 2 == 0:
+		AudioManager.play_sfx("flap", -20.0)
 	_play_squash()
 
 func _play_squash() -> void:
@@ -145,7 +149,7 @@ func _physics_process(delta: float) -> void:
 	var is_pressed := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE)
 	if is_pressed:
 		if not _was_pressed:
-			AudioManager.play_sfx("flap", -26.0)
+			AudioManager.play_sfx("flap", -20.0)
 			$Sprite2D.texture = _tex_frame2
 			flap_timer.start()
 			if not DataManager.reduce_motion:
@@ -156,6 +160,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		if _was_pressed:
 			flap_timer.stop()
+			_flap_sound_counter = 0
 			$Sprite2D.texture = _tex_frame1
 		velocity.y += GRAVITY * delta
 
@@ -260,6 +265,7 @@ func reset() -> void:
 	$Sprite2D.scale = _original_scale
 	_load_bird_textures()
 	_was_pressed = false
+	_flap_sound_counter = 0
 	storm_flap_override = 0
 	if not DataManager.reduce_motion:
 		_feather_particles.restart()

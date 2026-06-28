@@ -30,9 +30,9 @@ const MAX_LEVEL := 8
 
 const BIRDS := {
 	"hornero": { "name": "Hornero", "cost": 0, "Bonus": "—", "Penalidad": "—" },
-	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "Flap más lento" },
-	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi, reaparece cada 15s", "Penalidad": "- duracion de escudo y turbo" },
-	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-15% velocidad" },
+	"golondrina": { "name": "Golondrina", "cost": 25, "Bonus": "+20% kiwi, reaparece cada 15s", "Penalidad": "- duracion de escudo y turbo" },
+	"carpintero": { "name": "Carpintero", "cost": 35, "Bonus": "1 vida extra", "Penalidad": "-15% velocidad" },
+	"tero": { "name": "Tero", "cost": 50, "Bonus": "+40% velocidad", "Penalidad": "Flap más lento" },
 	"premio_pajarero": { "name": "Carancho", "cost": 20000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
 }
 
@@ -127,7 +127,7 @@ const ACHIEVEMENTS := {
 		{ "target": 20, "desc": "Aceptar 20 ofertas del kiwi", "reward_type": "none", "reward_amount": 0 },
 	]},
 	"major_run": { "name": "Imparable", "cond": "major_events_in_run", "idx": 11, "levels": [
-		{ "target": 10, "desc": "10 eventos mayores en una partida", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 10, "desc": "10 eventos en una partida", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 }
 

@@ -19,23 +19,23 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -872.0
-offset_top = -480.0
-offset_right = 872.0
-offset_bottom = 480.0
+offset_left = -900.0
+offset_top = -500.0
+offset_right = 900.0
+offset_bottom = 500.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 24
 
 [node name="Title" type="Label" parent="Bg/VBoxContainer" unique_id=2009993907]
 layout_mode = 2
-theme_override_font_sizes/font_size = 60
+theme_override_font_sizes/font_size = 64
 text = "LOGROS"
 horizontal_alignment = 1
 
 [node name="Estadisticas" type="Label" parent="Bg/VBoxContainer" unique_id=224773533]
 layout_mode = 2
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 36
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer" unique_id=1925309425]
@@ -45,7 +45,7 @@ size_flags_vertical = 3
 [node name="AchievementList" type="VBoxContainer" parent="Bg/VBoxContainer/ScrollContainer" unique_id=1333243488]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 14
+theme_override_constants/separation = 24
 
 [node name="ButtonRow" type="HBoxContainer" parent="Bg/VBoxContainer" unique_id=809832081]
 layout_mode = 2

@@ -21,7 +21,7 @@ func _ready() -> void:
 	AudioManager.add_click($Bg/VBoxContainer/Volver)
 	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
 	$Bg/VBoxContainer/Volver.custom_minimum_size = Vector2(800, 96)
-	$Bg/VBoxContainer/Volver.add_theme_font_size_override("font_size", 22)
+	$Bg/VBoxContainer/Volver.add_theme_font_size_override("font_size", 30)
 	_update_balance()
 	_populate_upgrades()
 	SceneTransition.fade_in()
@@ -80,12 +80,12 @@ func _populate_upgrades() -> void:
 
 		var name_label := Label.new()
 		name_label.text = u.name
-		name_label.add_theme_font_size_override("font_size", 24)
+		name_label.add_theme_font_size_override("font_size", 34)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 		var desc_label := Label.new()
 		desc_label.text = u.desc
-		desc_label.add_theme_font_size_override("font_size", 14)
+		desc_label.add_theme_font_size_override("font_size", 22)
 		desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		desc_label.modulate = Color(0.7, 0.7, 0.7)
 
@@ -97,14 +97,14 @@ func _populate_upgrades() -> void:
 		level_label.text = "Nivel %d/%d" % [level, max_lv]
 		level_label.size_flags_horizontal = 3
 		level_label.size_flags_vertical = 3
-		level_label.add_theme_font_size_override("font_size", 18)
+		level_label.add_theme_font_size_override("font_size", 28)
 		level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		level_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 		var buy_btn := Button.new()
 		buy_btn.size_flags_horizontal = 3
-		buy_btn.custom_minimum_size = Vector2(0, 48)
-		buy_btn.add_theme_font_size_override("font_size", 18)
+		buy_btn.custom_minimum_size = Vector2(0, 60)
+		buy_btn.add_theme_font_size_override("font_size", 28)
 		var cost := DataManager.get_upgrade_cost(u.key)
 		if cost == -1:
 			buy_btn.text = "COMPLETO"

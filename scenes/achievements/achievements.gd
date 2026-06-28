@@ -44,9 +44,9 @@ func _populate_achievements() -> void:
 		var cur_val: int = DataManager.get_current_value(a["cond"])
 
 		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 140)
+		row.custom_minimum_size = Vector2(0, 220)
 		row.size_flags_horizontal = 3
-		row.add_theme_constant_override("separation", 16)
+		row.add_theme_constant_override("separation", 28)
 
 		if all_done:
 			var lv = a["levels"][cur_level]
@@ -60,19 +60,19 @@ func _populate_achievements() -> void:
 			var info := VBoxContainer.new()
 			info.size_flags_horizontal = 3
 			info.size_flags_vertical = 3
-			info.add_theme_constant_override("separation", 6)
+			info.add_theme_constant_override("separation", 10)
 
 			var header := HBoxContainer.new()
-			header.add_theme_constant_override("separation", 10)
+			header.add_theme_constant_override("separation", 12)
 			var name_lbl := Label.new()
 			name_lbl.text = a["name"]
-			name_lbl.add_theme_font_size_override("font_size", 30)
+			name_lbl.add_theme_font_size_override("font_size", 32)
 			header.add_child(name_lbl)
 			info.add_child(header)
 
 			var done_lbl := Label.new()
 			done_lbl.text = "COMPLETADO"
-			done_lbl.add_theme_font_size_override("font_size", 16)
+			done_lbl.add_theme_font_size_override("font_size", 20)
 			done_lbl.modulate = Color(0, 1, 0)
 			info.add_child(done_lbl)
 
@@ -119,17 +119,17 @@ func _populate_achievements() -> void:
 			var info := VBoxContainer.new()
 			info.size_flags_horizontal = 3
 			info.size_flags_vertical = 3
-			info.add_theme_constant_override("separation", 6)
+			info.add_theme_constant_override("separation", 10)
 
 			var header := HBoxContainer.new()
-			header.add_theme_constant_override("separation", 10)
+			header.add_theme_constant_override("separation", 12)
 			var name_lbl := Label.new()
 			name_lbl.text = a["name"]
-			name_lbl.add_theme_font_size_override("font_size", 30)
+			name_lbl.add_theme_font_size_override("font_size", 32)
 			header.add_child(name_lbl)
 
 			var level_lbl := Label.new()
-			level_lbl.add_theme_font_size_override("font_size", 18)
+			level_lbl.add_theme_font_size_override("font_size", 20)
 			level_lbl.modulate = Color(0.7, 0.7, 0.7)
 			level_lbl.text = "Nivel %d/%d" % [cur_level + 2, total_levels]
 			header.add_child(level_lbl)
@@ -141,26 +141,26 @@ func _populate_achievements() -> void:
 				var lv = a["levels"][next_idx]
 				var desc_lbl := Label.new()
 				desc_lbl.text = lv["desc"]
-				desc_lbl.add_theme_font_size_override("font_size", 16)
+				desc_lbl.add_theme_font_size_override("font_size", 18)
 				desc_lbl.modulate = Color(0.7, 0.7, 0.7)
 				info.add_child(desc_lbl)
 
 				if id == "birder":
 					var reward_lbl := Label.new()
 					reward_lbl.text = "Recompensa: Nuevo pájaro"
-					reward_lbl.add_theme_font_size_override("font_size", 16)
+					reward_lbl.add_theme_font_size_override("font_size", 18)
 					reward_lbl.add_theme_color_override("font_color", Color(1.0, 0.75, 0.06))
 					info.add_child(reward_lbl)
 				elif id == "trato_hecho":
 					var reward_lbl := Label.new()
 					reward_lbl.text = "Recompensa: Más tratos con el kiwi"
-					reward_lbl.add_theme_font_size_override("font_size", 16)
+					reward_lbl.add_theme_font_size_override("font_size", 18)
 					reward_lbl.add_theme_color_override("font_color", Color(1.0, 0.75, 0.06))
 					info.add_child(reward_lbl)
 
 				if cur_val >= 0:
 					var bar := ProgressBar.new()
-					bar.custom_minimum_size = Vector2(0, 20)
+					bar.custom_minimum_size = Vector2(0, 24)
 					bar.size_flags_horizontal = 3
 					bar.min_value = 0.0
 					bar.max_value = lv["target"]
@@ -169,11 +169,17 @@ func _populate_achievements() -> void:
 
 					var progress_lbl := Label.new()
 					progress_lbl.text = "%d / %d" % [min(cur_val, lv["target"]), lv["target"]]
-					progress_lbl.add_theme_font_size_override("font_size", 14)
+					progress_lbl.add_theme_font_size_override("font_size", 16)
 					progress_lbl.modulate = Color(0.6, 0.6, 0.6)
-
 					info.add_child(bar)
 					info.add_child(progress_lbl)
+
+			row.add_child(info)
+
+			var right_box := HBoxContainer.new()
+			right_box.size_flags_vertical = 3
+			right_box.alignment = BoxContainer.ALIGNMENT_CENTER
+			right_box.add_theme_constant_override("separation", 8)
 
 			if cur_level >= 0:
 				var pending_key: String = id + "_" + str(cur_level)
@@ -196,9 +202,7 @@ func _populate_achievements() -> void:
 					recoger_btn.add_theme_font_size_override("font_size", 18)
 					recoger_btn.size_flags_vertical = 3
 					recoger_btn.pressed.connect(_claim_reward.bind(id, cur_level, lv["reward_type"], lv["reward_amount"]))
-					info.add_child(recoger_btn)
-
-			row.add_child(info)
+					right_box.add_child(recoger_btn)
 
 			var reward := Label.new()
 			if next_idx < total_levels:
@@ -210,7 +214,9 @@ func _populate_achievements() -> void:
 			reward.add_theme_font_size_override("font_size", 24)
 			reward.modulate = Color(0.5, 0.5, 0.5)
 			reward.size_flags_vertical = 3
-			row.add_child(reward)
+			right_box.add_child(reward)
+
+			row.add_child(right_box)
 
 		list.add_child(row)
 

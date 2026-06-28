@@ -7,14 +7,14 @@ var time := 0.0
 var target_y: float
 var move_timer: float = 0.0
 
+var _tex1 := preload("res://Sprites/Pajaros/kiwi1.png")
+var _tex2 := preload("res://Sprites/Pajaros/kiwi2.png")
+
+@onready var _sprite := $Sprite2D
+
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	_pick_new_target()
-	queue_redraw()
-
-func _draw() -> void:
-	draw_circle(Vector2.ZERO, 27, Color(0.3, 0.8, 1.0, 0.9))
-	draw_circle(Vector2.ZERO, 27, Color(1, 1, 1, 0.4), false, 3.0)
 
 func _physics_process(delta: float) -> void:
 	time += delta
@@ -31,6 +31,9 @@ func _physics_process(delta: float) -> void:
 
 	if position.x < -100:
 		queue_free()
+
+	var frame := int(time / 0.12) % 2
+	_sprite.texture = _tex1 if frame == 0 else _tex2
 
 func _pick_new_target() -> void:
 	target_y = randf_range(260, 820)

@@ -150,7 +150,7 @@ offset_bottom = 56.0
 theme_override_font_sizes/font_size = 14
 text = "Reset"
 
-[node name="DebugBtn" type="Button" parent="." unique_id=3104571764]
+[node name="DebugBtn" type="Button" parent="." unique_id=-1190395532]
 layout_mode = 0
 offset_left = 236.0
 offset_top = 16.0
@@ -162,18 +162,20 @@ text = "+100k Palitos"
 [node name="SettingsBtn" type="Button" parent="." unique_id=126314074]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -1901.0
-offset_top = 1029.0
-offset_right = -1797.0
-offset_bottom = 1076.0
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 10
+offset_top = -50
+offset_right = 110
+offset_bottom = -10
 grow_horizontal = 0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 22
 text = "Config"
 
 [node name="SettingsPanel" type="ColorRect" parent="." unique_id=981086457]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 1.0
@@ -181,7 +183,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -1897.0
 offset_top = 718.0
-offset_right = -1453.0
+offset_right = -1370.0
 offset_bottom = -66.0
 grow_horizontal = 0
 mouse_filter = 2
