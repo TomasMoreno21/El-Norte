@@ -30,9 +30,9 @@ const MAX_LEVEL := 8
 
 const BIRDS := {
 	"hornero": { "name": "Hornero", "cost": 0, "Bonus": "—", "Penalidad": "—" },
-	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "-15% palitos" },
-	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi", "Penalidad": "-15% palitos" },
-	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-25% palitos" },
+	"tero": { "name": "Tero", "cost": 45, "Bonus": "+40% velocidad", "Penalidad": "Flap más lento" },
+	"golondrina": { "name": "Golondrina", "cost": 35, "Bonus": "+20% kiwi, reaparece cada 15s", "Penalidad": "- duracion de escudo y turbo" },
+	"carpintero": { "name": "Carpintero", "cost": 25, "Bonus": "1 vida extra", "Penalidad": "-15% velocidad" },
 	"premio_pajarero": { "name": "Carancho", "cost": 20000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
 }
 
@@ -52,19 +52,19 @@ const RECORD_BOLAS := [
 
 const ACHIEVEMENTS := {
 	"first_flight": { "name": "Primer Vuelo", "cond": "distance", "idx": 0, "levels": [
-		{ "target": 100, "desc": "Llegar a 100m", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 100, "desc": "Llegar a 100m", "reward_type": "palitos", "reward_amount": 50 },
 	]},
 	"explorer": { "name": "Explorador", "cond": "distance", "idx": 1, "levels": [
-		{ "target": 500, "desc": "Llegar a 500m", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 500, "desc": "Llegar a 500m", "reward_type": "palitos", "reward_amount": 50 },
 	]},
 	"fearless": { "name": "Sin Miedo", "cond": "distance", "idx": 2, "levels": [
-		{ "target": 2000, "desc": "Llegar a 2000m", "reward_type": "palitos", "reward_amount": 80 },
+		{ "target": 2000, "desc": "Llegar a 2000m", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"llanura": { "name": "Llanuras", "cond": "distance", "idx": 12, "levels": [
 		{ "target": 2200, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
 	]},
 	"norte": { "name": "Norte", "cond": "distance", "idx": 13, "levels": [
-		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 3 },
+		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 10 },
 	]},
 	"maraton": { "name": "Maratón", "cond": "distance", "idx": 17, "levels": [
 		{ "target": 10000, "desc": "Llegar a 10000m", "reward_type": "bolas", "reward_amount": 5 },
@@ -83,15 +83,15 @@ const ACHIEVEMENTS := {
 		{ "target": 8000, "desc": "Tener 8000 palitos", "reward_type": "bolas", "reward_amount": 6 },
 	]},
 	"buyer": { "name": "Comprador", "cond": "total_upgrades_bought", "idx": 6, "levels": [
-		{ "target": 3, "desc": "Comprar 3 mejoras", "reward_type": "palitos", "reward_amount": 20 },
-		{ "target": 7, "desc": "Comprar 7 mejoras", "reward_type": "palitos", "reward_amount": 50 },
-		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 100 },
+		{ "target": 3, "desc": "Comprar 3 mejoras", "reward_type": "palitos", "reward_amount": 50 },
+		{ "target": 7, "desc": "Comprar 7 mejoras", "reward_type": "palitos", "reward_amount": 200 },
+		{ "target": 15, "desc": "Comprar 15 mejoras", "reward_type": "palitos", "reward_amount": 500 },
 	]},
 	"birder": { "name": "Pajarero", "cond": "all_birds", "idx": 9, "levels": [
 		{ "target": 1, "desc": "Desbloquea todas las skins", "reward_type": "unlock_carancho", "reward_amount": 0 },
 	]},
 	"pampeano": { "name": "Pampeano", "cond": "all_birds_5000", "idx": 20, "levels": [
-		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 4 },
+		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 10 },
 	]},
 	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
 		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },
@@ -108,20 +108,20 @@ const ACHIEVEMENTS := {
 		{ "target": 10, "desc": "10 calmas", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"persistent": { "name": "Persistente", "cond": "deaths", "idx": 4, "levels": [
-		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 30 },
-		{ "target": 35, "desc": "Morir 35 veces", "reward_type": "palitos", "reward_amount": 50 },
-		{ "target": 50, "desc": "Morir 50 veces", "reward_type": "palitos", "reward_amount": 80 },
+		{ "target": 20, "desc": "Morir 20 veces", "reward_type": "palitos", "reward_amount": 100 },
+		{ "target": 35, "desc": "Morir 35 veces", "reward_type": "palitos", "reward_amount": 150 },
+		{ "target": 50, "desc": "Morir 50 veces", "reward_type": "palitos", "reward_amount": 500 },
 	]},
 	"veterano": { "name": "Veterano", "cond": "deaths", "idx": 19, "levels": [
 		{ "target": 100, "desc": "Morir 100 veces", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"maxed_out": { "name": "Al Máximo", "cond": "all_maxed", "idx": 8, "levels": [
-		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 5 },
+		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 10 },
 	]},
 	"multiuso": { "name": "Multiuso", "cond": "bird_uses", "idx": 16, "levels": [
-		{ "target": 2, "desc": "Usar 2 pájaros distintos", "reward_type": "palitos", "reward_amount": 40 },
-		{ "target": 3, "desc": "Usar 3 pájaros distintos", "reward_type": "palitos", "reward_amount": 80 },
-		{ "target": 4, "desc": "Usar los 4 pájaros", "reward_type": "bolas", "reward_amount": 5 },
+		{ "target": 2, "desc": "Usar 2 pájaros distintos", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 3, "desc": "Usar 3 pájaros distintos", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 4, "desc": "Usar los 4 pájaros", "reward_type": "palitos", "reward_amount": 1000 },
 	]},
 	"trato_hecho": { "name": "Trato Hecho", "cond": "kiwi_accepts", "idx": 10, "levels": [
 		{ "target": 20, "desc": "Aceptar 20 ofertas del kiwi", "reward_type": "none", "reward_amount": 0 },
@@ -230,15 +230,15 @@ func unlock_bird(bird: String) -> Array:
 func get_bird_modifiers() -> Dictionary:
 	match active_bird:
 		"tero":
-			return { "flap_mult": 0.72, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 0.85, "extra_lives": 0 }
+			return { "flap_mult": 0.72, "speed_mult": 1.4, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 		"golondrina":
-			return { "flap_mult": 1.1, "speed_mult": 1.0, "kiwi_bonus": 0.20, "palitos_mult": 0.85, "extra_lives": 0 }
+			return { "flap_mult": 1.1, "speed_mult": 1.0, "kiwi_bonus": 0.20, "palitos_mult": 1.0, "extra_lives": 0, "powerup_duration_mult": 0.5, "storm_flap_mult": 1.3, "kiwi_cooldown_mult": 0.75 }
 		"carpintero":
-			return { "flap_mult": 1.0, "speed_mult": 0.9, "kiwi_bonus": 0.0, "palitos_mult": 0.75, "extra_lives": 1 }
+			return { "flap_mult": 1.0, "speed_mult": 0.85, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 1, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 		"premio_pajarero":
-			return { "flap_mult": 1.0, "speed_mult": 1.6, "kiwi_bonus": 0.0, "palitos_mult": 1.1, "extra_lives": 1 }
+			return { "flap_mult": 1.0, "speed_mult": 1.6, "kiwi_bonus": 0.0, "palitos_mult": 1.1, "extra_lives": 1, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 		_:
-			return { "flap_mult": 1.0, "speed_mult": 1.0, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0 }
+			return { "flap_mult": 1.0, "speed_mult": 1.0, "kiwi_bonus": 0.0, "palitos_mult": 1.0, "extra_lives": 0, "powerup_duration_mult": 1.0, "storm_flap_mult": 1.0, "kiwi_cooldown_mult": 1.0 }
 
 func select_bird(bird: String) -> void:
 	if is_bird_unlocked(bird):

@@ -145,6 +145,19 @@ func _populate_achievements() -> void:
 				desc_lbl.modulate = Color(0.7, 0.7, 0.7)
 				info.add_child(desc_lbl)
 
+				if id == "birder":
+					var reward_lbl := Label.new()
+					reward_lbl.text = "Recompensa: Nuevo pájaro"
+					reward_lbl.add_theme_font_size_override("font_size", 16)
+					reward_lbl.add_theme_color_override("font_color", Color(1.0, 0.75, 0.06))
+					info.add_child(reward_lbl)
+				elif id == "trato_hecho":
+					var reward_lbl := Label.new()
+					reward_lbl.text = "Recompensa: Más tratos con el kiwi"
+					reward_lbl.add_theme_font_size_override("font_size", 16)
+					reward_lbl.add_theme_color_override("font_color", Color(1.0, 0.75, 0.06))
+					info.add_child(reward_lbl)
+
 				if cur_val >= 0:
 					var bar := ProgressBar.new()
 					bar.custom_minimum_size = Vector2(0, 20)
@@ -161,6 +174,29 @@ func _populate_achievements() -> void:
 
 					info.add_child(bar)
 					info.add_child(progress_lbl)
+
+			if cur_level >= 0:
+				var pending_key: String = id + "_" + str(cur_level)
+				if pending_key in DataManager.pending_rewards:
+					var lv = a["levels"][cur_level]
+					var recoger_btn := Button.new()
+					recoger_btn.text = "Recoger"
+					recoger_btn.custom_minimum_size = Vector2(100, 40)
+					var s := StyleBoxFlat.new()
+					s.bg_color = Color(0.55, 0.45, 0.15)
+					s.corner_radius_top_left = 6
+					s.corner_radius_top_right = 6
+					s.corner_radius_bottom_left = 6
+					s.corner_radius_bottom_right = 6
+					recoger_btn.add_theme_stylebox_override("normal", s)
+					var sh := s.duplicate()
+					sh.bg_color = Color(0.7, 0.55, 0.2)
+					recoger_btn.add_theme_stylebox_override("hover", sh)
+					recoger_btn.add_theme_color_override("font_color", Color.WHITE)
+					recoger_btn.add_theme_font_size_override("font_size", 18)
+					recoger_btn.size_flags_vertical = 3
+					recoger_btn.pressed.connect(_claim_reward.bind(id, cur_level, lv["reward_type"], lv["reward_amount"]))
+					info.add_child(recoger_btn)
 
 			row.add_child(info)
 

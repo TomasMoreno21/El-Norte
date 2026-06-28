@@ -13,6 +13,7 @@ const BIRD_SPRITES := {
 	"carpintero": preload("res://Sprites/Pajaros/carpintero1.png"),
 	"golondrina": preload("res://Sprites/Pajaros/golondrina1.png"),
 	"tero": preload("res://Sprites/Pajaros/tero1.png"),
+	"premio_pajarero": preload("res://Sprites/Pajaros/carancho1.png"),
 }
 
 func _ready() -> void:
@@ -125,8 +126,8 @@ func _populate_birds() -> void:
 		if not owned and bird.get("cost", 0) < 0:
 			bonus_label.text = "???"
 		else:
-			bonus_label.text = "Bonus: %s" % bird.get("Bonus", "—")
-		bonus_label.add_theme_font_size_override("font_size", 14)
+			bonus_label.text = "Pro: %s" % bird.get("Bonus", "—")
+		bonus_label.add_theme_font_size_override("font_size", 22)
 		bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		bonus_label.modulate = Color(0.7, 0.7, 0.7)
 
@@ -134,8 +135,8 @@ func _populate_birds() -> void:
 		if not owned and bird.get("cost", 0) < 0:
 			penalty_label.text = ""
 		else:
-			penalty_label.text = "Penalidad: %s" % bird.get("Penalidad", "—")
-		penalty_label.add_theme_font_size_override("font_size", 14)
+			penalty_label.text = "Contra: %s" % bird.get("Penalidad", "—")
+		penalty_label.add_theme_font_size_override("font_size", 22)
 		penalty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		penalty_label.modulate = Color(0.7, 0.7, 0.7)
 

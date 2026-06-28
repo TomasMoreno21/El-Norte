@@ -136,10 +136,11 @@ func reset_overrides() -> void:
 
 func _build_layers(biome: Dictionary) -> void:
 	for child in get_children():
-		child.queue_free()
+		child.free()
 	_layers.clear()
 	_sprite_pairs.clear()
 	_tex_widths.clear()
+	_base_y.clear()
 
 	var viewport_size := get_viewport().get_visible_rect().size
 
@@ -179,7 +180,6 @@ func _build_fog_layers() -> void:
 		"res://Sprites/Fondos/Neblina/humo t3.png",
 		"res://Sprites/Fondos/Neblina/humo t4.png",
 	]
-	var fog_scales := [2.0, 3.0, 4.0, 6.0]
 	var vp := get_viewport().get_visible_rect().size
 
 	for i in tex_paths.size():
@@ -226,7 +226,7 @@ func set_run_distance(dist: float, speed_mult: float = 1.0) -> void:
 		in_transition = true
 		transition_started.emit(str(BIOMES[_current_biome_idx]["name"]) + " → " + str(BIOMES[new_idx]["name"]))
 		_current_biome_idx = new_idx
-		_swap_textures(BIOMES[new_idx])
+		_change_biome(BIOMES[new_idx])
 
 	var biome: Dictionary = BIOMES[_current_biome_idx]
 	var t := 0.0
@@ -285,11 +285,62 @@ func set_run_distance(dist: float, speed_mult: float = 1.0) -> void:
 			s.scale = Vector2(fscale, fscale)
 			s.position.y = base_y + y_off
 
-func _swap_textures(biome: Dictionary) -> void:
+func _change_biome(biome: Dictionary) -> void:
+	var target_count: int = biome["textures"].size()
+	var current_count: int = _layers.size()
 	var viewport_size := get_viewport().get_visible_rect().size
-	for i in biome["textures"].size():
-		if i >= _sprite_pairs.size():
-			break
+
+	var fog_insert_pos: int = -1
+	if _fog_layers.size() > 0:
+		fog_insert_pos = _fog_layers[0].get_index()
+
+	if target_count > current_count:
+		var diff := target_count - current_count
+		for j in range(diff):
+			var idx := current_count + j
+			var layer := ParallaxLayer.new()
+			layer.motion_scale = Vector2(0.0, 0.0)
+
+			var tex: Texture2D = load(biome["textures"][idx])
+			var tw := 0.0
+			if tex:
+				tw = tex.get_size().x
+
+			var y_off: float = biome["y_offsets"][idx] if idx < biome["y_offsets"].size() else 0.0
+			var base_y := viewport_size.y - (tex.get_size().y if tex else 1080.0) / 2.0 + y_off
+
+			var sprites: Array[Sprite2D] = []
+			for copy in 2:
+				var sprite := Sprite2D.new()
+				sprite.texture = tex
+				if tex:
+					sprite.position = Vector2(tw / 2.0 + copy * tw, base_y)
+				layer.add_child(sprite)
+				sprites.append(sprite)
+
+			add_child(layer)
+			if fog_insert_pos >= 0:
+				move_child(layer, fog_insert_pos + j)
+			_layers.append(layer)
+			_sprite_pairs.append(sprites)
+			_tex_widths.append(tw)
+			_base_y.append(base_y)
+			editor_y_offsets.append(0.0)
+			editor_x_offsets.append(0.0)
+
+	elif target_count < current_count:
+		var diff := current_count - target_count
+		for j in range(diff):
+			var idx := current_count - 1 - j
+			_layers[idx].free()
+			_layers.remove_at(idx)
+			_sprite_pairs.remove_at(idx)
+			_tex_widths.remove_at(idx)
+			_base_y.remove_at(idx)
+		editor_y_offsets = editor_y_offsets.slice(0, target_count)
+		editor_x_offsets = editor_x_offsets.slice(0, target_count)
+
+	for i in target_count:
 		var tex: Texture2D = load(biome["textures"][i])
 		if tex:
 			var tex_size := tex.get_size()
@@ -304,7 +355,6 @@ func _swap_textures(biome: Dictionary) -> void:
 			_sprite_pairs[i][1].position = Vector2(tw / 2.0 + tw, base_y)
 
 	_load_biome_overrides(biome["name"])
-	_apply_editor_offsets()
 
 func _load_biome_overrides(bn: String) -> void:
 	var n := _layers.size()

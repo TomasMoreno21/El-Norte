@@ -19,7 +19,7 @@ var in_storm := false
 var _rafaga_progress := 0.0
 var storm_time := 0.0
 var turbo_effect: CanvasLayer
-enum EventType { REAR_WAVE, FRONT_WAVE, STORM }
+enum EventType { REAR_WAVE, FRONT_WAVE, STORM, WALL }
 const EVENT_INTERVAL_MIN := 200.0
 const EVENT_INTERVAL_MAX := 400.0
 var _next_event_type := -1
@@ -27,6 +27,7 @@ var _next_event_distance := 0.0
 var _last_event_type := -1
 var bird_speed_mult := 1.0
 var bird_kiwi_bonus := 0.0
+var bird_kiwi_cooldown_mult := 1.0
 var rafaga_active := false
 var rafaga_time := 0.0
 var calma_active := false
@@ -64,6 +65,13 @@ enum WaveState { WARN, POST }
 var _wave_timer := 0.0
 var _wave_state := WaveState.WARN
 var _wave_lane_ys: Array[float] = []
+var _wall_active := false
+var _wall_phase := 0
+var _wall_timer := 0.0
+var _wall_gap_y := 540.0
+var _wall_total_waves := 1
+var _wall_current_wave := 0
+var _wall_warnings: Array[ColorRect] = []
 const CONTRA_VIENTO_DURATION := 10.0
 const CONTRA_VIENTO_COOLDOWN := 2000.0
 var _last_contra_viento_distance := 0.0
@@ -99,6 +107,10 @@ const REAR_INTERVAL := 600.0
 const REAR_SPEED := 900.0
 const WAVE_INTERVAL := 600.0
 const WAVE_COUNT := 4
+const WALL_GAP_SIZE := 190
+const WALL_SPEED_MULT := 1.3
+const WALL_WARN_DURATION := 1.5
+const WALL_CLEAR_DELAY := 3.0
 const CALMA_COOLDOWN := 800.0
 const CALMA_CHANCE := 0.25
 const CALMA_DURATION := 6.0
@@ -160,6 +172,7 @@ func _ready() -> void:
 	var mods := DataManager.get_bird_modifiers()
 	bird_speed_mult = mods["speed_mult"]
 	bird_kiwi_bonus = mods["kiwi_bonus"]
+	bird_kiwi_cooldown_mult = mods.get("kiwi_cooldown_mult", 1.0)
 	major_events_in_run = 0
 	run_bolas = 0
 	run_kiwis = 0
@@ -182,7 +195,8 @@ func start_storm() -> void:
 	in_storm = true
 	storm_time = 0.0
 	shake_strength = 16.0
-	player.storm_flap_override = -340
+	var mods := DataManager.get_bird_modifiers()
+	player.storm_flap_override = -340 / mods.get("storm_flap_mult", 1.0)
 	AudioManager.start_storm_wind()
 	_update_encounter_mode()
 	_update_existing_obstacle_speeds()
@@ -201,7 +215,7 @@ func end_storm() -> void:
 	_update_encounter_mode()
 
 func _schedule_next_event() -> void:
-	var types := [EventType.REAR_WAVE, EventType.FRONT_WAVE, EventType.STORM]
+	var types := [EventType.REAR_WAVE, EventType.FRONT_WAVE, EventType.STORM, EventType.WALL]
 	if _last_event_type >= 0:
 		types.erase(_last_event_type)
 	_next_event_type = types[randi() % types.size()]
@@ -491,6 +505,40 @@ func _process(delta: float) -> void:
 		_spawn_wave_warnings()
 		_next_event_type = -1
 
+	if _wall_active:
+		_wall_timer += delta
+		if _wall_phase == 0:
+			if _wall_timer >= WALL_WARN_DURATION:
+				_wall_timer = 0.0
+				_wall_phase = 1
+				_clear_wall_warning()
+				_spawn_wall_obstacles()
+		elif _wall_phase == 1:
+			if _wall_timer >= WALL_CLEAR_DELAY:
+				_wall_current_wave += 1
+				if _wall_current_wave >= _wall_total_waves:
+					_wall_active = false
+					_wall_phase = 0
+					DataManager.major_events_total += 1
+					major_events_in_run += 1
+					var nuevos := DataManager.check_achievements({ "major_events_in_run": major_events_in_run })
+					_show_popups(nuevos)
+					_schedule_next_event()
+				else:
+					_wall_phase = 0
+					_wall_timer = 0.0
+					_wall_gap_y = randf_range(300, 780)
+					_show_wall_warning()
+	elif not _rear_wave_active and not _wave_active and _next_event_type == EventType.WALL and distance >= _next_event_distance and not rafaga_active and not calma_active and not _contra_viento_active and not lluvia_active:
+		_wall_active = true
+		_wall_phase = 0
+		_wall_timer = 0.0
+		_wall_total_waves = randi() % 3 + 1
+		_wall_current_wave = 0
+		_wall_gap_y = randf_range(300, 780)
+		_show_wall_warning()
+		_next_event_type = -1
+
 	var palitos_rate := 1 + DataManager.get_upgrade_level("palitos_base")
 	var bird_palitos_mult: float = DataManager.get_bird_modifiers()["palitos_mult"]
 	var run_palitos := int(distance / 10) * palitos_rate * bird_palitos_mult
@@ -567,6 +615,7 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float, base_speed: flo
 	obs.speed = speed
 	obs.base_speed = base_speed
 	obs.shape_type = shape_type
+	obs.move_type = _random_move_type()
 	obs.position = Vector2(2100, y)
 	obs.add_to_group("obstacle")
 	add_child(obs)
@@ -578,6 +627,7 @@ func _spawn_rear_obstacle() -> void:
 	obs.base_speed = rs
 	obs.moving_right = true
 	obs.shape_type = randi() % 3
+	obs.move_type = _random_move_type()
 	obs.position = Vector2(-100, _rear_y)
 	obs.add_to_group("obstacle")
 	add_child(obs)
@@ -594,11 +644,19 @@ func _generate_wave_lane_ys() -> void:
 func _spawn_wave_warnings() -> void:
 	_generate_wave_lane_ys()
 	for i in 3:
+		var y := _wave_lane_ys[i]
+		var border := ColorRect.new()
+		border.name = "WaveWarningBorder%d" % i
+		border.color = Color(0, 0, 0)
+		border.size = Vector2(2200, 10)
+		border.position = Vector2(-50, y - 1)
+		border.mouse_filter = Control.MOUSE_FILTER_PASS
+		add_child(border)
 		var warn := ColorRect.new()
 		warn.name = "WaveWarning%d" % i
 		warn.color = Color(0.95, 0.15, 0.1, 0.6)
 		warn.size = Vector2(2200, 8)
-		warn.position = Vector2(-50, _wave_lane_ys[i])
+		warn.position = Vector2(-50, y)
 		warn.mouse_filter = Control.MOUSE_FILTER_PASS
 		add_child(warn)
 
@@ -615,15 +673,66 @@ func _spawn_wave_row() -> void:
 		obs.speed = ws
 		obs.base_speed = ws
 		obs.shape_type = randi() % 3
+		obs.move_type = _random_move_type()
 		obs.position = Vector2(2020, _wave_lane_ys[i])
 		obs.add_to_group("obstacle")
 		add_child(obs)
 
+func _random_move_type() -> int:
+	var r := randf()
+	return 0 if r < 0.85 else (1 if r < 0.95 else 2)
+
+func _show_wall_warning() -> void:
+	_clear_wall_warning()
+	var half_gap := WALL_GAP_SIZE / 2
+	for i in 2:
+		var y := _wall_gap_y - half_gap if i == 0 else _wall_gap_y + half_gap
+		var border := ColorRect.new()
+		border.color = Color(0, 0, 0)
+		border.size = Vector2(2200, 12)
+		border.position = Vector2(-50, y - 2)
+		border.mouse_filter = Control.MOUSE_FILTER_PASS
+		add_child(border)
+		_wall_warnings.append(border)
+		var warn := ColorRect.new()
+		warn.color = Color(0.2, 0.8, 0.2)
+		warn.size = Vector2(2200, 8)
+		warn.position = Vector2(-50, y)
+		warn.mouse_filter = Control.MOUSE_FILTER_PASS
+		add_child(warn)
+		_wall_warnings.append(warn)
+
+func _clear_wall_warning() -> void:
+	for w in _wall_warnings:
+		if is_instance_valid(w):
+			w.queue_free()
+	_wall_warnings.clear()
+
+func _spawn_wall_obstacles() -> void:
+	var ws: float = get_base_speed(difficulty_dist) * WALL_SPEED_MULT
+	var half_gap := WALL_GAP_SIZE / 2
+	var gap_top := _wall_gap_y - half_gap
+	var gap_bot := _wall_gap_y + half_gap
+	var y := 140.0
+	while y < 940.0:
+		if y + 12.5 > gap_top and y - 12.5 < gap_bot:
+			y += 80.0
+			continue
+		var obs := obstacle_scene.instantiate()
+		obs.speed = ws
+		obs.base_speed = ws
+		obs.shape_type = 0
+		obs.move_type = 0
+		obs.position = Vector2(2100, y)
+		obs.add_to_group("obstacle")
+		add_child(obs)
+		y += 80.0
+
 func _on_spawn_timer_timeout() -> void:
-	if not obstacle_scene or not player.alive or calma_active or _wave_active or $Background.in_transition:
+	if not obstacle_scene or not player.alive or calma_active or _wave_active or _wall_active or $Background.in_transition:
 		return
 
-	if kiwi_scene and kiwi_cooldown_timer >= KIWI_COOLDOWN:
+	if kiwi_scene and kiwi_cooldown_timer >= KIWI_COOLDOWN * bird_kiwi_cooldown_mult:
 		var prob := KIWI_SPAWN_CHANCE + bird_kiwi_bonus + DataManager.get_upgrade_level("kiwi") * 0.02
 		if randf() < prob:
 			var kiwi := kiwi_scene.instantiate()
@@ -663,16 +772,17 @@ func _on_kiwi_collected() -> void:
 func _on_power_up_selected(type: String) -> void:
 	var nuevos := DataManager.accept_kiwi()
 	_show_popups(nuevos)
+	var mods := DataManager.get_bird_modifiers()
 	match type:
 		"shield":
 			shield_active = true
 			shield_start_time = Time.get_ticks_msec()
-			shield_duration_max = 8.0 + DataManager.get_upgrade_level("shield_duration") * 0.2
+			shield_duration_max = (8.0 + DataManager.get_upgrade_level("shield_duration") * 0.2) * mods.get("powerup_duration_mult", 1.0)
 			player.set_shield(true)
 		"turbo":
 			turbo_active = true
 			turbo_start_time = Time.get_ticks_msec()
-			turbo_duration_max = 6.0 + DataManager.get_upgrade_level("turbo_duration") * 0.2
+			turbo_duration_max = (6.0 + DataManager.get_upgrade_level("turbo_duration") * 0.2) * mods.get("powerup_duration_mult", 1.0)
 			shake_strength = 10.0
 			_update_encounter_mode()
 			_spawn_shockwave()
@@ -740,18 +850,19 @@ func _on_revive() -> void:
 	last_lluvia_distance = distance
 
 	for obs in get_tree().get_nodes_in_group("obstacle"):
-		obs.queue_free()
+		obs.free()
 	for k in get_tree().get_nodes_in_group("kiwi"):
-		k.queue_free()
+		k.free()
 	for b in get_tree().get_nodes_in_group("bola"):
-		b.queue_free()
+		b.free()
 	for c in get_children():
 		if c is ColorRect and c.name.begins_with("WaveWarning"):
-			c.queue_free()
+			c.free()
 
 	if in_storm:
 		in_storm = false
 		storm_time = 0.0
+		AudioManager.stop_storm_wind(0.0)
 		_update_encounter_mode()
 	if rafaga_active:
 		rafaga_active = false
@@ -787,6 +898,10 @@ func _on_revive() -> void:
 	_wave_active = false
 	_wave_phase = 0
 	_wave_state = WaveState.WARN
+	_wall_active = false
+	_wall_phase = 0
+	_wall_current_wave = 0
+	_clear_wall_warning()
 	kiwi_cooldown_timer = 0.0
 
 	player.reset()
