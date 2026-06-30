@@ -4,11 +4,11 @@ const GRAVITY := 900.0
 const FLAP_VELOCITY := -430.0
 
 const BIRD_HITBOX := {
-	"hornero": Vector2(36, 24),
-	"carpintero": Vector2(34, 22),
-	"golondrina": Vector2(40, 20),
-	"tero": Vector2(38, 28),
-	"premio_pajarero": Vector2(50, 34),
+	"hornero": Vector2(58, 38),
+	"carpintero": Vector2(54, 36),
+	"golondrina": Vector2(64, 36),
+	"tero": Vector2(60, 44),
+	"premio_pajarero": Vector2(80, 54),
 }
 
 const BIRD_SQUASH := {
@@ -35,6 +35,7 @@ var _original_col_size: Vector2
 var _original_scale: Vector2
 
 var _was_pressed := false
+var _mouse_held := false
 var _miniatura_active := false
 var _target_rotation := 0.0
 var _flap_sound_counter := 0
@@ -142,11 +143,15 @@ func _play_squash() -> void:
 	sq.tween_property(s, "scale", base * sq_factor, 0.05)
 	sq.tween_property(s, "scale", base, 0.1)
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_mouse_held = event.pressed
+
 func _physics_process(delta: float) -> void:
 	if not alive:
 		return
 
-	var is_pressed := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE)
+	var is_pressed := _mouse_held or Input.is_key_pressed(KEY_SPACE)
 	if is_pressed:
 		if not _was_pressed:
 			AudioManager.play_sfx("flap", -20.0)
@@ -249,6 +254,10 @@ func end_storm_gradual() -> void:
 	var tween := create_tween()
 	tween.tween_property(self, "storm_flap_override", target, 1.5).set_ease(Tween.EASE_OUT)
 	tween.tween_callback(func(): storm_flap_override = 0.0)
+
+func reset_input() -> void:
+	_mouse_held = false
+	_was_pressed = false
 
 func reset() -> void:
 	kill_all_tweens()

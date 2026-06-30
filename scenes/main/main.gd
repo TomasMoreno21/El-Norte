@@ -16,6 +16,8 @@ var turbo_start_time := 0.0
 var shield_duration_max := 4.0
 var turbo_duration_max := 3.0
 var in_storm := false
+var _storm_pre_warning := false
+var _storm_pre_warning_timer := 0.0
 var _rafaga_progress := 0.0
 var storm_time := 0.0
 var turbo_effect: CanvasLayer
@@ -71,7 +73,7 @@ var _wall_timer := 0.0
 var _wall_gap_y := 540.0
 var _wall_total_waves := 1
 var _wall_current_wave := 0
-var _wall_warnings: Array[ColorRect] = []
+var _wall_warnings: Array[Node] = []
 const CONTRA_VIENTO_DURATION := 10.0
 const CONTRA_VIENTO_COOLDOWN := 2000.0
 var _last_contra_viento_distance := 0.0
@@ -93,8 +95,8 @@ const STORM_DURATION := 4.0
 const STORM_SPEED_BOOST := 1.3
 const STORM_INTERVAL_FACTOR := 0.7
 const STORM_WARNING_DIST := 50.0
-const BOLA_SPAWN_INTERVAL := 6.0
-const BOLA_SPAWN_CHANCE := 0.07
+const BOLA_SPAWN_INTERVAL := 8.0
+const BOLA_SPAWN_CHANCE := 0.10
 const TURBO_OBSTACLE_SPEED_BASE := 1.5
 const TURBO_OBSTACLE_SPEED_PER_M := 0.00002
 const TURBO_OBSTACLE_SPEED_MAX := 1.7
@@ -124,7 +126,7 @@ const REVIVE_REWIND := 150.0
 const MIN_GAP := 90
 const SPAWN_MIN_Y := 160.0
 const SPAWN_MAX_Y := 920.0
-const OBSTACLE_HALF_HEIGHTS := [12.5, 50.0, 27.5]
+const OBSTACLE_HALF_HEIGHTS := [50.0, 50.0, 32.5]
 
 @onready var spawn_timer := $SpawnTimer
 @onready var bola_timer := $BolaTimer
@@ -177,6 +179,7 @@ func _ready() -> void:
 	run_bolas = 0
 	run_kiwis = 0
 	_last_milestone_idx = 0
+	_storm_pre_warning = false
 	camera.zoom = Vector2(1.2, 1.2)
 	if turbo_effect_scene:
 		turbo_effect = turbo_effect_scene.instantiate()
@@ -187,7 +190,7 @@ func _ready() -> void:
 	$Background.transition_ended.connect(_on_transition_ended)
 	parallax_editor.set_background($Background)
 	if not DataManager.tutorial_done:
-		hud.start_tutorial()
+		SceneTransition.fade_in_finished.connect(hud.start_tutorial)
 	_setup_biome_effects()
 	_schedule_next_event()
 
@@ -203,7 +206,7 @@ func start_storm() -> void:
 
 func end_storm() -> void:
 	in_storm = false
-	storm_time = 0.0
+	_storm_pre_warning = false
 	player.end_storm_gradual()
 	_schedule_next_event()
 	DataManager.major_events_total += 1
@@ -325,14 +328,20 @@ func _process(delta: float) -> void:
 		if storm_time >= STORM_DURATION:
 			end_storm()
 	elif _next_event_type == EventType.STORM:
-		var warning := distance >= _next_event_distance - STORM_WARNING_DIST
-		hud.show_storm_warning(warning)
 		if distance >= _next_event_distance and not $Background.in_transition and not rafaga_active and not calma_active and not _contra_viento_active and not lluvia_active:
-			start_storm()
-			hud.show_storm_warning(false)
-			_next_event_type = -1
-	else:
-		hud.show_storm_warning(false)
+			if not _storm_pre_warning:
+				hud.show_event_warning()
+				hud.show_storm_warning(true)
+				_storm_pre_warning = true
+				_storm_pre_warning_timer = 2.0
+			else:
+				_storm_pre_warning_timer -= delta
+				if _storm_pre_warning_timer <= 0:
+					hud.hide_event_warning()
+					hud.show_storm_warning(false)
+					_storm_pre_warning = false
+					start_storm()
+					_next_event_type = -1
 
 	if not rafaga_active and not calma_active and not in_storm and not _contra_viento_active and not _wave_active and not _rear_wave_active and distance - last_rafaga_distance >= RAFAGA_COOLDOWN:
 		last_rafaga_distance = distance
@@ -452,6 +461,8 @@ func _process(delta: float) -> void:
 		if _rear_wave_timer >= phase_delay:
 			_rear_wave_timer = 0.0
 			hud.show_rear_warning(false)
+			if _rear_wave_phase == 0:
+				hud.hide_event_warning()
 			_spawn_rear_obstacle()
 			_rear_wave_phase += 1
 			if _rear_wave_phase >= 3:
@@ -472,6 +483,7 @@ func _process(delta: float) -> void:
 			_rear_wave_phase = 0
 			_rear_y = randf_range(200, 880)
 			hud.show_rear_warning(true, _rear_y)
+			hud.show_event_warning()
 			_next_event_type = -1
 
 	if _wave_active:
@@ -480,6 +492,8 @@ func _process(delta: float) -> void:
 			WaveState.WARN:
 				if _wave_timer >= max(0.9, 1.5 - distance * 0.00006):
 					_wave_timer = 0.0
+					if _wave_phase == 0:
+						hud.hide_event_warning()
 					_spawn_wave_row()
 					_wave_phase += 1
 					if _wave_phase >= WAVE_COUNT:
@@ -503,6 +517,7 @@ func _process(delta: float) -> void:
 		_wave_phase = 0
 		_wave_state = WaveState.WARN
 		_spawn_wave_warnings()
+		hud.show_event_warning()
 		_next_event_type = -1
 
 	if _wall_active:
@@ -512,6 +527,8 @@ func _process(delta: float) -> void:
 				_wall_timer = 0.0
 				_wall_phase = 1
 				_clear_wall_warning()
+				if _wall_current_wave == 0:
+					hud.hide_event_warning()
 				_spawn_wall_obstacles()
 		elif _wall_phase == 1:
 			if _wall_timer >= WALL_CLEAR_DELAY:
@@ -537,6 +554,7 @@ func _process(delta: float) -> void:
 		_wall_current_wave = 0
 		_wall_gap_y = randf_range(300, 780)
 		_show_wall_warning()
+		hud.show_event_warning()
 		_next_event_type = -1
 
 	var palitos_rate := 1 + DataManager.get_upgrade_level("palitos_base")
@@ -549,7 +567,6 @@ func _process(delta: float) -> void:
 		var nuevos := DataManager.check_achievements({ "distance": curr_dist })
 		_show_popups(nuevos)
 	hud.update_powerups(shield_remaining, turbo_remaining, x2_bolas_active, x2p_remaining, mini_remaining)
-	hud.show_storm(in_storm)
 	$Background.set_run_distance(distance, 3.5)
 	var turbo_spawn_mult := TURBO_SPAWN_MULT if turbo_active else 1.0
 	var rear_spawn_mult := 1.5 if _rear_wave_active else 1.0
@@ -616,6 +633,8 @@ func _spawn_obstacle_at(shape_type: int, speed: float, y: float, base_speed: flo
 	obs.base_speed = base_speed
 	obs.shape_type = shape_type
 	obs.move_type = _random_move_type()
+	if in_storm:
+		obs.is_event_obstacle = true
 	obs.position = Vector2(2100, y)
 	obs.add_to_group("obstacle")
 	add_child(obs)
@@ -626,6 +645,7 @@ func _spawn_rear_obstacle() -> void:
 	obs.speed = rs
 	obs.base_speed = rs
 	obs.moving_right = true
+	obs.is_event_obstacle = true
 	obs.shape_type = randi() % 3
 	obs.move_type = _random_move_type()
 	obs.position = Vector2(-100, _rear_y)
@@ -673,6 +693,7 @@ func _spawn_wave_row() -> void:
 		obs.base_speed = ws
 		obs.shape_type = randi() % 3
 		obs.move_type = _random_move_type()
+		obs.is_event_obstacle = true
 		obs.position = Vector2(2020, _wave_lane_ys[i])
 		obs.add_to_group("obstacle")
 		add_child(obs)
@@ -684,22 +705,30 @@ func _random_move_type() -> int:
 func _show_wall_warning() -> void:
 	_clear_wall_warning()
 	var half_gap := WALL_GAP_SIZE / 2
-	for i in 2:
-		var y := _wall_gap_y - half_gap if i == 0 else _wall_gap_y + half_gap
-		var border := ColorRect.new()
-		border.color = Color(0, 0, 0)
-		border.size = Vector2(2200, 12)
-		border.position = Vector2(-50, y - 2)
-		border.mouse_filter = Control.MOUSE_FILTER_PASS
-		add_child(border)
-		_wall_warnings.append(border)
-		var warn := ColorRect.new()
-		warn.color = Color(0.2, 0.8, 0.2)
-		warn.size = Vector2(2200, 8)
-		warn.position = Vector2(-50, y)
+	var gap_top := _wall_gap_y - half_gap
+	var gap_bot := _wall_gap_y + half_gap
+	var y := 140.0
+	while y < 940.0:
+		if y + 12.5 > gap_top and y - 12.5 < gap_bot:
+			y += 80.0
+			continue
+		var idx := _wall_warnings.size()
+		var warn := Label.new()
+		warn.name = "WallWarning%d" % idx
+		warn.text = "!"
+		warn.add_theme_font_size_override("font_size", 56)
+		warn.add_theme_color_override("font_color", Color(0.95, 0.15, 0.1))
+		warn.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+		warn.add_theme_constant_override("shadow_offset_x", 2)
+		warn.add_theme_constant_override("shadow_offset_y", 2)
+		warn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		warn.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		warn.custom_minimum_size = Vector2(56, 56)
+		warn.position = Vector2(1630, y - 28)
 		warn.mouse_filter = Control.MOUSE_FILTER_PASS
 		add_child(warn)
 		_wall_warnings.append(warn)
+		y += 80.0
 
 func _clear_wall_warning() -> void:
 	for w in _wall_warnings:
@@ -722,6 +751,7 @@ func _spawn_wall_obstacles() -> void:
 		obs.base_speed = ws
 		obs.shape_type = 0
 		obs.move_type = 0
+		obs.is_event_obstacle = true
 		obs.position = Vector2(2100, y)
 		obs.add_to_group("obstacle")
 		add_child(obs)
@@ -765,6 +795,7 @@ func _on_kiwi_collected() -> void:
 	AudioManager.play_sfx("kiwi_appear")
 	var menu := choice_menu_scene.instantiate()
 	menu.power_up_selected.connect(_on_power_up_selected)
+	menu.closed.connect(func(): player.reset_input())
 	add_child(menu)
 	get_tree().paused = true
 
@@ -776,12 +807,12 @@ func _on_power_up_selected(type: String) -> void:
 		"shield":
 			shield_active = true
 			shield_start_time = Time.get_ticks_msec()
-			shield_duration_max = (8.0 + DataManager.get_upgrade_level("shield_duration") * 0.2) * mods.get("powerup_duration_mult", 1.0)
+			shield_duration_max = (8.0 + DataManager.get_upgrade_level("shield_duration") * 0.5) * mods.get("powerup_duration_mult", 1.0)
 			player.set_shield(true)
 		"turbo":
 			turbo_active = true
 			turbo_start_time = Time.get_ticks_msec()
-			turbo_duration_max = (6.0 + DataManager.get_upgrade_level("turbo_duration") * 0.2) * mods.get("powerup_duration_mult", 1.0)
+			turbo_duration_max = (6.0 + DataManager.get_upgrade_level("turbo_duration") * 0.5) * mods.get("powerup_duration_mult", 1.0)
 			shake_strength = 10.0
 			_update_encounter_mode()
 			_spawn_shockwave()
@@ -860,6 +891,7 @@ func _on_revive() -> void:
 
 	if in_storm:
 		in_storm = false
+		_storm_pre_warning = false
 		storm_time = 0.0
 		AudioManager.stop_storm_wind(0.0)
 		_update_encounter_mode()
@@ -983,11 +1015,7 @@ func _on_transition_ended(biome_name: String) -> void:
 		"Llanuras": biome_idx = 1
 		"Puna": biome_idx = 2
 	if biome_idx >= 0:
-		var bonus := DataManager.claim_explorer_bonus(biome_idx)
-		if bonus > 0:
-			hud.show_transition_message("+%d palitos por explorar!" % bonus)
-			await get_tree().create_timer(1.5).timeout
-			hud.hide_transition_message()
+		DataManager.claim_explorer_bonus(biome_idx)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.keycode == KEY_F1 and event.pressed and not event.echo:

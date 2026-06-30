@@ -1,8 +1,9 @@
 extends CanvasLayer
 
+signal fade_in_finished
+
 var _overlay: ColorRect
 var _is_transitioning := false
-var _fading_in := false
 
 func _ready() -> void:
 	layer = 100
@@ -23,31 +24,17 @@ func fade_to_scene(scene_path: String) -> void:
 	var tween := create_tween()
 	tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	tween.tween_property(_overlay, "modulate:a", 1.0, 0.15)
-	tween.tween_callback(_change_scene.bind(scene_path))
-	await get_tree().create_timer(0.5).timeout
-	_change_scene(scene_path)
-
-func _change_scene(path: String) -> void:
-	if not _is_transitioning:
-		return
-	_is_transitioning = false
-	get_tree().change_scene_to_file(path)
+	await get_tree().create_timer(0.3).timeout
+	get_tree().change_scene_to_file(scene_path)
 
 func fade_in() -> void:
 	_is_transitioning = false
-	_fading_in = true
 	_overlay.visible = true
 	_overlay.modulate.a = 1.0
 
 	var tween := create_tween()
 	tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	tween.tween_property(_overlay, "modulate:a", 0.0, 0.15)
-	tween.tween_callback(_finish_fade_in)
-	await get_tree().create_timer(0.5).timeout
-	_finish_fade_in()
-
-func _finish_fade_in() -> void:
-	if not _fading_in:
-		return
-	_fading_in = false
+	await tween.finished
 	_overlay.visible = false
+	fade_in_finished.emit()

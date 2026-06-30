@@ -10,7 +10,7 @@ script = ExtResource("1")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.2, 0.2, 0.2, 0.95)
+color = Color(0.35, 0.25, 0.18, 0.95)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Bg" unique_id=1222739465]
 layout_mode = 1
@@ -19,9 +19,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -900.0
+offset_left = -935.0
 offset_top = -500.0
-offset_right = 900.0
+offset_right = 935.0
 offset_bottom = 500.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -31,11 +31,6 @@ theme_override_constants/separation = 24
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "LOGROS"
-horizontal_alignment = 1
-
-[node name="Estadisticas" type="Label" parent="Bg/VBoxContainer" unique_id=224773533]
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Bg/VBoxContainer" unique_id=1925309425]

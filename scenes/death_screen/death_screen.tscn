@@ -10,67 +10,71 @@ script = ExtResource("1")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=467348300]
 anchors_preset = -1
-anchor_left = 0.2
-anchor_top = 0.25
-anchor_right = 0.8
-anchor_bottom = 0.75
+anchor_left = 0.15
+anchor_top = 0.15
+anchor_right = 0.85
+anchor_bottom = 0.85
+offset_left = -23.0
+offset_right = 75.0
 color = Color(0.05, 0.05, 0.05, 0.92)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ColorRect" unique_id=2032780090]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_constants/separation = 20
+theme_override_constants/separation = 28
 
 [node name="Title" type="Label" parent="ColorRect/VBoxContainer" unique_id=1174477123]
 layout_mode = 2
-theme_override_font_sizes/font_size = 54
+theme_override_font_sizes/font_size = 70
 text = "EL VIENTO PARÓ"
 horizontal_alignment = 1
 
 [node name="DistanceLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=596636937]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 50
 text = "0m"
 horizontal_alignment = 1
 
 [node name="PalitosLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=100933802]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 44
 text = "Palitos: +0"
 horizontal_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=1733749348]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 
 [node name="BonusLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=485973396]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.4, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 
 [node name="RecordDiffLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=1410288723]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 
 [node name="TipLabel" type="Label" parent="ColorRect/VBoxContainer" unique_id=919238852]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 36
 horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="ButtonRow" type="HBoxContainer" parent="ColorRect/VBoxContainer" unique_id=838787196]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 20
 
 [node name="RestartButton" type="Button" parent="ColorRect/VBoxContainer/ButtonRow" unique_id=1332674319]
-custom_minimum_size = Vector2(0, 80)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 58
@@ -78,7 +82,7 @@ text = "Volver a volar"
 script = ExtResource("2")
 
 [node name="MenuButton" type="Button" parent="ColorRect/VBoxContainer/ButtonRow" unique_id=1505973835]
-custom_minimum_size = Vector2(0, 80)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 58

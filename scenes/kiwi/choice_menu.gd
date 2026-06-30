@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 signal power_up_selected(type: String)
+signal closed
 
 const POOL := [
 	{ "text": "Escudo", "type": "shield", "cost": 35 },
@@ -20,7 +21,14 @@ const DESCRIPTIONS := {
 	"bola_extra": "Da 1 barro extra",
 }
 
+var _kiwi_anim_time := 0.0
+var _kiwi_base_y: float
+
+@onready var _kiwi_sprite := $KiwiSprite
+
 func _ready() -> void:
+	_kiwi_base_y = _kiwi_sprite.position.y
+
 	var pool: Array[Dictionary] = []
 	for p in POOL:
 		if p["type"] != "bola_extra" or "trato_hecho" in DataManager.completed_achievements:
@@ -31,7 +39,7 @@ func _ready() -> void:
 
 	var palitos_label := Label.new()
 	palitos_label.text = "$" + str(DataManager.palitos_balance) + " palitos"
-	palitos_label.add_theme_font_size_override("font_size", 22)
+	palitos_label.add_theme_font_size_override("font_size", 34)
 	palitos_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	palitos_label.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2))
 	$RightPanel/VBoxContainer.add_child(palitos_label)
@@ -54,12 +62,21 @@ func _ready() -> void:
 
 	_add_reject()
 
+func _process(delta: float) -> void:
+	_kiwi_anim_time += delta
+	var frame := int(_kiwi_anim_time / 0.12) % 2
+	if frame == 0:
+		_kiwi_sprite.texture = preload("res://Sprites/Pajaros/kiwi1.png")
+	else:
+		_kiwi_sprite.texture = preload("res://Sprites/Pajaros/kiwi2.png")
+	_kiwi_sprite.position.y = _kiwi_base_y + sin(_kiwi_anim_time * 2.0) * 15.0
+
 func _add_choice(text: String, type: String, cost: int) -> void:
 	var btn := Button.new()
 	btn.text = text
 	btn.tooltip_text = DESCRIPTIONS.get(type, "")
-	btn.custom_minimum_size = Vector2(0, 64)
-	btn.add_theme_font_size_override("font_size", 30)
+	btn.custom_minimum_size = Vector2(0, 90)
+	btn.add_theme_font_size_override("font_size", 42)
 	btn.size_flags_horizontal = 4
 	btn.pressed.connect(_on_choice.bind(type, cost))
 	$RightPanel/VBoxContainer.add_child(btn)
@@ -67,8 +84,8 @@ func _add_choice(text: String, type: String, cost: int) -> void:
 func _add_reject() -> void:
 	var btn := Button.new()
 	btn.text = "Rechazar"
-	btn.custom_minimum_size = Vector2(0, 64)
-	btn.add_theme_font_size_override("font_size", 30)
+	btn.custom_minimum_size = Vector2(0, 90)
+	btn.add_theme_font_size_override("font_size", 42)
 	btn.size_flags_horizontal = 4
 	btn.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	btn.pressed.connect(_on_reject)
@@ -80,9 +97,11 @@ func _on_choice(type: String, cost: int) -> void:
 		DataManager.palitos_balance -= cost
 		DataManager.save_data()
 	power_up_selected.emit(type)
+	closed.emit()
 	get_tree().paused = false
 	queue_free()
 
 func _on_reject() -> void:
+	closed.emit()
 	get_tree().paused = false
 	queue_free()

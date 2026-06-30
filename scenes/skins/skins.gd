@@ -20,6 +20,7 @@ func _ready() -> void:
 	$Bg/VBoxContainer/Volver.pressed.connect(_on_volver)
 	AudioManager.add_click($Bg/VBoxContainer/Volver)
 	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
+	$Bg/VBoxContainer/BolasLabel.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2))
 	_update_balance()
 	_populate_birds()
 	SceneTransition.fade_in()
@@ -59,7 +60,7 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 		tr.texture = tex
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		tr.mouse_filter = 2
-		tr.position = Vector2(15, 10)
+		tr.position = Vector2(15, 35)
 		tr.custom_minimum_size = Vector2(300, 267)
 		container.add_child(tr)
 		if not owned:
@@ -71,7 +72,7 @@ func _make_bird_display(bird_id: String, owned: bool) -> Control:
 			qmark.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			qmark.modulate = Color(0.5, 0.5, 0.5)
 			qmark.mouse_filter = 2
-			qmark.position = Vector2(15, 10)
+			qmark.position = Vector2(15, 35)
 			qmark.custom_minimum_size = Vector2(270, 280)
 			container.add_child(qmark)
 		return container
@@ -104,14 +105,29 @@ func _populate_birds() -> void:
 		var row := HBoxContainer.new()
 		row.custom_minimum_size = Vector2(0, 300)
 		row.size_flags_horizontal = 3
-		row.add_theme_constant_override("separation", 20)
+
+		var panel_bg := ColorRect.new()
+		panel_bg.color = Color(0.15, 0.15, 0.16, 0.5)
+		panel_bg.size_flags_horizontal = 3
+		panel_bg.size_flags_vertical = 3
+		panel_bg.mouse_filter = 2
+		row.add_child(panel_bg)
+
+		var inner := HBoxContainer.new()
+		inner.size_flags_horizontal = 3
+		inner.size_flags_vertical = 3
+		inner.anchor_right = 1.0
+		inner.anchor_bottom = 1.0
+		inner.add_theme_constant_override("separation", 20)
+		panel_bg.add_child(inner)
 
 		var display := _make_bird_display(id, owned)
-		row.add_child(display)
+		inner.add_child(display)
 
 		var info_col := VBoxContainer.new()
 		info_col.size_flags_horizontal = 3
 		info_col.size_flags_vertical = 3
+		info_col.alignment = BoxContainer.ALIGNMENT_CENTER
 		info_col.add_theme_constant_override("separation", 2)
 
 		var name_label := Label.new()
@@ -129,7 +145,7 @@ func _populate_birds() -> void:
 			bonus_label.text = "Pro: %s" % bird.get("Bonus", "—")
 		bonus_label.add_theme_font_size_override("font_size", 22)
 		bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		bonus_label.modulate = Color(0.7, 0.7, 0.7)
+		bonus_label.modulate = Color(0.3, 0.9, 0.3)
 
 		var penalty_label := Label.new()
 		if not owned and bird.get("cost", 0) < 0:
@@ -138,12 +154,12 @@ func _populate_birds() -> void:
 			penalty_label.text = "Contra: %s" % bird.get("Penalidad", "—")
 		penalty_label.add_theme_font_size_override("font_size", 22)
 		penalty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		penalty_label.modulate = Color(0.7, 0.7, 0.7)
+		penalty_label.modulate = Color(0.9, 0.25, 0.2)
 
 		info_col.add_child(name_label)
 		info_col.add_child(bonus_label)
 		info_col.add_child(penalty_label)
-		row.add_child(info_col)
+		inner.add_child(info_col)
 
 		var action_btn := Button.new()
 		action_btn.size_flags_horizontal = 3
@@ -175,7 +191,7 @@ func _populate_birds() -> void:
 			action_btn.pressed.connect(func(): _buy(id, action_btn.global_position + action_btn.size * 0.5))
 			AudioManager.add_click(action_btn)
 
-		row.add_child(action_btn)
+		inner.add_child(action_btn)
 		list.add_child(row)
 
 	_update_balance()

@@ -10,6 +10,7 @@ var moving_right := false
 var move_type := MoveType.NORMAL
 
 var angular_speed := 0.0
+var is_event_obstacle := false
 var _sprite: Sprite2D
 var _collision_shape: CollisionShape2D
 var _pulse_time := randf_range(0.0, TAU)
@@ -24,26 +25,35 @@ var _sizer_min := randf_range(0.8, 0.9)
 var _sizer_max := randf_range(1.1, 1.25)
 var _sizer_speed := randf_range(0.8, 2.0)
 var _orig_shape_size: Vector2
+var _base_scale := Vector2.ONE
 
 const MOVE_TINT := {
 	MoveType.NORMAL: Color(1, 1, 1),
-	MoveType.OSCILLATE: Color(0.6, 0.75, 1.0),
-	MoveType.SIZER: Color(1.0, 0.85, 0.4),
+	MoveType.OSCILLATE: Color(1, 1, 1),
+	MoveType.SIZER: Color(1, 1, 1),
 }
 
-const SHAPE_COLORS := {
-	ShapeType.RECT_H: Color(0.5, 0.7, 0.3),
-	ShapeType.RECT_V: Color(0.8, 0.3, 0.3),
-	ShapeType.CIRCLE: Color(0.6, 0.6, 0.6),
+const SHAPE_SPRITES := {
+	ShapeType.RECT_H: "res://Sprites/Obstáculos/bolsa.png",
+	ShapeType.RECT_V: "res://Sprites/Obstáculos/botella.png",
+	ShapeType.CIRCLE: "res://Sprites/Obstáculos/roca.png",
 }
 
 const SHAPE_SIZES := {
-	ShapeType.RECT_H: Vector2(100, 25),
+	ShapeType.RECT_H: Vector2(25, 100),
 	ShapeType.RECT_V: Vector2(25, 100),
-	ShapeType.CIRCLE: Vector2(55, 55),
+	ShapeType.CIRCLE: Vector2(65, 65),
 }
 
-const REAR_COLOR := Color(0.95, 0.15, 0.1)
+const REAR_COLOR := Color(1.0, 0.35, 0.25, 0.55)
+
+const SPRITE_OFFSET := Vector2(0, 0)
+
+const SPRITE_SCALES := {
+	ShapeType.RECT_H: Vector2(1, 1),
+	ShapeType.RECT_V: Vector2(1, 1),
+	ShapeType.CIRCLE: Vector2(1, 1),
+}
 
 func _ready() -> void:
 	angular_speed = randf_range(1.5, 4.0) * (-1 if randi() % 2 == 0 else 1)
@@ -64,21 +74,22 @@ func _physics_process(delta: float) -> void:
 		if position.x < -200:
 			queue_free()
 	_sprite.rotation += angular_speed * delta
+	_collision_shape.rotation += angular_speed * delta
 	_pulse_time += delta
 	match move_type:
 		MoveType.OSCILLATE:
 			position.y = _start_y + sin(_pulse_time * _osc_frequency * TAU) * _osc_amplitude
-			var s := _pulse_base + sin(_pulse_time * _pulse_speed) * 0.04
-			_sprite.scale = Vector2(s, s)
+			var p := _pulse_base + sin(_pulse_time * _pulse_speed) * 0.04
+			_sprite.scale = _base_scale * p
 		MoveType.SIZER:
 			var t := sin(_pulse_time * _sizer_speed * TAU) * 0.5 + 0.5
 			var size_factor := lerpf(_sizer_min, _sizer_max, t)
-			var s := size_factor + sin(_pulse_time * _pulse_speed) * 0.02
-			_sprite.scale = Vector2(s, s)
+			var p := size_factor + sin(_pulse_time * _pulse_speed) * 0.02
+			_sprite.scale = _base_scale * p
 			_resize_collision(size_factor)
 		_: # NORMAL
-			var s := _pulse_base + sin(_pulse_time * _pulse_speed) * 0.04
-			_sprite.scale = Vector2(s, s)
+			var p := _pulse_base + sin(_pulse_time * _pulse_speed) * 0.04
+			_sprite.scale = _base_scale * p
 
 func _resize_collision(factor: float) -> void:
 	match shape_type:
@@ -92,15 +103,24 @@ func _resize_collision(factor: float) -> void:
 				cs.radius = _orig_shape_size.x / 2.0 * factor
 
 func _setup_visual() -> void:
-	var size: Vector2 = SHAPE_SIZES[shape_type]
-	var color: Color = REAR_COLOR if moving_right else SHAPE_COLORS[shape_type]
-	var image := Image.create(int(size.x), int(size.y), false, Image.FORMAT_RGBA8)
-	image.fill(color)
-	var texture := ImageTexture.create_from_image(image)
+	var tex_path: String = SHAPE_SPRITES[shape_type]
+	var tex := load(tex_path) as Texture2D
 
 	_sprite = Sprite2D.new()
-	_sprite.texture = texture
+	if tex:
+		_sprite.texture = tex
+		var ts: Vector2 = tex.get_size()
+		var cs: Vector2 = SHAPE_SIZES[shape_type]
+		if shape_type == ShapeType.CIRCLE:
+			var s: float = cs.x / max(ts.x, ts.y)
+			_sprite.scale = Vector2(s, s) * SPRITE_SCALES[shape_type]
+		else:
+			_sprite.scale = Vector2(cs.x / ts.x, cs.y / ts.y) * SPRITE_SCALES[shape_type]
+		_base_scale = _sprite.scale
+	_sprite.position = SPRITE_OFFSET
 	_sprite.modulate = MOVE_TINT.get(move_type, Color.WHITE)
+	if moving_right or is_event_obstacle:
+		_sprite.modulate *= REAR_COLOR
 	add_child(_sprite)
 
 func _setup_collision() -> void:

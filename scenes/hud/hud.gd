@@ -15,6 +15,10 @@ extends CanvasLayer
 @onready var milestone_flash := $MilestoneFlash
 @onready var event_label := $EventLabel
 @onready var rear_warning := $RearWarningLabel
+@onready var event_warning_flash := $EventWarningFlash
+
+var _flash_id := 0
+var _event_flash_id := 0
 
 var _storm_warning_active := false
 var _storm_warning_time := 0.0
@@ -29,6 +33,7 @@ var _tutorial_arrow_time := 0.0
 const TUTORIAL_DURATION := 5.0
 
 var _last_flash_100m := 0
+var _last_flash_1000m := 0
 var _heartbeat_time := 0.0
 var _last_dist_value := 0
 var _idle_time := 0.0
@@ -80,6 +85,7 @@ func _ready() -> void:
 	$PauseOverlay/ContinueBtn.pressed.connect(_toggle_pause)
 	$PauseOverlay/QuitBtn.pressed.connect(_quit_to_menu)
 
+
 # pause stats removed
 
 func _toggle_pause() -> void:
@@ -111,6 +117,7 @@ func _input(event: InputEvent) -> void:
 func _quit_to_menu() -> void:
 	get_tree().paused = false
 	Engine.time_scale = 1.0
+	AudioManager.stop_all_sfx()
 	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")
 
 func update_distance(meters: int) -> void:
@@ -126,6 +133,10 @@ func update_distance(meters: int) -> void:
 	if curr_100 > _last_flash_100m:
 		_last_flash_100m = curr_100
 		_flash_100m()
+	var curr_1000 := floori(meters / 1000.0)
+	if curr_1000 > _last_flash_1000m:
+		_last_flash_1000m = curr_1000
+		flash_milestone()
 
 func _flash_100m() -> void:
 	var flash := ColorRect.new()
@@ -167,17 +178,70 @@ func update_powerups(shield_remaining: float, turbo_remaining: float, x4_barro: 
 	powerup_label.text = "  ".join(parts)
 
 func flash_milestone() -> void:
-	print("flash_milestone called")
-	var flash := ColorRect.new()
-	flash.color = Color(1, 1, 0, 0.5)
-	flash.anchors_preset = Control.PRESET_FULL_RECT
-	flash.mouse_filter = Control.MOUSE_FILTER_PASS
-	add_child(flash)
-	flash.show()
-	var tween := create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tween.tween_property(flash, "color:a", 0.0, 1.0)
-	tween.tween_callback(flash.queue_free)
+	if event_warning_flash.visible:
+		return
+	_flash_id += 1
+	var id := _flash_id
+	milestone_flash.visible = true
+	for c in milestone_flash.get_children():
+		if c is ColorRect:
+			c.color.a = 0.0
+	var t := 0.0
+	while t < 0.15 and id == _flash_id and not event_warning_flash.visible:
+		t += get_process_delta_time()
+		var a := minf(t / 0.15, 1.0)
+		for c in milestone_flash.get_children():
+			if c is ColorRect:
+				c.color.a = 0.8 * a
+		await get_tree().process_frame
+	t = 0.0
+	while t < 0.65 and id == _flash_id and not event_warning_flash.visible:
+		t += get_process_delta_time()
+		var a := minf(t / 0.65, 1.0)
+		for c in milestone_flash.get_children():
+			if c is ColorRect:
+				c.color.a = 0.8 * (1.0 - a)
+		await get_tree().process_frame
+	if id == _flash_id and not event_warning_flash.visible:
+		for c in milestone_flash.get_children():
+			if c is ColorRect:
+				c.color.a = 0.0
+		milestone_flash.visible = false
+
+func show_event_warning() -> void:
+	_event_flash_id += 1
+	var id := _event_flash_id
+	event_warning_flash.visible = true
+	for c in event_warning_flash.get_children():
+		if c is ColorRect:
+			c.color.a = 0.0
+	var t := 0.0
+	while id == _event_flash_id:
+		t += get_process_delta_time()
+		var pulse := 0.55 + 0.25 * sin(t * 6.0)
+		for c in event_warning_flash.get_children():
+			if c is ColorRect:
+				c.color.a = pulse
+		await get_tree().process_frame
+
+func hide_event_warning() -> void:
+	_event_flash_id += 1
+	var start_a := 0.0
+	for c in event_warning_flash.get_children():
+		if c is ColorRect:
+			start_a = max(start_a, c.color.a)
+	var t := 0.0
+	while t < 0.5:
+		t += get_process_delta_time()
+		var a := start_a * (1.0 - minf(t / 0.5, 1.0))
+		for c in event_warning_flash.get_children():
+			if c is ColorRect:
+				c.color.a = a
+		await get_tree().process_frame
+	for c in event_warning_flash.get_children():
+		if c is ColorRect:
+			c.color.a = 0.0
+	event_warning_flash.visible = false
 
 func show_event_text(text: String, is_positive: bool) -> void:
 	event_label.text = text

@@ -22,10 +22,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -350.0
-offset_top = -150.0
-offset_right = 350.0
-offset_bottom = 150.0
+offset_left = -450.0
+offset_top = -200.0
+offset_right = 450.0
+offset_bottom = 200.0
 color = Color(0.1, 0.1, 0.1, 0.95)
 
 [node name="VBox" type="VBoxContainer" parent="Panel"]
@@ -34,24 +34,24 @@ anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_constants/separation = 20
+theme_override_constants/separation = 28
 
 [node name="Title" type="Label" parent="Panel/VBox"]
 layout_mode = 2
-text = "¡HORNERO CAÍDO!"
-theme_override_font_sizes/font_size = 40
+text = "¡PÁJARO CAÍDO!"
+theme_override_font_sizes/font_size = 56
 horizontal_alignment = 1
 
 [node name="PalitosLabel" type="Label" parent="Panel/VBox"]
 layout_mode = 2
 text = "Palitos: 0"
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 
 [node name="CostLabel" type="RichTextLabel" parent="Panel/VBox"]
 layout_mode = 2
 text = "Revivir por 0 palitos?"
-theme_override_font_sizes/normal_font_size = 36
+theme_override_font_sizes/normal_font_size = 48
 fit_content = true
 scroll_active = false
 bbcode_enabled = true
@@ -62,18 +62,18 @@ custom_minimum_size = Vector2(0, 20)
 
 [node name="ButtonRow" type="HBoxContainer" parent="Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 20
 
 [node name="ReviveBtn" type="Button" parent="Panel/VBox/ButtonRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "REVIVIR"
-custom_minimum_size = Vector2(0, 80)
-theme_override_font_sizes/font_size = 48
+custom_minimum_size = Vector2(0, 100)
+theme_override_font_sizes/font_size = 56
 
 [node name="RejectBtn" type="Button" parent="Panel/VBox/ButtonRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "RENDIRSE"
-custom_minimum_size = Vector2(0, 80)
-theme_override_font_sizes/font_size = 40
+custom_minimum_size = Vector2(0, 90)
+theme_override_font_sizes/font_size = 48

@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://djcsbqagw2xdu" path="res://Sprites/Fondos/Menú/menu arbol1.png" id="3_10kqg"]
 [ext_resource type="Script" uid="uid://dsra5rdm4cj4b" path="res://scenes/hud/settings_panel.gd" id="4"]
 [ext_resource type="Texture2D" uid="uid://c31sle8t2hcbg" path="res://Sprites/Fondos/Menú/menu nubes1.png" id="4_pvnqh"]
+[ext_resource type="Texture2D" uid="uid://dqoglty6rwe8o" path="res://Sprites/Inteface/tituloo.png" id="5"]
 
 [node name="Menu" type="Control" unique_id=2052919699]
 layout_mode = 3
@@ -42,21 +43,21 @@ offset_bottom = 1081.0
 mouse_filter = 2
 texture = ExtResource("3_10kqg")
 
-[node name="Label" type="Label" parent="." unique_id=1109512196]
+[node name="Titulo" type="TextureRect" parent="." unique_id=1453924808]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
-anchor_top = 0.1
+anchor_top = 0.04
 anchor_right = 0.5
-anchor_bottom = 0.22
-offset_left = 102.0
-offset_top = 58.0
-offset_right = 647.0
-offset_bottom = 120.399994
+anchor_bottom = 0.04
+offset_left = 21.0
+offset_top = 148.8
+offset_right = 821.0
+offset_bottom = 333.8
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 120
-text = "El Norte"
-horizontal_alignment = 1
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5")
 
 [node name="Jugar" type="Button" parent="." unique_id=559790194]
 layout_mode = 1
@@ -65,14 +66,14 @@ anchor_left = 0.5
 anchor_top = 0.45
 anchor_right = 0.5
 anchor_bottom = 0.45
-offset_left = 189.0
+offset_left = 74.25
 offset_top = 222.0
-offset_right = 534.5
+offset_right = 649.25
 offset_bottom = 320.5
 grow_horizontal = 2
 grow_vertical = 2
 icon = ExtResource("2")
-expand_icon = true
+flat = true
 
 [node name="Salir" type="Button" parent="." unique_id=532527606]
 layout_mode = 1
@@ -81,14 +82,14 @@ anchor_left = 0.5
 anchor_top = 0.57
 anchor_right = 0.5
 anchor_bottom = 0.57
-offset_left = 110.0
-offset_top = 244.40002
-offset_right = 626.5
-offset_bottom = 321.40002
+offset_left = 74.0
+offset_top = 234.40002
+offset_right = 649.0
+offset_bottom = 332.40002
 grow_horizontal = 2
 grow_vertical = 2
 icon = ExtResource("3")
-expand_icon = true
+flat = true
 
 [node name="Tienda" type="Button" parent="." unique_id=1853443418]
 custom_minimum_size = Vector2(60, 60)
@@ -98,14 +99,15 @@ anchor_left = 0.84000003
 anchor_top = 0.35000002
 anchor_right = 0.96
 anchor_bottom = 0.44
-offset_left = 74.19995
-offset_top = 160.99997
-offset_right = -60.19995
-offset_bottom = 142.79999
+offset_left = 134.19995
+offset_top = 259.99997
+offset_right = -0.19995117
+offset_bottom = 241.79999
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 30
 text = "$"
+flat = true
 
 [node name="Logros" type="Button" parent="." unique_id=168330598]
 custom_minimum_size = Vector2(60, 60)
@@ -115,14 +117,15 @@ anchor_left = 0.84
 anchor_top = 0.46
 anchor_right = 0.96
 anchor_bottom = 0.55
-offset_left = 75.20007
-offset_top = 290.19998
-offset_right = -59.19995
-offset_bottom = 275.0
+offset_left = 134.20007
+offset_top = 409.19998
+offset_right = -0.19995117
+offset_bottom = 394.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 30
 text = "*"
+flat = true
 
 [node name="Skins" type="Button" parent="." unique_id=403521957]
 custom_minimum_size = Vector2(60, 60)
@@ -132,59 +135,40 @@ anchor_left = 0.84
 anchor_top = 0.57
 anchor_right = 0.96
 anchor_bottom = 0.66
-offset_left = 75.20007
-offset_top = 43.400024
-offset_right = -61.19995
-offset_bottom = 31.199951
+offset_left = 134.20007
+offset_top = 153.40002
+offset_right = -2.1999512
+offset_bottom = 141.19995
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 30
 text = "S"
-
-[node name="ResetButton" type="Button" parent="." unique_id=2104571763]
-layout_mode = 0
-offset_left = 140.0
-offset_top = 16.0
-offset_right = 228.0
-offset_bottom = 56.0
-theme_override_font_sizes/font_size = 14
-text = "Reset"
-
-[node name="DebugBtn" type="Button" parent="." unique_id=-1190395532]
-layout_mode = 0
-offset_left = 236.0
-offset_top = 16.0
-offset_right = 380.0
-offset_bottom = 56.0
-theme_override_font_sizes/font_size = 14
-text = "+100k Palitos"
+flat = true
 
 [node name="SettingsBtn" type="Button" parent="." unique_id=126314074]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.0
 anchor_top = 1.0
-anchor_right = 0.0
 anchor_bottom = 1.0
-offset_left = 10
-offset_top = -50
-offset_right = 110
-offset_bottom = -10
+offset_left = 40.0
+offset_top = -50.0
+offset_right = 140.0
+offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 22
 text = "Config"
 
 [node name="SettingsPanel" type="ColorRect" parent="." unique_id=981086457]
+visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
+anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = -1897.0
-offset_top = 718.0
-offset_right = -1370.0
-offset_bottom = -66.0
+offset_left = 27.0
+offset_top = -433.0
+offset_right = 519.0
+offset_bottom = -73.0
 grow_horizontal = 0
 mouse_filter = 2
 color = Color(0.1, 0.1, 0.1, 0.92)

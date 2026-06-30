@@ -3,19 +3,19 @@ extends Node
 const SAVE_PATH := "user://save.data"
 
 const UPGRADE_COST := {
-	"speed": 110,
-	"kiwi": 90,
-	"palitos_base": 150,
-	"shield_duration": 100,
-	"turbo_duration": 100,
+	"speed": 135,
+	"kiwi": 115,
+	"palitos_base": 200,
+	"shield_duration": 125,
+	"turbo_duration": 125,
 }
 
 const UPGRADE_COST_TABLE := {
-	"speed": [200, 300, 500, 700, 1200, 2000, 3000, 5000],
-	"kiwi": [150, 250, 400, 600, 1000, 1500, 2500, 4000],
-	"palitos_base": [250, 400, 600, 1000, 1500, 2500, 4000, 6500],
-	"shield_duration": [150, 250, 400, 700, 1000],
-	"turbo_duration": [150, 250, 400, 700, 1000],
+	"speed": [225, 300, 500, 700, 1200, 2000, 3000, 5000],
+	"kiwi": [175, 250, 400, 600, 1000, 1500, 2500, 4000],
+	"palitos_base": [300, 450, 650, 1050, 1550, 2550, 4050, 6550],
+	"shield_duration": [175, 250, 400, 700, 1000],
+	"turbo_duration": [175, 250, 400, 700, 1000],
 }
 
 const UPGRADE_MAX_LEVEL := {
@@ -33,7 +33,7 @@ const BIRDS := {
 	"golondrina": { "name": "Golondrina", "cost": 25, "Bonus": "+20% kiwi, reaparece cada 15s", "Penalidad": "- duracion de escudo y turbo" },
 	"carpintero": { "name": "Carpintero", "cost": 35, "Bonus": "1 vida extra", "Penalidad": "-15% velocidad" },
 	"tero": { "name": "Tero", "cost": 50, "Bonus": "+40% velocidad", "Penalidad": "Flap más lento" },
-	"premio_pajarero": { "name": "Carancho", "cost": 20000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
+	"premio_pajarero": { "name": "Carancho", "cost": 40000, "Bonus": "1 vida, +60% vel, +10% palitos", "Penalidad": "—" },
 }
 
 const DISTANCE_MILESTONES := [
@@ -45,9 +45,9 @@ const DISTANCE_MILESTONES := [
 
 const RECORD_BOLAS := [
 	{ "target": 500, "reward": 1 },
-	{ "target": 1000, "reward": 2 },
-	{ "target": 2200, "reward": 3 },
-	{ "target": 4600, "reward": 5 },
+	{ "target": 1000, "reward": 1 },
+	{ "target": 2200, "reward": 2 },
+	{ "target": 4600, "reward": 4 },
 ]
 
 const ACHIEVEMENTS := {
@@ -64,7 +64,7 @@ const ACHIEVEMENTS := {
 		{ "target": 2200, "desc": "Llegar a las Llanuras", "reward_type": "bolas", "reward_amount": 2 },
 	]},
 	"norte": { "name": "Norte", "cond": "distance", "idx": 13, "levels": [
-		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 10 },
+		{ "target": 4600, "desc": "Llegar al Norte (Puna)", "reward_type": "bolas", "reward_amount": 5 },
 	]},
 	"maraton": { "name": "Maratón", "cond": "distance", "idx": 17, "levels": [
 		{ "target": 10000, "desc": "Llegar a 10000m", "reward_type": "bolas", "reward_amount": 5 },
@@ -78,9 +78,9 @@ const ACHIEVEMENTS := {
 		{ "target": 1000, "desc": "1000 barros en total", "reward_type": "palitos", "reward_amount": 500 },
 	]},
 	"rico": { "name": "Rico", "cond": "palitos_balance", "idx": 15, "levels": [
-		{ "target": 1000, "desc": "Tener 1000 palitos", "reward_type": "bolas", "reward_amount": 2 },
-		{ "target": 3000, "desc": "Tener 3000 palitos", "reward_type": "bolas", "reward_amount": 4 },
-		{ "target": 8000, "desc": "Tener 8000 palitos", "reward_type": "bolas", "reward_amount": 6 },
+		{ "target": 1000, "desc": "Tener 1000 palitos", "reward_type": "bolas", "reward_amount": 1 },
+		{ "target": 3000, "desc": "Tener 3000 palitos", "reward_type": "bolas", "reward_amount": 2 },
+		{ "target": 8000, "desc": "Tener 8000 palitos", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"buyer": { "name": "Comprador", "cond": "total_upgrades_bought", "idx": 6, "levels": [
 		{ "target": 3, "desc": "Comprar 3 mejoras", "reward_type": "palitos", "reward_amount": 50 },
@@ -91,7 +91,7 @@ const ACHIEVEMENTS := {
 		{ "target": 1, "desc": "Desbloquea todas las skins", "reward_type": "unlock_carancho", "reward_amount": 0 },
 	]},
 	"pampeano": { "name": "Pampeano", "cond": "all_birds_5000", "idx": 20, "levels": [
-		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 10 },
+		{ "target": 4, "desc": "5000m con cada pájaro", "reward_type": "bolas", "reward_amount": 5 },
 	]},
 	"por_los_pelos": { "name": "Por los Pelos", "cond": "revives_used", "idx": 14, "levels": [
 		{ "target": 1, "desc": "Usar 1 revive", "reward_type": "palitos", "reward_amount": 30 },
@@ -116,7 +116,7 @@ const ACHIEVEMENTS := {
 		{ "target": 100, "desc": "Morir 100 veces", "reward_type": "bolas", "reward_amount": 3 },
 	]},
 	"maxed_out": { "name": "Al Máximo", "cond": "all_maxed", "idx": 8, "levels": [
-		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 10 },
+		{ "target": 1, "desc": "Todas las mejoras en nivel 8", "reward_type": "bolas", "reward_amount": 5 },
 	]},
 	"multiuso": { "name": "Multiuso", "cond": "bird_uses", "idx": 16, "levels": [
 		{ "target": 2, "desc": "Usar 2 pájaros distintos", "reward_type": "bolas", "reward_amount": 1 },
@@ -155,6 +155,7 @@ var explored_biomes := []
 var bird_max_distances := {}
 var reduce_motion := false
 var sound_enabled := true
+var music_enabled := true
 var minimap_visible := false
 var carancho_available := false
 
@@ -253,9 +254,9 @@ func calculate_palitos_earned(distance: int) -> int:
 	total = int(total * mods["palitos_mult"])
 	var biome_mult := 1.0
 	if distance > 4600:
-		biome_mult = 2.0
+		biome_mult = 1.75
 	elif distance > 2200:
-		biome_mult = 1.5
+		biome_mult = 1.25
 	total = int(total * biome_mult)
 	return total
 
@@ -318,6 +319,7 @@ func reset_data() -> void:
 	used_birds = []
 	first_milestones_claimed = []
 	record_bolas_claimed = []
+	pending_rewards = {}
 	tutorial_done = false
 	welcome_bonus_given = false
 	explored_biomes = []
@@ -565,6 +567,7 @@ func save_data() -> void:
 		"bird_max_distances": bird_max_distances,
 		"reduce_motion": reduce_motion,
 		"sound_enabled": sound_enabled,
+		"music_enabled": music_enabled,
 		"minimap_visible": minimap_visible,
 		"carancho_available": carancho_available,
 	}
@@ -599,6 +602,7 @@ func load_data() -> void:
 				bird_max_distances = data.get("bird_max_distances", {})
 				reduce_motion = data.get("reduce_motion", false)
 				sound_enabled = data.get("sound_enabled", true)
+				music_enabled = data.get("music_enabled", true)
 				minimap_visible = data.get("minimap_visible", false)
 				carancho_available = data.get("carancho_available", false)
 				var u = data.get("upgrades", {})

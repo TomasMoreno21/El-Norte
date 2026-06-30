@@ -27,9 +27,13 @@ const MUSIC := {
 	"puna": "res://audio/music/puna.ogg",
 }
 
+const MENU_MUSIC := "res://audio/sfx/Musica de menu.mp3"
+
 var _music_player: AudioStreamPlayer
 var _ambient_player: AudioStreamPlayer
 var _storm_player: AudioStreamPlayer
+var _storm_tween: Tween
+var _menu_music_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 const SFX_POOL_SIZE := 8
 
@@ -57,7 +61,32 @@ func _ready() -> void:
 		add_child(asp)
 		_sfx_pool.append(asp)
 
+	# Configurar reproductor de música del menú (loop, volumen bajo)
+	_menu_music_player = AudioStreamPlayer.new()
+	_menu_music_player.bus = "Music"
+	_menu_music_player.volume_db = -20.0
+	add_child(_menu_music_player)
+	var menu_stream := load(MENU_MUSIC)
+	if menu_stream is AudioStream:
+		_enable_loop(menu_stream)
+		_menu_music_player.stream = menu_stream
+
 ## Reproduce un efecto de sonido breve
+func start_menu_music() -> void:
+	if not DataManager.music_enabled:
+		return
+	_menu_music_player.volume_db = -20.0
+	if not _menu_music_player.playing:
+		_menu_music_player.play()
+
+func stop_menu_music() -> void:
+	_menu_music_player.stop()
+
+func fade_out_menu_music(fade_time: float = 0.5) -> void:
+	var tween := create_tween()
+	tween.tween_property(_menu_music_player, "volume_db", -80.0, fade_time)
+	tween.tween_callback(func(): _menu_music_player.stop())
+
 func play_sfx(sound_name: String, vol_db: float = 0.0) -> void:
 	if not DataManager.sound_enabled:
 		return
@@ -138,6 +167,12 @@ func start_ambient_wind() -> void:
 func stop_ambient_wind() -> void:
 	_ambient_player.stop()
 
+func stop_all_sfx() -> void:
+	for p in _sfx_pool:
+		p.stop()
+	_ambient_player.stop()
+	_storm_player.stop()
+
 func stop_all_ambient() -> void:
 	_ambient_player.stop()
 	_storm_player.stop()
@@ -151,6 +186,10 @@ func _enable_loop(stream: AudioStream) -> void:
 func start_storm_wind(fade_time: float = 0.3) -> void:
 	if not DataManager.sound_enabled:
 		return
+	
+	if _storm_tween:
+		_storm_tween.kill()
+	
 	stop_ambient_wind()
 	var stream = load(SOUNDS["storm_wind"])
 	if stream is AudioStream:
@@ -158,15 +197,19 @@ func start_storm_wind(fade_time: float = 0.3) -> void:
 		_storm_player.stream = stream
 		_storm_player.volume_db = -80.0
 		_storm_player.play()
-		var tw := create_tween()
-		tw.tween_property(_storm_player, "volume_db", -3.0, fade_time)
+		_storm_tween = create_tween()
+		_storm_tween.tween_property(_storm_player, "volume_db", -3.0, fade_time)
 
 func stop_storm_wind(fade_time: float = 0.3) -> void:
-	var tw := create_tween()
-	tw.tween_property(_storm_player, "volume_db", -80.0, fade_time)
-	tw.tween_callback(func():
-		_storm_player.stop()
-		start_ambient_wind()
+	if _storm_tween:
+		_storm_tween.kill()
+		
+	_storm_tween = create_tween()
+	_storm_tween.tween_property(_storm_player, "volume_db", -80.0, fade_time)
+	_storm_tween.tween_callback(func():
+		if _storm_player.volume_db <= -70.0:
+			_storm_player.stop()
+			start_ambient_wind()
 	)
 
 func _get_available_sfx_player() -> AudioStreamPlayer:

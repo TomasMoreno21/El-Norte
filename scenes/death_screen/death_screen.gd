@@ -3,8 +3,8 @@ extends CanvasLayer
 const TIPS := [
 	"Si ves el signo '!', prepárate para la tormenta.",
 	"El kiwi aparece cada 20 segundos... estate atento.",
-	"Llegar a las Llanuras da ×1.5 de palitos.",
-	"Llegar a la Puna da ×2 de palitos.",
+	"Llegar a las Llanuras da ×1.25 de palitos.",
+	"Llegar a la Puna da ×1.75 de palitos.",
 	"El Carancho es el pájaro más rápido del juego.",
 	"Las calmas son un respiro... pero no duran para siempre.",
 	"Usá el escudo en zonas de obstáculos densos.",
@@ -46,12 +46,15 @@ func _ready() -> void:
 
 	var tip_bg := StyleBoxFlat.new()
 	tip_bg.bg_color = Color(0.12, 0.12, 0.13, 0.8)
-	tip_bg.corner_radius_top_left = 4
-	tip_bg.corner_radius_top_right = 4
-	tip_bg.corner_radius_bottom_left = 4
-	tip_bg.corner_radius_bottom_right = 4
+	tip_bg.corner_radius_top_left = 8
+	tip_bg.corner_radius_top_right = 8
+	tip_bg.corner_radius_bottom_left = 8
+	tip_bg.corner_radius_bottom_right = 8
+	tip_bg.content_margin_left = 16
+	tip_bg.content_margin_right = 16
+	tip_bg.content_margin_top = 12
+	tip_bg.content_margin_bottom = 12
 	$ColorRect/VBoxContainer/TipLabel.add_theme_stylebox_override("normal", tip_bg)
-	$ColorRect/VBoxContainer/TipLabel.add_theme_font_size_override("font_size", 20)
 
 	var spacer := Control.new()
 	spacer.size_flags_vertical = 3
@@ -60,8 +63,6 @@ func _ready() -> void:
 
 	_style_button($ColorRect/VBoxContainer/ButtonRow/RestartButton, Color(0.15, 0.5, 0.15))
 	_style_button($ColorRect/VBoxContainer/ButtonRow/MenuButton, Color(0.86, 0.27, 0.16))
-	$ColorRect/VBoxContainer/ButtonRow/RestartButton.add_theme_font_size_override("font_size", 34)
-	$ColorRect/VBoxContainer/ButtonRow/MenuButton.add_theme_font_size_override("font_size", 30)
 
 func _style_button(btn: Button, color: Color) -> void:
 	var normal := StyleBoxFlat.new()
@@ -125,4 +126,5 @@ func _on_restart() -> void:
 func _on_menu() -> void:
 	Engine.time_scale = 1.0
 	get_tree().paused = false
+	AudioManager.stop_all_sfx()
 	SceneTransition.fade_to_scene("res://scenes/menu/menu.tscn")

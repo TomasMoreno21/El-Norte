@@ -24,7 +24,10 @@ func _physics_process(delta: float) -> void:
 
 	var dart_speed := 120.0
 	position.y = move_toward(position.y, target_y, dart_speed * delta)
-	position.y += sin(time * 2.0) * 4.0
+	position.y += sin(time * 2.0) * 6.0
+
+	var pulse := 1.0 + 0.1 * sin(time * 4.0)
+	_sprite.scale = Vector2(1.5, 1.5) * pulse
 
 	if move_timer <= 0.0 or abs(position.y - target_y) < 12.0:
 		_pick_new_target()
@@ -32,7 +35,7 @@ func _physics_process(delta: float) -> void:
 	if position.x < -100:
 		queue_free()
 
-	var frame := int(time / 0.12) % 2
+	var frame := int(time / 0.06) % 2
 	_sprite.texture = _tex1 if frame == 0 else _tex2
 
 func _pick_new_target() -> void:

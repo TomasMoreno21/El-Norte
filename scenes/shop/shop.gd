@@ -1,11 +1,11 @@
 extends CanvasLayer
 
 const UPGRADE_DATA := [
-	{ "key": "speed", "name": "+Velocidad", "base_cost": 110, "desc": "+5% velocidad por nivel" },
-	{ "key": "kiwi", "name": "+Kiwi", "base_cost": 90, "desc": "+2% prob. kiwi por nivel" },
-	{ "key": "palitos_base", "name": "+Palitos", "base_cost": 150, "desc": "+1 palito/10m por nivel" },
-	{ "key": "shield_duration", "name": "+Escudo", "base_cost": 100, "desc": "+0.2s escudo por nivel" },
-	{ "key": "turbo_duration", "name": "+Turbo", "base_cost": 100, "desc": "+0.2s turbo por nivel" },
+	{ "key": "speed", "name": "+Velocidad", "base_cost": 135, "desc": "+5% velocidad por nivel" },
+	{ "key": "kiwi", "name": "+Kiwi", "base_cost": 115, "desc": "+2% prob. kiwi por nivel" },
+	{ "key": "palitos_base", "name": "+Palitos", "base_cost": 200, "desc": "+1 palito/10m por nivel" },
+	{ "key": "shield_duration", "name": "+Escudo", "base_cost": 125, "desc": "+0.5s escudo por nivel" },
+	{ "key": "turbo_duration", "name": "+Turbo", "base_cost": 125, "desc": "+0.5s turbo por nivel" },
 ]
 
 const STRIPE_COLORS := {
@@ -22,6 +22,7 @@ func _ready() -> void:
 	_style_button($Bg/VBoxContainer/Volver, Color(0.86, 0.27, 0.16))
 	$Bg/VBoxContainer/Volver.custom_minimum_size = Vector2(800, 96)
 	$Bg/VBoxContainer/Volver.add_theme_font_size_override("font_size", 30)
+	$Bg/VBoxContainer/PalitosLabel.add_theme_color_override("font_color", Color(0.9, 0.7, 0.2))
 	_update_balance()
 	_populate_upgrades()
 	SceneTransition.fade_in()
@@ -64,14 +65,28 @@ func _populate_upgrades() -> void:
 		var row := HBoxContainer.new()
 		row.custom_minimum_size = Vector2(0, 110)
 		row.size_flags_horizontal = 3
-		row.add_theme_constant_override("separation", 14)
+
+		var panel_bg := ColorRect.new()
+		panel_bg.color = Color(0.15, 0.15, 0.16, 0.5)
+		panel_bg.size_flags_horizontal = 3
+		panel_bg.size_flags_vertical = 3
+		panel_bg.mouse_filter = 2
+		row.add_child(panel_bg)
+
+		var inner := HBoxContainer.new()
+		inner.size_flags_horizontal = 3
+		inner.size_flags_vertical = 3
+		inner.anchor_right = 1.0
+		inner.anchor_bottom = 1.0
+		inner.add_theme_constant_override("separation", 14)
+		panel_bg.add_child(inner)
 
 		var stripe := ColorRect.new()
 		stripe.color = STRIPE_COLORS[u.key]
 		stripe.custom_minimum_size = Vector2(6, 0)
 		stripe.size_flags_vertical = 3
 		stripe.mouse_filter = 2
-		row.add_child(stripe)
+		inner.add_child(stripe)
 
 		var info_col := VBoxContainer.new()
 		info_col.size_flags_horizontal = 3
@@ -82,6 +97,7 @@ func _populate_upgrades() -> void:
 		name_label.text = u.name
 		name_label.add_theme_font_size_override("font_size", 34)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.add_theme_color_override("font_color", STRIPE_COLORS.get(u.key, Color.WHITE))
 
 		var desc_label := Label.new()
 		desc_label.text = u.desc
@@ -91,7 +107,7 @@ func _populate_upgrades() -> void:
 
 		info_col.add_child(name_label)
 		info_col.add_child(desc_label)
-		row.add_child(info_col)
+		inner.add_child(info_col)
 
 		var level_label := Label.new()
 		level_label.text = "Nivel %d/%d" % [level, max_lv]
@@ -123,8 +139,8 @@ func _populate_upgrades() -> void:
 			buy_btn.pressed.connect(func(): _buy(key, buy_btn.global_position + buy_btn.size * 0.5))
 			AudioManager.add_click(buy_btn)
 
-		row.add_child(level_label)
-		row.add_child(buy_btn)
+		inner.add_child(level_label)
+		inner.add_child(buy_btn)
 		list.add_child(row)
 
 	_update_balance()
